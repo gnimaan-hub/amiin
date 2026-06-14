@@ -5,7 +5,7 @@
 //   flutter run --dart-define=AMIIN_API_URL=http://172.25.25.54:8000/v1
 //
 // PRODUCTION (Render) :
-//   flutter build apk --dart-define=AMIIN_API_URL=https://amiin-api.onrender.com/v1
+//   flutter build apk --dart-define=AMIIN_API_URL=https://amiin.onrender.com/v1
 //
 // La valeur par défaut pointe vers le backend Render (production).
 // Passer --dart-define=AMIIN_API_URL=http://... pour développer en local.
@@ -15,7 +15,7 @@ import 'package:dio/dio.dart';
 class ApiClient {
   static const String baseUrl = String.fromEnvironment(
     'AMIIN_API_URL',
-    defaultValue: 'https://amiin-api.onrender.com/v1',
+    defaultValue: 'https://amiin.onrender.com/v1',
   );
 
   static final Dio _dio = Dio(BaseOptions(
