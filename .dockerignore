@@ -1,0 +1,45 @@
+# Environnements locaux
+amiin_env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Base de données locale (remplacée par Qdrant Cloud)
+amiin_db/
+amiin_db_backup/
+_backup_before_tool_first/
+
+# Fichiers sensibles — variables d'env injectées par Render
+.env
+
+# Scripts de dev non nécessaires en production
+indexer_*.py
+run_all_indexers.py
+scraper*.py
+crawler*.py
+migrate_to_qdrant.py
+visualiser_*.py
+chunks_viewer.html
+amiin_visuals.html
+correction_categorie.py
+corriger_base_amiin.py
+fix_wiki.py
+nettoyer*.py
+amiin_rag.py
+amiin_legal*.py
+test_*.py
+
+# PDFs et données sources (déjà indexés dans Qdrant)
+*.pdf
+*.docx
+*.xlsx
+*.csv
+*.json
+*.log
+
+# IDE et OS
+.vscode/
+.idea/
+*.iml
+Thumbs.db
+.DS_Store

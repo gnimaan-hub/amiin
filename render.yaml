@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: amiin-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+
+    # Variables d'environnement — valeurs à remplir dans le dashboard Render
+    # Dashboard → amiin-api → Environment → Add Environment Variable
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false          # valeur saisie manuellement dans Render (jamais dans le code)
+      - key: JINA_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: OWM_API_KEY
+        sync: false
+
+    # Health check — Render surveille cet endpoint pour savoir si le service est vivant
+    healthCheckPath: /v1/chat/health

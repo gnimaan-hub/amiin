@@ -1,0 +1,65 @@
+# Variables d'environnement — clés API sensibles : JAMAIS sur GitHub
+.env
+.env.*
+!.env.example
+
+# Environnement virtuel Python
+amiin_env/
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Base de données locale (remplacée par Qdrant Cloud)
+amiin_db/
+amiin_db_backup/
+_backup_before_tool_first/
+
+# Logs
+*.log
+amiin_indexation.log
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dossier de backup local (trop lourd pour git)
+# amiin_avant_cloudflare/ est dans d:/projet/, pas ici
+
+# Documents PDF, Word, Excel — sources légales et business (trop lourds pour git)
+*.pdf
+*.docx
+*.xlsx
+*.xls
+Amiin_legal/
+Reglementation_metiers/
+pdfs_banque_centrale/
+pdfs_douanes/
+
+# Fichiers CSV de scraping (données intermédiaires)
+amiin_links*.csv
+amiin_links_titres.csv
+rapport_scraping.csv
+
+# Fichiers HTML générés (visualisations)
+*.html
+amiin_visuals.html
+chunks_viewer.html
+
+# Fichiers temporaires LibreOffice
+.~lock.*
+
+# Scripts de génération PDF (utilitaires locaux)
+generer_pdf_migration.py
+Amiin_Migration_Cloud_Documentation.pdf
+
+# Données de dev
+1.txt

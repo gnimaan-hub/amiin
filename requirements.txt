@@ -1,0 +1,25 @@
+# ──────────────────────────────────────────────────────────────────
+# Amiin Backend — dépendances de production (container Docker / Render)
+# Génération : 2026-06-14
+#
+# NE PAS INCLURE :
+#   - sentence-transformers / torch  → remplacés par API Jina AI
+#   - chromadb                       → remplacé par Qdrant Cloud
+# ──────────────────────────────────────────────────────────────────
+
+# API framework
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
+pydantic==2.13.3
+pydantic-settings==2.14.0
+
+# LLM
+anthropic==0.97.0
+
+# Base vectorielle cloud
+qdrant-client==1.9.1
+
+# HTTP & utils
+requests==2.33.1
+python-dotenv==1.2.2
+python-dateutil==2.9.0.post0
