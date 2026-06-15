@@ -14,6 +14,7 @@ import logging
 import functools
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
+from logging.handlers import RotatingFileHandler
 from typing import Optional, List, Any, Dict
 from contextlib import asynccontextmanager
 
@@ -29,6 +30,23 @@ load_dotenv()   # charge .env en local ; no-op sur Render (env vars injectées)
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, Filter, FieldCondition, MatchValue, MatchAny
 from anthropic import Anthropic, AsyncAnthropic
+
+# ══════════════════════════════════════════════════════════════════════════════
+# LOGGER FICHIER — trace complète de chaque requête (diagnostic + debug)
+# ══════════════════════════════════════════════════════════════════════════════
+
+_req_logger = logging.getLogger('amiin.requests')
+_req_logger.setLevel(logging.DEBUG)
+_req_fh = RotatingFileHandler(
+    'amiin_requests.log', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'
+)
+_req_fh.setFormatter(logging.Formatter('%(message)s'))
+_req_logger.addHandler(_req_fh)
+_req_logger.propagate = False   # ne remonte pas dans le logger root de FastAPI
+
+def _log_request(data: dict) -> None:
+    """Écrit une ligne JSON dans amiin_requests.log."""
+    _req_logger.info(json.dumps(data, ensure_ascii=False))
 
 # ══════════════════════════════════════════════════════════════════════════════
 # CONFIGURATION
@@ -392,8 +410,8 @@ def _should_expand(query: str) -> bool:
 
 # ── C : cache LRU sur les embeddings ─────────────────────────────────────────
 
-def _jina_embed_batch(texts: list, task: str = "retrieval.query") -> list:
-    """Appel API Jina AI — retourne une liste de vecteurs (1024 dim)."""
+def _jina_embed_batch(texts: list, task: str = "retrieval.query") -> tuple:
+    """Appel API Jina AI — retourne (list_of_embeddings, total_tokens_used)."""
     resp = _requests.post(
         "https://api.jina.ai/v1/embeddings",
         headers={
@@ -404,12 +422,26 @@ def _jina_embed_batch(texts: list, task: str = "retrieval.query") -> list:
         timeout=15
     )
     resp.raise_for_status()
-    return [item["embedding"] for item in resp.json()["data"]]
+    data = resp.json()
+    tokens = data.get("usage", {}).get("total_tokens", 0)
+    return [item["embedding"] for item in data["data"]], tokens
 
-@lru_cache(maxsize=256)
-def _cached_embed(text: str) -> tuple:
-    """Cache LRU sur les embeddings de requête pour éviter les appels API redondants."""
-    return tuple(_jina_embed_batch([text])[0])
+# Cache manuel (remplace @lru_cache) pour permettre le suivi des tokens Jina
+_embed_cache: dict = {}   # {text: embedding_list}
+_EMBED_CACHE_MAX = 256
+
+def _cached_embed(text: str, token_acc: list = None) -> tuple:
+    """Retourne l'embedding (tuple).  Si token_acc=[0], cumule les tokens Jina consommés."""
+    if text in _embed_cache:
+        return tuple(_embed_cache[text])   # cache hit — aucun appel Jina
+    embeddings, tokens = _jina_embed_batch([text])
+    result = embeddings[0]
+    if len(_embed_cache) >= _EMBED_CACHE_MAX:
+        del _embed_cache[next(iter(_embed_cache))]   # éviction FIFO
+    _embed_cache[text] = result
+    if token_acc is not None:
+        token_acc[0] += tokens
+    return tuple(result)
 
 def _search_with_embedding(embedding: list, top_k: int, category: str = None) -> list:
     """Recherche vectorielle dans Qdrant. Retourne des chunks triés par distance (plus petit = meilleur)."""
@@ -594,7 +626,7 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
             extras = [q for q in queries[1:] if q.strip()]
             all_chunks: dict = {c['id']: c for c in direct_chunks}
             if extras:
-                extra_embeddings = _jina_embed_batch(extras)
+                extra_embeddings, _ = _jina_embed_batch(extras)
                 for emb in extra_embeddings:
                     for chunk in _search_with_embedding(emb, TOP_K):
                         cid = chunk['id']
@@ -642,6 +674,8 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     t0 = time.time()
     loop = asyncio.get_event_loop()
     chunks = []
+    jina_acc = [0]   # accumulateur de tokens Jina pour cette requête
+    is_second_pass = bool(tool_results)
 
     if lat is not None and lon is not None:
         weather_ctx = await loop.run_in_executor(None, _fetch_weather_context, lat, lon)
@@ -655,7 +689,7 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     else:
         # 1re passe : pipeline RAG complet
         should_exp = expand and _should_expand(query)
-        direct_embedding = list(_cached_embed(query))
+        direct_embedding = list(_cached_embed(query, token_acc=jina_acc))
         yield f'data: {json.dumps({"type": "status", "text": "Recherche…"})}\n\n'
 
         if should_exp:
@@ -666,8 +700,11 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
             extras = [q for q in queries[1:] if q.strip()]
             all_chunks: dict = {c['id']: c for c in direct_chunks}
             if extras:
-                extra_embs = await loop.run_in_executor(None, lambda: _jina_embed_batch(extras))
-                for emb in extra_embs:
+                extra_embs_raw, extra_tokens = await loop.run_in_executor(
+                    None, lambda: _jina_embed_batch(extras)
+                )
+                jina_acc[0] += extra_tokens
+                for emb in extra_embs_raw:
                     for chunk in _search_with_embedding(emb, TOP_K):
                         cid = chunk['id']
                         if cid not in all_chunks or chunk['distance'] < all_chunks[cid]['distance']:
@@ -680,6 +717,7 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
         yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
 
     tool_calls = []
+    final_usage = None
     async with async_claude.messages.stream(
         model=MODEL_CLAUDE,
         max_tokens=MAX_TOKENS,
@@ -692,7 +730,8 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
         async for text in stream.text_stream:
             yield f'data: {json.dumps({"type": "token", "text": text})}\n\n'
         final_msg = await stream.get_final_message()
-        _log_usage(final_msg.usage, "[stream] ")
+        final_usage = final_msg.usage
+        _log_usage(final_usage, "[stream] ")
         for block in final_msg.content:
             if block.type == "tool_use":
                 tool_calls.append({"id": block.id, "name": block.name, "input": block.input})
@@ -702,7 +741,39 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
          "category": c['metadata'].get('category', '?'), "distance": round(c['distance'], 4)}
         for c in chunks
     ] if chunks else []
-    yield f'data: {json.dumps({"type": "done", "tool_calls": tool_calls, "sources": sources, "processing_time": round(time.time() - t0, 2)})}\n\n'
+
+    # ── Métriques usage ───────────────────────────────────────────────────────
+    claude_in  = getattr(final_usage, 'input_tokens', 0) if final_usage else 0
+    claude_out = getattr(final_usage, 'output_tokens', 0) if final_usage else 0
+    cache_read = getattr(final_usage, 'cache_read_input_tokens', 0) or 0
+    cache_write = getattr(final_usage, 'cache_creation_input_tokens', 0) or 0
+    usage = {
+        "claude_input":      claude_in,
+        "claude_output":     claude_out,
+        "claude_cache_read": cache_read,
+        "jina_tokens":       jina_acc[0],
+        "tools":             [tc["name"] for tc in tool_calls],
+        "pass":              2 if is_second_pass else 1,
+    }
+
+    # ── Log fichier ───────────────────────────────────────────────────────────
+    _log_request({
+        "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "query":           query[:300],
+        "history_len":     len(history) if history else 0,
+        "pass":            usage["pass"],
+        "expand":          expand and not is_second_pass,
+        "jina_tokens":     jina_acc[0],
+        "claude_input":    claude_in,
+        "claude_output":   claude_out,
+        "claude_cache_read":  cache_read,
+        "claude_cache_write": cache_write,
+        "tools":           usage["tools"],
+        "sources_count":   len(sources),
+        "processing_time": round(time.time() - t0, 2),
+    })
+
+    yield f'data: {json.dumps({"type": "done", "tool_calls": tool_calls, "sources": sources, "processing_time": round(time.time() - t0, 2), "usage": usage})}\n\n'
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ANNUAIRE
@@ -859,7 +930,7 @@ async def annuaire_search(q: str, category: Optional[str] = None):
     if not jina_api_key or not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
-    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch([q])[0])
+    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch([q])[0][0])
     chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 15, category=category))
     services = [
         _chunk_to_service(c['id'], c['document'], c['metadata'],
@@ -874,7 +945,7 @@ async def annuaire_nearby(lat: float, lng: float, radius: int = 5):
     if not jina_api_key or not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
-    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch(["services publics administration Djibouti"])[0])
+    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch(["services publics administration Djibouti"])[0][0])
     chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 30))
     services = []
     for c in chunks:
