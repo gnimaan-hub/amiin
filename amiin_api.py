@@ -37,15 +37,22 @@ from anthropic import Anthropic, AsyncAnthropic
 
 _req_logger = logging.getLogger('amiin.requests')
 _req_logger.setLevel(logging.DEBUG)
+_req_logger.propagate = False   # ne remonte pas dans le logger root de FastAPI
+
+# Handler fichier (historique persistant en session)
 _req_fh = RotatingFileHandler(
     'amiin_requests.log', maxBytes=5 * 1024 * 1024, backupCount=5, encoding='utf-8'
 )
 _req_fh.setFormatter(logging.Formatter('%(message)s'))
 _req_logger.addHandler(_req_fh)
-_req_logger.propagate = False   # ne remonte pas dans le logger root de FastAPI
+
+# Handler stdout (visible dans le dashboard Render en temps réel)
+_req_sh = logging.StreamHandler()
+_req_sh.setFormatter(logging.Formatter('[REQ] %(message)s'))
+_req_logger.addHandler(_req_sh)
 
 def _log_request(data: dict) -> None:
-    """Écrit une ligne JSON dans amiin_requests.log."""
+    """Écrit une ligne JSON dans amiin_requests.log ET sur stdout (Render dashboard)."""
     _req_logger.info(json.dumps(data, ensure_ascii=False))
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -835,6 +842,29 @@ app.add_middleware(
 )
 
 # ─── Health ───────────────────────────────────────────────────────────────────
+
+@app.get("/v1/logs")
+async def get_logs(n: int = 100, secret: Optional[str] = None):
+    """Retourne les n dernières lignes de amiin_requests.log.
+    Protégé par la variable d'env LOG_SECRET si elle est définie."""
+    log_secret = os.environ.get("LOG_SECRET", "")
+    if log_secret and secret != log_secret:
+        raise HTTPException(status_code=401, detail="Secret invalide. Ajouter ?secret=… dans l'URL.")
+    log_path = "amiin_requests.log"
+    if not os.path.exists(log_path):
+        return {"lines": [], "total": 0, "message": "Aucun log encore — le fichier est créé dès le premier message."}
+    with open(log_path, encoding="utf-8") as f:
+        all_lines = f.readlines()
+    last_n = all_lines[-n:] if len(all_lines) > n else all_lines
+    parsed = []
+    for line in reversed(last_n):   # plus récent en premier
+        line = line.strip()
+        if line:
+            try:
+                parsed.append(json.loads(line))
+            except Exception:
+                parsed.append({"raw": line})
+    return {"lines": parsed, "total": len(all_lines), "returned": len(parsed)}
 
 @app.get("/v1/chat/health", response_model=HealthResponse)
 async def health():
