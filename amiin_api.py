@@ -450,10 +450,10 @@ def _cached_embed(text: str, token_acc: list = None) -> tuple:
         token_acc[0] += tokens
     return tuple(result)
 
-def _search_with_embedding(embedding: list, top_k: int, category: str = None) -> list:
+def _search_with_embedding(embedding: list, top_k: int, category: str = None,
+                           query_filter=None) -> list:
     """Recherche vectorielle dans Qdrant. Retourne des chunks triés par distance (plus petit = meilleur)."""
-    query_filter = None
-    if category and category != 'autre':
+    if query_filter is None and category and category != 'autre':
         query_filter = Filter(
             must=[FieldCondition(key="category", match=MatchValue(value=category))]
         )
@@ -793,26 +793,34 @@ def _haversine_km(lat1, lon1, lat2, lon2):
     return round(R * 2 * math.asin(math.sqrt(a)), 2)
 
 def _chunk_to_service(chunk_id, document, metadata, ref_lat=None, ref_lng=None, is_favorite=False):
-    svc_lat = metadata.get('lat') or metadata.get('latitude')
-    svc_lng = metadata.get('lng') or metadata.get('longitude')
+    svc_lat = metadata.get('latitude') or metadata.get('lat')
+    svc_lng = metadata.get('longitude') or metadata.get('lng')
     coords = {"lat": float(svc_lat), "lng": float(svc_lng)} if svc_lat and svc_lng else None
     dist = _haversine_km(ref_lat, ref_lng, float(svc_lat), float(svc_lng)) if (ref_lat and ref_lng and svc_lat and svc_lng) else None
+    # Préfère le nom et la catégorie du nouveau format annuaire
+    name     = metadata.get('nom') or metadata.get('title') or metadata.get('name') or document[:60]
+    cat_full = metadata.get('categorie') or metadata.get('category', 'autre')
+    sous_cat = metadata.get('sous_categorie') or metadata.get('sous_category') or ''
+    quartier = metadata.get('quartier') or metadata.get('district') or ''
+    ville    = metadata.get('ville_region') or metadata.get('city') or 'Djibouti-ville'
     return {
-        "id": chunk_id,
-        "name": metadata.get('title') or metadata.get('name') or document[:60],
-        "ministry": metadata.get('ministry') or metadata.get('ministere'),
-        "category": metadata.get('category', 'autre'),
-        "description": document[:300] if document else None,
-        "phone": metadata.get('phone') or metadata.get('telephone'),
-        "email": metadata.get('email'),
-        "website": metadata.get('website') or metadata.get('url'),
+        "id":           chunk_id,
+        "name":         name,
+        "ministry":     metadata.get('ministry') or metadata.get('ministere'),
+        "category":     cat_full,
+        "sous_categorie": sous_cat,
+        "quartier":     quartier,
+        "description":  document[:300] if document else None,
+        "phone":        metadata.get('telephone') or metadata.get('phone'),
+        "email":        metadata.get('email'),
+        "website":      metadata.get('site_web') or metadata.get('website') or metadata.get('url'),
+        "hours":        metadata.get('horaires'),
         "address": {
-            "street": metadata.get('address') or metadata.get('adresse') or "",
-            "district": metadata.get('district') or metadata.get('quartier') or "",
-            "city": metadata.get('city') or "Djibouti-ville",
+            "street":      metadata.get('adresse') or metadata.get('address') or '',
+            "district":    quartier,
+            "city":        ville,
             "coordinates": coords,
         },
-        "hours": None,
         "isFavorite": is_favorite,
         "distanceKm": dist,
     }
@@ -955,35 +963,149 @@ async def stats():
 
 # ─── Annuaire ─────────────────────────────────────────────────────────────────
 
+def _annuaire_filter(categorie: str = None, sous_categorie: str = None,
+                     quartier: str = None, ville: str = None) -> Filter:
+    """Construit un filtre Qdrant limité aux entrées annuaire avec filtres optionnels."""
+    conditions = [FieldCondition(key="type", match=MatchValue(value="annuaire"))]
+    if categorie:
+        conditions.append(FieldCondition(key="categorie", match=MatchValue(value=categorie)))
+    if sous_categorie:
+        conditions.append(FieldCondition(key="sous_categorie", match=MatchValue(value=sous_categorie)))
+    if quartier:
+        conditions.append(FieldCondition(key="quartier", match=MatchValue(value=quartier)))
+    if ville:
+        conditions.append(FieldCondition(key="ville_region", match=MatchValue(value=ville)))
+    return Filter(must=conditions)
+
+
+@app.get("/v1/annuaire/categories")
+async def annuaire_categories():
+    """Retourne les catégories, sous-catégories, quartiers et villes disponibles avec comptages."""
+    if not qdrant_client:
+        raise HTTPException(status_code=503, detail="Base non chargée")
+    loop = asyncio.get_event_loop()
+    def _fetch():
+        cats: dict = {}
+        villes: dict = {}
+        quartiers: dict = {}
+        offset = None
+        ann_filter = Filter(must=[FieldCondition(key="type", match=MatchValue(value="annuaire"))])
+        while True:
+            hits, offset = qdrant_client.scroll(
+                collection_name=QDRANT_COLLECTION,
+                scroll_filter=ann_filter,
+                limit=500,
+                with_payload=["categorie", "sous_categorie", "quartier", "ville_region"],
+                offset=offset
+            )
+            for h in hits:
+                p = h.payload
+                cat  = p.get("categorie", "")
+                scat = p.get("sous_categorie", "")
+                q    = p.get("quartier", "")
+                v    = p.get("ville_region", "")
+                if cat:
+                    cats.setdefault(cat, {}).setdefault(scat, 0)
+                    cats[cat][scat] += 1
+                if q:
+                    quartiers[q] = quartiers.get(q, 0) + 1
+                if v:
+                    villes[v] = villes.get(v, 0) + 1
+            if offset is None:
+                break
+        return cats, quartiers, villes
+    cats, quartiers, villes = await loop.run_in_executor(None, _fetch)
+    tree = [
+        {"categorie": c,
+         "total": sum(sc.values()),
+         "sous_categories": [{"nom": sc, "count": n} for sc, n in sorted(scs.items(), key=lambda x: -x[1])]}
+        for c, scs in sorted(cats.items(), key=lambda x: -sum(x[1].values()))
+    ]
+    return {
+        "categories": tree,
+        "quartiers":  [{"nom": q, "count": n} for q, n in sorted(quartiers.items(), key=lambda x: -x[1])],
+        "villes":     [{"nom": v, "count": n} for v, n in sorted(villes.items(),   key=lambda x: -x[1])],
+    }
+
+
+@app.get("/v1/annuaire/browse")
+async def annuaire_browse(
+    categorie:      Optional[str] = None,
+    sous_categorie: Optional[str] = None,
+    quartier:       Optional[str] = None,
+    ville:          Optional[str] = None,
+    limit:          int = 50,
+    offset:         int = 0,
+):
+    """Navigation paginée sans recherche sémantique — filtrage pur par métadonnées."""
+    if not qdrant_client:
+        raise HTTPException(status_code=503, detail="Base non chargée")
+    loop = asyncio.get_event_loop()
+    f = _annuaire_filter(categorie, sous_categorie, quartier, ville)
+    def _fetch():
+        hits, _ = qdrant_client.scroll(
+            collection_name=QDRANT_COLLECTION,
+            scroll_filter=f,
+            limit=limit,
+            offset=offset,
+            with_payload=True
+        )
+        return hits
+    hits = await loop.run_in_executor(None, _fetch)
+    services = [
+        _chunk_to_service(
+            hit.payload.get("original_id", str(hit.id)),
+            hit.payload.get("document", ""),
+            {k: v for k, v in hit.payload.items() if k != "document"},
+            is_favorite=(hit.payload.get("original_id", str(hit.id)) in _favorites)
+        )
+        for hit in hits
+    ]
+    return {"services": services, "count": len(services)}
+
+
 @app.get("/v1/annuaire/services")
-async def annuaire_search(q: str, category: Optional[str] = None):
+async def annuaire_search(
+    q:              str,
+    categorie:      Optional[str] = None,
+    sous_categorie: Optional[str] = None,
+    quartier:       Optional[str] = None,
+    ville:          Optional[str] = None,
+    category:       Optional[str] = None,   # ancien paramètre — rétrocompat
+):
     if not jina_api_key or not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
     emb = await loop.run_in_executor(None, lambda: _jina_embed_batch([q])[0][0])
-    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 15, category=category))
+    # Filtre annuaire si au moins un critère précis, sinon recherche globale
+    has_filter = any([categorie, sous_categorie, quartier, ville])
+    ann_filter = _annuaire_filter(categorie, sous_categorie, quartier, ville) if has_filter else None
+    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 20, query_filter=ann_filter))
     services = [
         _chunk_to_service(c['id'], c['document'], c['metadata'],
                           is_favorite=(c['metadata'].get('original_id', c['id']) in _favorites))
         for c in chunks
-        if c['distance'] <= 1.2
+        if c['metadata'].get('type') == 'annuaire' and c['distance'] <= 1.2
     ]
     return {"services": services}
 
 @app.get("/v1/annuaire/services/nearby")
-async def annuaire_nearby(lat: float, lng: float, radius: int = 5):
+async def annuaire_nearby(lat: float, lng: float, radius: int = 5,
+                          categorie: Optional[str] = None):
     if not jina_api_key or not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
-    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch(["services publics administration Djibouti"])[0][0])
-    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 30))
+    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch(["services pratiques Djibouti annuaire"])[0][0])
+    ann_filter = _annuaire_filter(categorie=categorie)
+    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 50, query_filter=ann_filter))
     services = []
     for c in chunks:
         svc = _chunk_to_service(c['id'], c['document'], c['metadata'],
                                 ref_lat=lat, ref_lng=lng,
                                 is_favorite=(c['metadata'].get('original_id', c['id']) in _favorites))
-        if svc['distanceKm'] is None or svc['distanceKm'] <= radius:
+        if svc['distanceKm'] is not None and svc['distanceKm'] <= radius:
             services.append(svc)
+    services.sort(key=lambda s: s['distanceKm'] or 999)
     return {"services": services}
 
 @app.get("/v1/annuaire/services/{service_id}")

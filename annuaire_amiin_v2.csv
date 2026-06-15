@@ -1,0 +1,900 @@
+﻿id,nom,categorie,sous_categorie,categorie_v1,sous_categorie_v1,ville_region,adresse,telephone,latitude,longitude,source,statut_verification
+1,Signatures Restaurant,Alimentation & Restauration,Restaurant international,restauration,restaurant indien,Djibouti-ville,Heron,+253 77 05 55 86,11.6093619,43.1468966,google_places,geolocalise
+2,LA FUSION Restaurant,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,"Hypermarche Al Gamil, zone industrielle",+253 77 19 98 98,11.5713539,43.1530752,google_places,geolocalise
+3,Deluxe,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,Route de Venise,+253 77 48 80 11,11.6009579,43.142591,google_places,geolocalise
+4,Janateyn Yemeni Restaurant,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant yemenite,Djibouti-ville,Zone industrielle,+253 77 81 90 90,11.5713942,43.1516594,google_places,geolocalise
+5,Appetito Restaurant,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,Rue de Bender (pres Mosquee Hamoudi),+253 77 04 52 52,11.5921799,43.1452893,google_places,geolocalise
+6,Restaurant Le Longchamp,Alimentation & Restauration,Restaurant international,restauration,restaurant-bar,Djibouti-ville,Heron,+253 77 10 49 49,11.6084568,43.1474852,google_places,geolocalise
+7,Pizzaiolo Haramous,Alimentation & Restauration,Pizzeria,restauration,pizzeria,Djibouti-ville,Haramous,+253 21 35 35 12,11.5657266,43.1645211,google_places,geolocalise
+8,Villa Camille,Alimentation & Restauration,Café / salon de thé,restauration,cafe-restaurant / galerie,Djibouti-ville,Plateau du Serpent,+253 21 35 74 58,11.6070467,43.1545371,google_places,geolocalise
+9,Restaurant NUMBER 1,Alimentation & Restauration,Restaurant international,restauration,restaurant international,Djibouti-ville,Route de l'aeroport,+253 21 34 48 83,11.5593398,43.1478753,google_places,geolocalise
+10,QG Pub & Resto,Alimentation & Restauration,Restaurant international,restauration,pub-restaurant,Djibouti-ville,Route de l'aeroport,+253 77 41 41 41,11.5593925,43.1480928,google_places,geolocalise
+11,Comfort Hotel Djibouti,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,"Palace Rainbow, centre-ville",+253 21 34 40 01,11.5907239,43.1456855,google_places,geolocalise
+12,Djib Guesthouse,Hébergement,Auberge / guesthouse,hebergement,maison d'hotes,Djibouti-ville,Heron,+253 77 81 01 10,11.6099242,43.1460389,google_places,geolocalise
+13,Djibouti Ayla Grand Hotel,Hébergement,Hôtel de luxe (4-5*),hebergement,hotel 5 etoiles,Djibouti-ville,"Salines Ouest, Port de Peche",+253 21 31 81 11,11.5944787,43.1301513,google_places,geolocalise
+14,Djibouti Palace Kempinski,Hébergement,Hôtel de luxe (4-5*),hebergement,hotel 5 etoiles,Djibouti-ville,Ilot du Heron,+253 21 32 55 55,11.6174963,43.1458191,google_places,geolocalise
+15,Ras Dika Hotel,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Rue d'Ethiopie,,11.5927527,43.1458048,google_places,geolocalise
+16,Red Sea Hotel Apartment,Hébergement,Appart-hôtel / résidence,hebergement,appart-hotel,Djibouti-ville,Gabode,+253 21 25 14 14,11.5672077,43.1503383,google_places,geolocalise
+17,Best Western Premier DJ Hotel,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Place Lagarde,+253 21 33 10 00,11.595883,43.1471756,google_places,geolocalise
+18,Escale International Hotel,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Marabout,+253 21 25 78 88,11.6058317,43.1443258,google_places,geolocalise
+19,Sheraton Djibouti,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Plateau du Serpent,+253 21 32 80 00,11.6025059,43.1578917,google_places,geolocalise
+20,Acacias Hotel,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,"Ilot du Heron, BP 4111",+253 21 32 78 60,11.6203308,43.1506805,google_places,geolocalise
+21,Residence Lagon Bleu,Hébergement,Appart-hôtel / résidence,hebergement,residence hoteliere,Djibouti-ville,Rue Pierre Pascal,+253 21 35 58 21,11.595625,43.1462743,google_places,geolocalise
+22,Hotel-Restaurant de Djibouti,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Avenue 13,+253 21 35 64 15,11.5883943,43.1456599,google_places,geolocalise
+23,Gadileh Resort Hotel,Hébergement,Resort,hebergement,resort,Tadjourah,Gadileh Palm Villas,+253 27 42 45 45,11.7833573,42.8920974,google_places,geolocalise
+24,Loubatanleh Hotel,Hébergement,Campement / écolodge,hebergement,ecolodge,Tadjourah,Region de Tadjourah,+253 77 29 29 94,11.794769,42.9644701,google_places,geolocalise
+25,Hotel Le Golfe,Hébergement,Hôtel (standard),hebergement,hotel,Tadjourah,Front de mer,+253 77 84 65 98,11.7862625,42.8724219,google_places,geolocalise
+26,Hotel Gobaad,Hébergement,Hôtel (standard),hebergement,hotel,Dikhil,RN1,+253 77 15 00 47,11.1073047,42.3512251,google_places,geolocalise
+27,Grande Pharmacie de la Corne d'Afrique,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue de Marseille,+253 21 33 50 54,11.5954961,43.1481565,google_places,geolocalise
+28,Pharmacie de l'Independance,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue d'Ethiopie,+253 21 35 26 30,11.5944464,43.1462016,google_places,geolocalise
+29,Pharmacie Internationale,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Place Rimbaud,+253 21 35 23 73,11.5905002,43.1458891,google_places,geolocalise
+30,Pharmacie de l'Ocean Indien,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,"Blvd du General de Gaulle, Q.3",+253 21 35 94 93,11.5878788,43.1520921,google_places,geolocalise
+31,Pharmacie Dawo,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue de Bender,+253 77 78 01 01,11.5906375,43.1457409,google_places,geolocalise
+32,Pharmacie Principale,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue d'Ethiopie,+253 21 34 18 83,11.5927064,43.1458095,google_places,geolocalise
+33,La Pharmacie de la Cite,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Cite,,11.5884046,43.1402547,google_places,geolocalise
+34,Pharmacie La Capitale,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,"Bd Hassan Gouled Q4, route d'Arta",+253 21 34 98 78,11.5853306,43.143385,google_places,geolocalise
+35,Pharmacie Avicenne,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Centre-ville,+253 21 34 68 66,11.5884289,43.1455435,google_places,geolocalise
+36,Pharmacie de la Mer Rouge,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Route de l'aeroport,+253 21 34 12 02,11.5593884,43.1481129,google_places,geolocalise
+37,Banque Centrale de Djibouti,Services financiers & juridiques,Banque / agence bancaire,finance,banque centrale,Djibouti-ville,Rue de Geneve,+253 21 35 27 51,11.596259,43.1455718,google_places,geolocalise
+38,CAC International Bank (siege),Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,Rue de Marseille,+253 21 35 63 63,11.595517,43.1473274,google_places,geolocalise
+39,CAC International Bank (Bawadi Mall),Services financiers & juridiques,Banque / agence bancaire,finance,agence bancaire,Djibouti-ville,Bawadi Mall,,11.5909375,43.1325645,google_places,geolocalise
+40,East Africa Bank,Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,"Place du 27 Juin, BP 2022",+253 21 31 19 00,11.5948481,43.1477124,google_places,geolocalise
+41,Exim Bank Djibouti,Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,Ave Georges Clemenceau,+253 21 35 15 14,11.5940587,43.1465609,google_places,geolocalise
+42,Commercial Bank of Djibouti,Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,"Plateau du Serpent, Rue Jean Jaures",+253 21 33 03 00,11.603544,43.152933,google_places,geolocalise
+43,Bank of Africa - agence Aeroport,Services financiers & juridiques,Banque / agence bancaire,finance,agence bancaire,Djibouti-ville,Route de l'aeroport,+253 21 35 35 00,11.5601138,43.1541575,google_places,geolocalise
+44,BCIMR - agence Harbi,Services financiers & juridiques,Banque / agence bancaire,finance,agence bancaire,Djibouti-ville,Rue de Geneve,,11.5903458,43.1448546,google_places,geolocalise
+45,Intercontinental Investment Bank (iib),Services financiers & juridiques,Banque / agence bancaire,finance,banque,Djibouti-ville,"Imm. 15 Rue d'Ethiopie, Place Menelik",+253 21 35 50 06,11.5946151,43.146425,google_places,geolocalise
+46,GXA Assurances,Services financiers & juridiques,Assurance,finance,assurance,Djibouti-ville,Ave Georges Clemenceau,+253 21 35 36 36,11.5940973,43.1464142,google_places,geolocalise
+47,TRUST Assurance SA,Services financiers & juridiques,Assurance,finance,assurance,Djibouti-ville,Centre-ville,+253 21 25 40 14,11.5954871,43.1476305,google_places,geolocalise
+48,Amerga Assurances (siege),Services financiers & juridiques,Assurance,finance,assurance,Djibouti-ville,Ave Georges Clemenceau,+253 21 35 25 10,11.5938102,43.1465604,google_places,geolocalise
+49,Amerga Assurances - Aviation,Services financiers & juridiques,Assurance,finance,assurance,Djibouti-ville,Route de l'aeroport,+253 21 34 68 72,11.5599961,43.1537315,google_places,geolocalise
+50,Amerga Assurances - Cite Hodan,Services financiers & juridiques,Assurance,finance,assurance,Balbala,Cite Hodan,+253 21 36 60 99,11.5572806,43.0998702,google_places,geolocalise
+51,Tamini Insurance SA (takaful),Services financiers & juridiques,Assurance,finance,assurance islamique,Djibouti-ville,Rue du 27 Juin,+253 21 35 04 03,11.5945128,43.1464045,google_places,geolocalise
+52,ATIC - African Takaful Insurance Company,Services financiers & juridiques,Assurance,finance,assurance islamique,Djibouti-ville,Rue de Geneve,+253 21 34 00 08,11.5917916,43.1445453,google_places,geolocalise
+53,Pool Assurances,Services financiers & juridiques,Assurance,finance,assurance,Djibouti-ville,Centre-ville,+253 21 25 12 88,11.5904755,43.1413501,google_places,geolocalise
+54,Speed Zone Controle,Services automobile,Contrôle technique / pneus,services,controle technique auto,Balbala,PK12,+253 77 39 27 40,11.5594029,43.0805666,google_places,geolocalise
+55,Hypermarche Al Gamil,Commerce & Courses,Hypermarché / supermarché,commerce,hypermarche,Djibouti-ville,"Zone industrielle Sud, Gabode",+253 21 35 66 59,11.5715639,43.1529288,google_places,geolocalise
+56,Supermarche Casino,Commerce & Courses,Hypermarché / supermarché,commerce,supermarche,Djibouti-ville,Haramous,+253 21 32 72 60,11.5719595,43.1603615,google_places,geolocalise
+57,Nougaprix Supermarket,Commerce & Courses,Hypermarché / supermarché,commerce,supermarche,Djibouti-ville,Rue de Geneve,+253 21 35 87 50,11.5917427,43.1442309,google_places,geolocalise
+58,Hyper (Bawadi Mall),Commerce & Courses,Hypermarché / supermarché,commerce,hypermarche,Djibouti-ville,Bawadi Mall,+253 21 33 70 00,11.59119,43.1326773,google_places,geolocalise
+59,Cash Center Supermarket,Commerce & Courses,Hypermarché / supermarché,commerce,supermarche,Djibouti-ville,Heron,+253 21 35 00 76,11.6098454,43.1472767,google_places,geolocalise
+60,Supermarche Napoleon,Commerce & Courses,Hypermarché / supermarché,commerce,supermarche 24h/24,Djibouti-ville,Blvd du General de Gaulle,+253 21 35 48 19,11.5876826,43.1520837,google_places,geolocalise
+61,Al Gamil Ship Chandler,Transport & Logistique,Transit / fret / shipping,logistique,avitaillement maritime,Djibouti-ville,Zone industrielle,+253 77 13 97 97,11.5715625,43.1529375,google_places,geolocalise
+62,Superette Carrefour,Commerce & Courses,Épicerie / supérette,commerce,superette,Djibouti-ville,Ave F. d'Esperey,+253 77 07 58 54,11.612132,43.1490338,google_places,geolocalise
+63,LIMO Djibouti - Marketplace,Commerce & Courses,Boutique spécialisée,commerce,e-commerce / livraison,Djibouti-ville,Rue de Moscou,+253 77 39 63 48,11.5940637,43.1479045,google_places,geolocalise
+64,Bawadi Mall,Commerce & Courses,Centre commercial,commerce,centre commercial,Djibouti-ville,Bawadi Mall,+253 21 35 28 40,11.5905646,43.1331527,google_places,geolocalise
+65,Alrayan Mall,Commerce & Courses,Centre commercial,commerce,centre commercial,Djibouti-ville,Rue Hassan Gouled,,11.5810089,43.1408451,google_places,geolocalise
+66,Marche Riyad,Commerce & Courses,Marché traditionnel,commerce,marche,Djibouti-ville,Riyad,+253 77 42 89 90,11.5772573,43.1362272,google_places,geolocalise
+67,Marche d'Ambouli (Marche central),Commerce & Courses,Marché traditionnel,commerce,marche,Djibouti-ville,Place Rimbaud,+253 77 10 69 55,11.5913463,43.1463022,google_places,geolocalise
+68,Marche de Hayableh,Commerce & Courses,Marché traditionnel,commerce,marche,Balbala,Hayableh,+253 77 23 73 24,11.567363,43.1038284,google_places,geolocalise
+69,Kerim Flower Shop,Commerce & Courses,Boutique spécialisée,commerce,fleuriste,Djibouti-ville,Heron,+253 77 03 33 33,11.6103826,43.1459968,google_places,geolocalise
+70,Djibah Seafoods,"Industrie, Énergie & Grandes entreprises",Production industrielle,industrie,produits de la mer,Damerjog,Zone Damerjog,+253 77 86 43 60,11.4650325,43.2474327,google_places,geolocalise
+71,Mutualis - Centre medical et laboratoire,Santé,Centre médical spécialisé,sante,centre medical,Djibouti-ville,Rue de Geneve,+253 21 25 02 37,11.6024375,43.1478006,google_places,geolocalise
+72,CHU de Djibouti,Santé,Hôpital public,sante,hopital public,Djibouti-ville,Ave Marechal Foch,+253 21 35 27 10,11.6080416,43.1531432,google_places,geolocalise
+73,Hopital General Peltier,Santé,Hôpital public,sante,hopital public,Djibouti-ville,Ave Marechal Foch,+253 21 35 27 10,11.6083024,43.1531881,google_places,geolocalise
+74,Clinique Aden,Santé,Clinique privée / polyclinique,sante,clinique privee,Djibouti-ville,Heron,+253 21 25 32 32,11.6116585,43.15196,google_places,geolocalise
+75,Clinique AFFI,Santé,Clinique privée / polyclinique,sante,clinique privee,Djibouti-ville,Centre-ville,+253 21 35 74 74,11.5893686,43.1425563,google_places,geolocalise
+76,Djibouti Medical Center,Santé,Centre médical spécialisé,sante,centre medical,Djibouti-ville,Q7 bis,+253 21 35 04 62,11.5731881,43.1419879,google_places,geolocalise
+77,Som Clinique - Centre de diagnostic,Santé,Clinique privée / polyclinique,sante,clinique / imagerie,Djibouti-ville,Centre-ville,+253 21 33 50 15,11.595589,43.1480956,google_places,geolocalise
+78,La Maison Medicale,Santé,Clinique privée / polyclinique,sante,clinique,Djibouti-ville,Centre-ville,+253 21 35 00 38,11.5897797,43.1413748,google_places,geolocalise
+79,Clinique Le Heron,Santé,Clinique privée / polyclinique,sante,clinique privee,Djibouti-ville,Heron,+253 21 34 55 13,11.6106614,43.1508573,google_places,geolocalise
+80,Hopital de Balbala Cheiko,Santé,Hôpital public,sante,hopital public,Balbala,Balbala,+253 27 51 38 07,11.5498533,43.1121688,google_places,geolocalise
+81,Lycee Francais de Djibouti (Joseph Kessel),Éducation & Formation,École internationale / française,education,lycee francais,Djibouti-ville,RN2,+253 21 33 49 00,11.5667667,43.1517752,google_places,geolocalise
+82,International Maarif School of Djibouti,Éducation & Formation,École internationale / française,education,ecole internationale,Djibouti-ville,Haramous/Damerjog,+253 77 15 81 81,11.5257285,43.1449913,google_places,geolocalise
+83,Canadian International School Djibouti,Éducation & Formation,École internationale / française,education,ecole internationale,Djibouti-ville,"Saline Ouest, Konya Road",+253 21 25 10 41,11.5907362,43.1386726,google_places,geolocalise
+84,Ecole Privee de l'Avenir,Éducation & Formation,Lycée (public / privé),education,ecole privee,Djibouti-ville,Gabode 6,+253 77 13 20 28,11.5658396,43.1460404,google_places,geolocalise
+85,International School of Djibouti (ISD),Éducation & Formation,École internationale / française,education,ecole internationale,Djibouti-ville,Gabode,+253 77 01 87 78,11.5627283,43.1461086,google_places,geolocalise
+86,QSI International School of Djibouti,Éducation & Formation,École internationale / française,education,ecole internationale,Djibouti-ville,Haramous,+253 21 34 07 09,11.5654142,43.1681434,google_places,geolocalise
+87,Lycee d'Etat de Djibouti,Éducation & Formation,Lycée (public / privé),education,lycee public,Djibouti-ville,Blvd du General de Gaulle,+253 77 21 21 21,11.5947637,43.1499195,google_places,geolocalise
+88,Ecole Francaise Francoise Dolto,Éducation & Formation,École internationale / française,education,ecole francaise,Djibouti-ville,Plateau du Serpent,+253 21 35 03 32,11.6014653,43.1490738,google_places,geolocalise
+89,Universite de Djibouti - Campus Balbala,Éducation & Formation,Université / institut supérieur,education,universite,Balbala,Campus Balbala,+253 21 31 55 55,11.5381486,43.1169962,google_places,geolocalise
+90,Institut Superieur des Sciences de la Sante (ISSS),Éducation & Formation,Université / institut supérieur,education,institut superieur,Djibouti-ville,Plateau du Serpent,+253 21 35 52 83,11.6097252,43.152871,google_places,geolocalise
+91,CERD - Centre d'Etude et de Recherche de Djibouti,Éducation & Formation,Université / institut supérieur,education,recherche,Djibouti-ville,Route de l'aeroport,+253 21 35 27 95,11.5666408,43.1539247,google_places,geolocalise
+92,CFEEF - Centre de Formation des Enseignants,Éducation & Formation,Centre de formation,education,formation des maitres,Djibouti-ville,Centre-ville,+253 21 32 03 00,11.5939108,43.1509695,google_places,geolocalise
+93,Institut Confucius de Djibouti,Culture & Culte,Institut / centre culturel,education,institut culturel,Djibouti-ville,Balbala/Saline,+253 21 34 31 58,11.5823144,43.1343449,google_places,geolocalise
+94,Institut Djiboutien des Arts,Culture & Culte,Institut / centre culturel,culture,institut des arts,Djibouti-ville,Bd de Gaulle,+253 21 35 20 11,,,google_places,geolocalise
+95,Laureat Institute,Éducation & Formation,Centre de formation,education,centre de formation,Djibouti-ville,Rue de Geneve,+253 21 35 50 51,11.5916239,43.1435602,google_places,geolocalise
+96,Oxford Training and Consultancy,Éducation & Formation,Centre de formation,education,centre de formation,Djibouti-ville,"Bat. Emeraude, Saline Ouest",+253 21 35 04 40,11.5790179,43.1305909,google_places,geolocalise
+97,Institut Africain de Djibouti,Éducation & Formation,Université / institut supérieur,education,institut superieur prive,Djibouti-ville,Gabode,+253 21 35 15 52,11.562435,43.1459314,google_places,geolocalise
+98,Institut Francais Arthur Rimbaud (IFAR),Culture & Culte,Institut / centre culturel,culture,centre culturel francais,Djibouti-ville,Rue de Geneve,+253 21 35 35 13,11.5915083,43.1423826,google_places,geolocalise
+99,Lycee de Dikhil,Éducation & Formation,Lycée (public / privé),education,lycee public,Dikhil,Dikhil,+253 27 42 00 10,11.1098625,42.3765156,google_places,geolocalise
+100,Lycee d'Enseignement Technique et Industriel d'Ali Sabieh,Éducation & Formation,Lycée (public / privé),education,lycee technique,Ali Sabieh,Ali Sabieh,,11.1645769,42.709543,google_places,geolocalise
+101,Ministere de l'Education Nationale et de la Formation Professionnelle (MENFOP),Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Bd de la Republique,+253 77 20 31 06,11.5975014,43.148222,google_places,geolocalise
+102,Mosquee Al-Hamoudi,Géographie & Patrimoine naturel,Monument / lieu historique,culte,mosquee historique,Djibouti-ville,Place Rimbaud,+253 77 86 57 74,11.5922265,43.1459891,google_places,geolocalise
+103,Mosquee Djimaleh Aptidon,Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Pres Bawadi Mall,,11.5934762,43.1351751,google_places,geolocalise
+104,Mosquee Al-Nourani,Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Quartier 7,+253 77 23 91 61,11.5759852,43.1449423,google_places,geolocalise
+105,Grande Mosquee (Tabligh),Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Q6,,11.5763806,43.1353789,google_places,geolocalise
+106,Mosquee Abdulhamid II (Mosquee turque),Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Derriere Salaam Tower,,11.5932834,43.1418668,google_places,geolocalise
+107,Mosquee Doha,Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Ave Nasser,+253 77 67 82 63,11.5790349,43.1418648,google_places,geolocalise
+108,Mosquee Al Sada,Géographie & Patrimoine naturel,Monument / lieu historique,culte,mosquee historique (1906),Djibouti-ville,Ave Georges Clemenceau,,11.5934573,43.1496695,google_places,geolocalise
+109,Mosquee du Prince Salman,Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Route de l'aeroport,+253 77 85 33 00,11.5691936,43.1532216,google_places,geolocalise
+110,Mosquee Al-Nadwat,Culture & Culte,Mosquée,culte,mosquee,Djibouti-ville,Aviation,,11.5580968,43.1434212,google_places,geolocalise
+111,Mosquee de Dikhil,Culture & Culte,Mosquée,culte,mosquee,Dikhil,Dikhil,,11.1082375,42.3729219,google_places,geolocalise
+112,Station-service NOC PK12,Services automobile,Station-service,services,station-service,Balbala,PK12,+253 77 60 07 75,11.5561667,43.0723742,google_places,geolocalise
+113,Station UCIG Balbala,Services automobile,Station-service,services,station-service,Balbala,Balbala,,11.5485536,43.1117587,google_places,geolocalise
+114,Station-service NOC Golf Oil Marabout,Services automobile,Station-service,services,station-service,Djibouti-ville,Marabout,+253 77 02 34 93,11.6086072,43.1462586,google_places,geolocalise
+115,Station NOC Balbala,Services automobile,Station-service,services,station-service,Balbala,RN,+253 77 22 22 28,11.5524703,43.1230247,google_places,geolocalise
+116,Station UCIG Rue de Geneve,Services automobile,Station-service,services,station-service,Djibouti-ville,Rue de Geneve,,11.6015342,43.147087,google_places,geolocalise
+117,Station Rubis Boulaos,Services automobile,Station-service,services,station-service,Djibouti-ville,Boulaos,,11.5764146,43.1507486,google_places,geolocalise
+118,Station Rubis (Bd de Gaulle),Services automobile,Station-service,services,station-service,Djibouti-ville,Bd de Gaulle,+253 77 85 48 15,11.5988139,43.1494313,google_places,geolocalise
+119,Station UCIG RN3,Services automobile,Station-service,services,station-service,Balbala,RN3,+253 21 36 35 25,11.5695762,43.1194811,google_places,geolocalise
+120,Centrale electrique de Boulaos (EDD),"Industrie, Énergie & Grandes entreprises",Centrale électrique,energie,centrale electrique,Djibouti-ville,Boulaos,,11.5759727,43.1571699,google_places,geolocalise
+121,Station d'epuration de Djibouti (ONEAD),Administration & Services publics,Service des eaux / électricité,infrastructure,assainissement,Damerjog,Damerjog,,11.5240602,43.173769,google_places,geolocalise
+122,Ragueb Travel Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage,Djibouti-ville,8 Rue de la Mosquee,+253 21 35 06 06,11.5932256,43.1492067,google_places,geolocalise
+123,DTTA - Djibouti Travel & Tourism Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage,Djibouti-ville,Centre-ville,+253 21 35 74 44,11.5955624,43.1467947,google_places,geolocalise
+124,Nora Travel,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage (Omra),Balbala,Cite Sogik,+253 77 53 20 04,11.5379524,43.123156,google_places,geolocalise
+125,Shakirin Travel Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage (Omra),Djibouti-ville,Ave Adm. Bernard,+253 77 86 94 95,11.5954842,43.1457736,google_places,geolocalise
+126,ATTA Travel Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage IATA,Djibouti-ville,Bd Pierre Pascal,+253 21 35 48 48,11.5953845,43.1462306,google_places,geolocalise
+127,Tata Tour Djibouti,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,tour-operateur,Djibouti-ville,Centre-ville,+253 77 07 01 13,11.5911855,43.1488106,google_places,geolocalise
+128,Bacha Travel Tourism Cargo,Transport & Logistique,Transit / fret / shipping,tourisme,agence de voyage / cargo,Djibouti-ville,Centre-ville,+253 21 35 10 00,11.5955371,43.1456598,google_places,geolocalise
+129,Djibouti Tour Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,tour-operateur,Region d'Arta,RN1,+253 77 01 84 13,11.3381631,42.6702708,google_places,geolocalise
+130,Office National du Tourisme de Djibouti (ONTD),Administration & Services publics,Ministère / institution d'État,tourisme,office du tourisme,Djibouti-ville,"Place Menelik, BP 1938",+253 21 35 28 00,11.594259,43.147845,google_places,geolocalise
+131,Universal Travel Agency,Tourisme & Loisirs,Agence de voyage / tour-opérateur,tourisme,agence de voyage,Djibouti-ville,Rue de Soleillet,+253 77 62 02 02,11.5929215,43.1474748,google_places,geolocalise
+132,Ambassade des Etats-Unis,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Lot 350-B Haramous,+253 21 45 30 00,11.5639498,43.1671566,google_places,geolocalise
+133,Ambassade de France,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Bd Idriss Omar Guelleh,+253 21 35 25 03,11.6077626,43.1512483,google_places,geolocalise
+134,Consulat de France,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,consulat,Djibouti-ville,Plateau du Serpent,,11.6027715,43.1549715,google_places,geolocalise
+135,Ambassade de Libye,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Heron,,11.6189847,43.1478998,google_places,geolocalise
+136,Ambassade de Russie,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Plateau du Serpent,+253 21 35 07 40,11.6091039,43.1517806,google_places,geolocalise
+137,Ambassade du Japon,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Plateau du Serpent,+253 77 00 01 00,11.6108232,43.1508679,google_places,geolocalise
+138,Ambassade du Yemen,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Plateau du Serpent,,11.6066531,43.1552031,google_places,geolocalise
+139,Ambassade du Qatar,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Haramous,+253 21 35 97 97,11.5666772,43.165014,google_places,geolocalise
+140,Ambassade de Turquie,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade,Djibouti-ville,Haramous,+253 21 35 12 90,11.5649281,43.1680511,google_places,geolocalise
+141,Ministere des Affaires Etrangeres et de la Cooperation Internationale,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Rue Marchand,+253 21 35 24 71,11.5967392,43.1448558,google_places,geolocalise
+142,Ministere de la Femme et de la Famille,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Q4,+253 21 35 26 12,11.5826771,43.1416509,google_places,geolocalise
+143,Ministere delegue charge de la Decentralisation,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Q4,+253 21 35 97 87,11.5821335,43.1422493,google_places,geolocalise
+144,Ministere de l'Enseignement Superieur et de la Recherche,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Route de l'aeroport,+253 21 32 73 12,11.5665261,43.1538687,google_places,geolocalise
+145,Primature de la Republique de Djibouti,Administration & Services publics,Ministère / institution d'État,administration,institution,Djibouti-ville,Centre-ville,+253 21 32 52 13,11.5982996,43.1470974,google_places,geolocalise
+146,"Ministere de l'Agriculture, de l'Eau, de la Peche et de l'Elevage",Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Bd de Gaulle,+253 21 35 12 97,11.5898596,43.1531433,google_places,geolocalise
+147,"Ministere de la Communication, des Postes et des Telecommunications",Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Centre-ville,+253 77 71 23 46,11.5945393,43.1454803,google_places,geolocalise
+148,Cite ministerielle,Administration & Services publics,Ministère / institution d'État,administration,batiment administratif,Djibouti-ville,Centre-ville,,11.5980699,43.1466639,google_places,geolocalise
+149,Palais de Justice,Administration & Services publics,"Justice (tribunal, palais)",justice,palais de justice,Djibouti-ville,Plateau du Serpent (ZPS),+253 77 49 21 66,11.6010594,43.150523,google_places,geolocalise
+150,Direction Generale de la Police Nationale,Administration & Services publics,Police / gendarmerie,securite,police,Djibouti-ville,Q4,+253 21 35 11 71,11.5837862,43.1416659,google_places,geolocalise
+151,Commissariat central de police,Administration & Services publics,Police / gendarmerie,securite,police,Djibouti-ville,Bd de la Republique,+253 21 35 27 61,11.5975362,43.1490927,google_places,geolocalise
+152,Brigade de gendarmerie PK13,Administration & Services publics,Police / gendarmerie,securite,gendarmerie,Balbala,PK13,+253 21 36 28 28,11.5634734,43.0824642,google_places,geolocalise
+153,Brigade de gendarmerie PK12,Administration & Services publics,Police / gendarmerie,securite,gendarmerie,Balbala,PK12,,11.5517049,43.0822041,google_places,geolocalise
+154,Etat-major de la Gendarmerie Nationale,Administration & Services publics,Police / gendarmerie,securite,gendarmerie,Djibouti-ville,Centre-ville,,11.592774,43.1503581,google_places,geolocalise
+155,UNFPA Djibouti,Diplomatie & Organisations internationales,Agence ONU,organisation_internationale,agence ONU,Djibouti-ville,"Rue de Khartoum, Heron",+253 77 56 60 58,11.6156153,43.1482273,google_places,geolocalise
+156,UNICEF Djibouti,Diplomatie & Organisations internationales,Agence ONU,organisation_internationale,agence ONU,Djibouti-ville,Heron,,11.6180352,43.1509179,google_places,geolocalise
+157,Port de Djibouti (port historique),Transport & Logistique,Port / terminal,logistique,port,Djibouti-ville,Ave General Galleni,+253 77 81 62 48,11.6087133,43.1425491,google_places,geolocalise
+158,Port de Doraleh (DMP),Transport & Logistique,Port / terminal,logistique,port polyvalent,Doraleh,Doraleh,,11.5938528,43.1056507,google_places,geolocalise
+159,SGTD - Societe de Gestion du Terminal a Conteneurs de Doraleh,Transport & Logistique,Port / terminal,logistique,terminal a conteneurs,Doraleh,Port de Doraleh,+253 21 31 73 17,11.5986431,43.1027029,google_places,geolocalise
+160,Djibouti Container Terminal,Transport & Logistique,Port / terminal,logistique,terminal a conteneurs,Doraleh,Doraleh,,11.604887,43.1389836,google_places,geolocalise
+161,Djibouti Telecom - Direction commerciale (siege),Télécom & Tech,Opérateur télécom,telecom,operateur telecom,Djibouti-ville,Centre-ville,,11.5983649,43.1480758,google_places,geolocalise
+162,Djibouti Telecom - Agence Aviation,Télécom & Tech,Opérateur télécom,telecom,agence,Djibouti-ville,"Route de l'aeroport, Gabode 1",,11.5695708,43.152577,google_places,geolocalise
+163,Djibouti Telecom - Agence Balbala Cheikh Moussa,Télécom & Tech,Opérateur télécom,telecom,agence,Balbala,Arrondissement 5,+253 77 80 27 97,11.5632004,43.1163818,google_places,geolocalise
+164,Djibouti Telecom - Agence Farahad,Télécom & Tech,Opérateur télécom,telecom,agence,Balbala,Farahad,+253 77 59 06 46,11.552895,43.0891524,google_places,geolocalise
+165,Djibouti Telecom - Agence Wassel,Télécom & Tech,Opérateur télécom,telecom,agence,Djibouti-ville,Bd de Gaulle,+253 77 73 65 63,11.5905401,43.1516162,google_places,geolocalise
+166,Djibouti Telecom - Agence Tadjourah,Télécom & Tech,Opérateur télécom,telecom,agence,Tadjourah,Quartier 4,+253 77 83 50 16,11.825138,42.590275,google_places,geolocalise
+167,La Poste de Djibouti - Agence Ali Sabieh,Administration & Services publics,Bureau de poste,services_publics,bureau de poste,Ali Sabieh,"Place du 27 Juin, RN5",+253 27 42 61 36,11.154854,42.705916,google_places,geolocalise
+168,ONEAD (siege),Administration & Services publics,Service des eaux / électricité,services_publics,eau et assainissement,Djibouti-ville,Bd de la Republique,+253 21 35 31 07,11.6025422,43.1516596,google_places,geolocalise
+169,ONEAD - Agence Moulk Centre,Administration & Services publics,Ministère / institution d'État,services_publics,agence,Djibouti-ville,Route de l'aeroport,+253 21 35 82 49,11.5682224,43.1526279,google_places,geolocalise
+170,ONEAD - Agence Biokeyt,Administration & Services publics,Ministère / institution d'État,services_publics,agence,Balbala,Biokeyt,,11.5499003,43.1047917,google_places,geolocalise
+171,ONEAD - Centre de formation,Éducation & Formation,Centre de formation,services_publics,formation,Damerjog,Damerjog,+253 21 35 31 07,11.5247501,43.1741479,google_places,geolocalise
+172,Electricite de Djibouti (EDD) - siege,Administration & Services publics,Service des eaux / électricité,services_publics,electricite,Djibouti-ville,47 Bd de la Republique,+253 21 35 53 68,11.601641,43.1510747,google_places,geolocalise
+173,Salon Enti Ajmal,Services à la personne,Coiffure / beauté / spa,services,salon de beaute,Balbala,Cite Hodan,+253 77 07 63 98,11.5588132,43.0967127,google_places,geolocalise
+174,SAM Beauty & Spa,Services à la personne,Coiffure / beauté / spa,services,spa / beaute,Djibouti-ville,Route de l'aeroport,+253 77 27 00 00,11.5680845,43.1596473,google_places,geolocalise
+175,Miss Ebene,Services à la personne,Coiffure / beauté / spa,services,salon de coiffure,Djibouti-ville,Centre-ville,+253 21 35 45 42,11.5897071,43.141195,google_places,geolocalise
+176,Salon S Beauty,Services à la personne,Coiffure / beauté / spa,services,salon de coiffure,Djibouti-ville,Q4,+253 77 43 23 46,11.5808624,43.1410176,google_places,geolocalise
+177,Sam Barber and Spa,Services à la personne,Coiffure / beauté / spa,services,barbier,Djibouti-ville,Haramous,+253 77 11 91 91,11.568101,43.1592572,google_places,geolocalise
+178,SSH Beauty Lounge,Services à la personne,Coiffure / beauté / spa,services,salon de beaute,Djibouti-ville,Rue d'Ethiopie,+253 77 73 71 25,11.593925,43.1462537,google_places,geolocalise
+179,D'Aesthetic Clinic & Beauty Salon,Services à la personne,Informatique / réparation,services,clinique esthetique,Djibouti-ville,Gabode 3,+253 77 20 09 27,11.5689504,43.1523619,google_places,geolocalise
+180,Queens Spa,Services à la personne,Coiffure / beauté / spa,services,spa,Djibouti-ville,Marabout,+253 21 34 69 99,11.6018793,43.1465588,google_places,geolocalise
+181,Coiffeur La Reine,Services à la personne,Coiffure / beauté / spa,services,salon de coiffure,Djibouti-ville,Gabode,+253 77 03 65 65,11.5685324,43.1524311,google_places,geolocalise
+182,Salon Moulki,Services à la personne,Coiffure / beauté / spa,services,salon de coiffure,Djibouti-ville,Q5,+253 77 70 57 32,11.5847792,43.1477551,google_places,geolocalise
+183,Arta Electronique,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Djibouti-ville,Route de l'aeroport,+253 21 35 07 00,11.5597544,43.1517461,google_places,geolocalise
+184,Hassan Waraabe Electronic,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Djibouti-ville,Q7,+253 77 84 11 03,11.5777047,43.1426275,google_places,geolocalise
+185,Future Technology,Commerce & Courses,Électronique / téléphonie,commerce,telephonie / cameras,Djibouti-ville,Centre-ville,+253 77 23 56 07,11.5919052,43.147317,google_places,geolocalise
+186,Djibtvplus,Commerce & Courses,Électronique / téléphonie,commerce,IPTV / electronique,Djibouti-ville,Q4,+253 77 75 79 34,11.5797024,43.1496051,google_places,geolocalise
+187,Electronique Hamreiteh,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Balbala,Hayableh,+253 77 84 06 45,11.566451,43.1032348,google_places,geolocalise
+188,Magasin Numerique 2,Commerce & Courses,Électronique / téléphonie,commerce,telephonie,Djibouti-ville,Rue de Rome,+253 21 35 75 26,11.5936261,43.147357,google_places,geolocalise
+189,Google Electronic and Repair Mobiles,Commerce & Courses,Électronique / téléphonie,commerce,reparation telephones,Djibouti-ville,Q1 Bd 14,+253 77 83 14 05,11.591845,43.1476276,google_places,geolocalise
+190,Garage Tayio,Services automobile,Garage / réparation,services,garage automobile,Balbala,Balbala,+253 77 05 00 40,11.567413,43.121014,google_places,geolocalise
+191,Garage Atika,Services automobile,Garage / réparation,services,garage automobile,Djibouti-ville,Rue Guelleh Batal,+253 77 82 70 83,11.5670254,43.1440199,google_places,geolocalise
+192,Garage STCD,Services automobile,Garage / réparation,services,garage automobile,Djibouti-ville,Gabode,+253 77 09 23 04,11.5672528,43.1440138,google_places,geolocalise
+193,Point S Djibouti,Services automobile,Contrôle technique / pneus,services,pneumatiques,Djibouti-ville,Rue de la Siesta,,11.5796014,43.1574233,google_places,geolocalise
+194,Inchcape Djibouti (concessionnaire),Services automobile,Concessionnaire auto,commerce,concessionnaire auto,Djibouti-ville,Saline Nord Lot 51,+253 77 74 50 50,11.5880282,43.1336869,google_places,geolocalise
+195,Garage Hakuna Matata,Services automobile,Garage / réparation,services,garage / carrosserie,Djibouti-ville,Gabode 5,+253 77 44 99 88,11.5662237,43.1442875,google_places,geolocalise
+196,La Cle Minute,Services automobile,Garage / réparation,services,serrurerie auto,Djibouti-ville,Gabode,+253 77 79 56 90,11.5720558,43.1455324,google_places,geolocalise
+197,Garage & Location Roberto,Services automobile,Location de voitures,services,location / garage,Djibouti-ville,Haramous,+253 77 05 80 40,11.5747677,43.1591194,google_places,geolocalise
+198,A.C. Ries (Nissan),Services automobile,Concessionnaire auto,commerce,concessionnaire auto,Djibouti-ville,Route de l'aeroport,+253 21 35 26 56,11.5758375,43.1507969,google_places,geolocalise
+199,Boulangerie Le Moulin,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie-patisserie,Djibouti-ville,Gabode,+253 21 34 21 45,11.5653216,43.1462378,google_places,geolocalise
+200,HanCake's,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,patisserie-cafe,Djibouti-ville,Rue de Rome,+253 77 52 52 93,11.59487,43.1474836,google_places,geolocalise
+201,The Camel Coffee Shop,Alimentation & Restauration,Café / salon de thé,restauration,cafe,Djibouti-ville,Heron,+253 77 08 11 22,11.6084375,43.1479375,google_places,geolocalise
+202,L'O Delices - Patisserie,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,patisserie,Djibouti-ville,Gabode,+253 77 49 20 05,11.5728008,43.1486734,google_places,geolocalise
+203,Patisserie d'Ambouli,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,patisserie,Djibouti-ville,Centre-ville,+253 21 34 06 80,11.5960787,43.1466794,google_places,geolocalise
+204,Boulangerie Fournile,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie 24h/24,Djibouti-ville,Bd de Gaulle,+253 77 62 47 14,11.5903679,43.1513796,google_places,geolocalise
+205,Bawadi Bakery,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie,Djibouti-ville,Bawadi Mall,+253 21 34 03 57,11.5906452,43.1344601,google_places,geolocalise
+206,DjibHouse,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie-patisserie,Balbala,Balbala,+253 77 43 91 20,11.5656754,43.1324222,google_places,geolocalise
+207,Cafe Barbera Djibouti,Alimentation & Restauration,Café / salon de thé,restauration,cafe,Djibouti-ville,Haramous,+253 77 63 09 56,11.5780557,43.1573727,google_places,geolocalise
+208,Plage de Douda,Géographie & Patrimoine naturel,Plage,tourisme,plage,Region d'Arta,Douda,+253 77 84 44 44,11.5182582,43.1912799,google_places,geolocalise
+209,Plage de la Mangrove (Godoria),Géographie & Patrimoine naturel,Plage,tourisme,plage / mangrove,Region d'Obock,Cote nord,,11.7243114,43.2123996,google_places,geolocalise
+210,Plage Douda (reservee aux femmes),Géographie & Patrimoine naturel,Plage,tourisme,plage,Region d'Arta,Douda,,11.5227061,43.1886395,google_places,geolocalise
+211,Carre Beach (Triton Beach),Géographie & Patrimoine naturel,Plage,tourisme,plage urbaine,Djibouti-ville,Plateau du Serpent,,11.6060357,43.1575326,google_places,geolocalise
+212,Plage du Goubet,Géographie & Patrimoine naturel,Plage,tourisme,plage,Region de Tadjourah,Goubet al-Kharab,,11.5273549,42.5238547,google_places,geolocalise
+213,Plage des Sables Blancs,Géographie & Patrimoine naturel,Plage,tourisme,plage,Tadjourah,Sable Blanc,+253 77 81 28 26,11.7790961,42.9249378,google_places,geolocalise
+214,Plage du Heron,Géographie & Patrimoine naturel,Plage,tourisme,plage urbaine,Djibouti-ville,Heron,+253 77 21 42 23,11.6147466,43.1466261,google_places,geolocalise
+215,Plage de Doraleh (Khor Ambado est),Géographie & Patrimoine naturel,Plage,tourisme,plage,Doraleh,Doraleh,,11.5937936,43.0653189,google_places,geolocalise
+216,Arta Plage,Géographie & Patrimoine naturel,Plage,tourisme,plage,Region d'Arta,Arta Plage,+253 77 11 34 18,11.5838023,42.8232643,google_places,geolocalise
+217,Place Menelik,Géographie & Patrimoine naturel,Monument / lieu historique,patrimoine,place historique,Djibouti-ville,Centre-ville,,11.5948511,43.1468283,google_places,geolocalise
+218,Place Rimbaud (Place Mahmoud Harbi),Géographie & Patrimoine naturel,Monument / lieu historique,patrimoine,place historique,Djibouti-ville,Centre-ville,,11.5912156,43.1462865,google_places,geolocalise
+219,Place de Dikhil,Géographie & Patrimoine naturel,Monument / lieu historique,patrimoine,place,Dikhil,Dikhil,+253 77 47 65 75,11.106971,42.3699849,google_places,geolocalise
+220,Elevage de Dikhil,"Industrie, Énergie & Grandes entreprises",Production industrielle,agriculture,elevage,Dikhil,Dikhil,+253 77 21 83 65,11.1057311,42.3726552,google_places,geolocalise
+221,Magasin chez Zeinab,Commerce & Courses,Boutique spécialisée,commerce,boutique,Ali Sabieh,Ali Sabieh,+253 77 04 04 66,11.1525594,42.7053456,google_places,geolocalise
+222,Himilo Electronics & Cosmetics,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Ali Sabieh,BP 1972,+253 77 16 69 78,11.1524422,42.7059111,google_places,geolocalise
+223,Alla Aamiin Collection,Commerce & Courses,Boutique spécialisée,commerce,boutique,Ali Sabieh,Ali Sabieh,,11.1529078,42.7065235,google_places,geolocalise
+224,Magasin chez Choli,Commerce & Courses,Boutique spécialisée,commerce,boutique,Ali Sabieh,Ali Sabieh,,11.1524189,42.7053611,google_places,geolocalise
+225,Epicerie Lalayeh,Commerce & Courses,Épicerie / supérette,commerce,epicerie,Ali Sabieh,Ali Sabieh,+253 77 87 33 10,11.1491559,42.7105026,google_places,geolocalise
+226,Boutique Shineh,Commerce & Courses,Épicerie / supérette,commerce,epicerie,Ali Sabieh,Ali Sabieh,+253 27 42 60 42,11.1470554,42.7101551,google_places,geolocalise
+227,Boutique Adam Ebraahim,Commerce & Courses,Boutique spécialisée,commerce,boutique-cafe,Dikhil,Dikhil,+253 77 39 07 66,11.1101875,42.3435625,google_places,geolocalise
+228,Royal Kebab Djibouti,Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,Saline Ouest,,11.5890545,43.1388231,google_places,geolocalise
+229,City Burger,Alimentation & Restauration,Fast-food & snack,restauration,fast-food 24h/24,Djibouti-ville,Rue d'Ethiopie,+253 21 35 44 45,11.5943669,43.1461433,google_places,geolocalise
+230,Kayan's Chicken,Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,Centre-ville,+253 77 40 44 04,11.5939024,43.1460913,google_places,geolocalise
+231,O'Tacos de Lyon,Alimentation & Restauration,Fast-food & snack,restauration,tacos,Djibouti-ville,Ambouli,+253 77 60 08 83,11.5576914,43.1402247,google_places,geolocalise
+232,O-Point Burger (Ambouli),Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,Route Nelson Mandela,+253 77 86 63 85,11.5630602,43.1337127,google_places,geolocalise
+233,O-Point Burger (Bawadi Mall),Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,Bawadi Mall,+253 77 86 63 85,11.5904322,43.133535,google_places,geolocalise
+234,Tacos King,Alimentation & Restauration,Fast-food & snack,restauration,tacos,Djibouti-ville,Bd de Gaulle,+253 77 40 17 20,11.5891233,43.1517785,google_places,geolocalise
+235,CTR Fried Chicken,Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,"Hamoudi Mall, 2e etage",+253 77 77 11 11,11.5926416,43.1452855,google_places,geolocalise
+236,Bendo's Food,Alimentation & Restauration,Fast-food & snack,restauration,restaurant a emporter,Djibouti-ville,Gabode,+253 77 11 35 78,11.5720216,43.1513767,google_places,geolocalise
+237,Pizzeria Snack,Alimentation & Restauration,Fast-food & snack,restauration,snack-pizzeria,Djibouti-ville,Q7 bis,+253 77 49 98 77,11.5712498,43.1473624,google_places,geolocalise
+238,Chez Davido,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant africain,Djibouti-ville,Aviation,+253 77 42 01 56,11.5597264,43.145978,google_places,geolocalise
+239,Moonlight Restaurant,Alimentation & Restauration,Restaurant international,restauration,restaurant bord de mer,Djibouti-ville,Venise,+253 21 34 20 63,11.5998691,43.14194,google_places,geolocalise
+240,Cafe de la Gare,Alimentation & Restauration,Restaurant international,restauration,restaurant francais,Djibouti-ville,Plateau du Serpent,+253 21 35 15 30,11.603856,43.1526141,google_places,geolocalise
+241,Papou's Coffee Corner,Alimentation & Restauration,Café / salon de thé,restauration,coffee shop,Djibouti-ville,Zone industrielle sud,+253 77 23 08 28,11.5740594,43.1513645,google_places,geolocalise
+242,Restaurant La Mer Rouge,Alimentation & Restauration,Restaurant international,restauration,restaurant fruits de mer,Djibouti-ville,Nelson Mandela,+253 21 34 00 05,11.5578887,43.1410723,google_places,geolocalise
+243,La Pergola,Alimentation & Restauration,Restaurant international,restauration,restaurant-piscine,Djibouti-ville,Route de l'aeroport,+253 21 34 08 83,11.5595842,43.1481047,google_places,geolocalise
+244,Chez Liza,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Obock,Obock,,11.9646926,43.2883684,google_places,geolocalise
+245,Cabinet Dentaire Hiliyeh,Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,Centre-ville,+253 77 62 47 92,11.5898125,43.1406875,google_places,geolocalise
+246,Clinique Dentaire (Cite Dawaleh),Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,"Cite Dawaleh, Lot 76, Gabode",+253 77 11 50 09,11.5723741,43.1476483,google_places,geolocalise
+247,2M Dental Clinic,Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,Saline Ouest,+253 21 35 10 19,11.586933,43.1379804,google_places,geolocalise
+248,Denta Clinic (Dr Safwat),Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,Saline Nord Lot 75,+253 21 35 55 89,11.585052,43.1346262,google_places,geolocalise
+249,Clinique Pasteur - Ophtalmologie Dr Issa Bogoreh,Santé,Centre médical spécialisé,sante,ophtalmologie,Djibouti-ville,BP 386,+253 21 35 07 07,11.5702124,43.1499339,google_places,geolocalise
+250,Clinique Dentaire Dr Nasihe Fathi,Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,Rue d'Ethiopie,+253 21 35 67 69,11.5952356,43.1463867,google_places,geolocalise
+251,Europcar Djibouti,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,Gabode,+253 21 32 94 44,11.5734375,43.1515625,google_places,geolocalise
+252,Hertz Djibouti,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,Aeroport,+253 77 82 81 20,11.5527808,43.1485192,google_places,geolocalise
+253,Lootah Rent A Car,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,"Haramous, face ambassade USA",+253 77 07 04 24,11.5624488,43.1673592,google_places,geolocalise
+254,Goldcar Djibouti,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,Haramous,+253 77 38 05 36,11.5717786,43.1579331,google_places,geolocalise
+255,Pyramid Rent a Car & Car Care,Services automobile,Garage / réparation,services,location / entretien auto,Djibouti-ville,Rue de la Siesta,+253 21 35 82 03,11.5793235,43.1574742,google_places,geolocalise
+256,Habib Location de Voiture et Guide,Tourisme & Loisirs,Agence de voyage / tour-opérateur,services,location / guide,Region de Tadjourah,,+253 77 65 98 24,11.7709165,42.5023689,google_places,geolocalise
+257,Groupe Marill (concession auto),Services automobile,Concessionnaire auto,commerce,concessionnaire auto,Djibouti-ville,57 RN2,+253 21 32 94 00,11.5731212,43.1516851,google_places,geolocalise
+258,Quincaillerie Nayef,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Djibouti-ville,Avenue 13,+253 77 84 52 12,11.5887782,43.1480094,google_places,geolocalise
+259,Quincaillerie Tayo,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Balbala,Marche Mijadeer,+253 77 76 16 04,11.5583792,43.1119496,google_places,geolocalise
+260,Quincaillerie Al-Doubai Ismael Ahmed,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Djibouti-ville,Avenue 13,+253 77 54 11 01,11.5886154,43.1471172,google_places,geolocalise
+261,BricoDiscount,Commerce & Courses,Quincaillerie / bricolage,commerce,bricolage / quincaillerie,Djibouti-ville,Rue de Venise,+253 21 35 15 45,11.5904147,43.1371451,google_places,geolocalise
+262,Quincaillerie Al Aoul,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Damerjog,Damerjog,+253 77 66 42 62,11.5181209,43.1435737,google_places,geolocalise
+263,Quincaillerie Al Akram,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Djibouti-ville,Avenue 13,+253 77 83 43 62,11.5889381,43.1489062,google_places,geolocalise
+264,Quincaillerie Dingqi,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Djibouti-ville,Avenue 13,+253 21 35 50 41,11.5887986,43.1482096,google_places,geolocalise
+265,Quincaillerie Abdi,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Djibouti-ville,"Avenue 13, BP 1237",+253 21 35 18 18,11.5890749,43.1463396,google_places,geolocalise
+266,Quincaillerie Abu Khaled PK12,Commerce & Courses,Quincaillerie / bricolage,commerce,quincaillerie,Balbala,PK12,+253 77 83 70 01,11.5583955,43.076776,google_places,geolocalise
+267,Quincaillerie Ileys Enterprise,Commerce & Courses,Quincaillerie / bricolage,commerce,materiaux de construction,Djibouti-ville,Avenue 13,+253 21 35 34 12,11.5885902,43.1475299,google_places,geolocalise
+268,Olympus Gym and Fitness,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Centre-ville,,11.5912613,43.1511857,google_places,geolocalise
+269,Olympus Gym VIP,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Gabode,,11.5696856,43.1522018,google_places,geolocalise
+270,BM Fitness and Boxing,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport / boxe,Djibouti-ville,Ave Roosevelt,,11.5927675,43.1455474,google_places,geolocalise
+271,Moulk Fitness,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Moulk,+253 77 09 35 35,11.5682311,43.1523604,google_places,geolocalise
+272,New Gym,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Sud de la ville,,11.5423373,43.1558599,google_places,geolocalise
+273,Iftou Bareda Gym,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Ambouli,+253 77 81 05 59,11.5689432,43.1320143,google_places,geolocalise
+274,MaHoKa Gym,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Balbala,Cite Hodan 1,,11.825138,42.590275,google_places,geolocalise
+275,Big Show Gym Fitness Center,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Q6,+253 77 72 79 72,11.5757947,43.136006,google_places,geolocalise
+276,MWR Gym,Tourisme & Loisirs,Complexe sportif / salle de sport,sport,salle de sport,Djibouti-ville,Douda/Sud,,11.5428909,43.149887,google_places,geolocalise
+277,Habone-Deka,Commerce & Courses,Vêtements & accessoires,commerce,vetements / bijoux,Djibouti-ville,Avenue 13,+253 77 83 75 12,11.5890991,43.1465266,google_places,geolocalise
+278,Top Crazy,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Rue de Rome,+253 77 77 63 63,11.5940566,43.1474073,google_places,geolocalise
+279,Sympa Shop,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Rue de Rome,+253 77 77 72 72,11.5930253,43.1471406,google_places,geolocalise
+280,Le Bonheur Hommes-Femmes,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Bawadi Mall,+253 21 34 73 58,11.5906127,43.1337776,google_places,geolocalise
+281,Moonlight Boubou,Commerce & Courses,Vêtements & accessoires,commerce,vetements traditionnels,Djibouti-ville,Rue des Mouches Q1,+253 77 01 09 31,11.5900879,43.1467616,google_places,geolocalise
+282,Amy Collection Shop,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Haramous,+253 77 06 08 08,11.554036,43.16506,google_places,geolocalise
+283,Le Tailor,Commerce & Courses,Vêtements & accessoires,commerce,vetements / tailleur,Djibouti-ville,Rue Coubeche,+253 77 26 99 37,11.5934536,43.1451526,google_places,geolocalise
+284,Fashion Shop Defile,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Zone industrielle sud,+253 77 41 10 10,11.576819,43.1573513,google_places,geolocalise
+285,Boutique SDM,Commerce & Courses,Vêtements & accessoires,commerce,vetements,Djibouti-ville,Centre-ville,+253 77 85 50 83,11.5913807,43.150184,google_places,geolocalise
+286,Massida Logistics,Transport & Logistique,Transit / fret / shipping,logistique,logistique / express,Djibouti-ville,Zone industrielle,+253 21 35 15 31,11.5709513,43.1593429,google_places,geolocalise
+287,Maritime Transport International (MTI),Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,Centre-ville,+253 21 35 14 55,11.594853,43.1483464,google_places,geolocalise
+288,Freight Secure Logistics & Services,Transport & Logistique,Transit / fret / shipping,logistique,transit / logistique,Djibouti-ville,Mohamed Kamil Road,+253 77 06 04 20,11.5720558,43.1455324,google_places,geolocalise
+289,Djibouti Transport & Shipping SARL,Transport & Logistique,Transit / fret / shipping,logistique,transport,Djibouti-ville,Marabout,,11.6049683,43.1440763,google_places,geolocalise
+290,Transit Marill,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,Rue Marchand,+253 21 35 11 50,11.5963717,43.1461193,google_places,geolocalise
+291,Chab Shipping SARL,Transport & Logistique,Transit / fret / shipping,logistique,shipping,Djibouti-ville,"Imm. Gadileh, Heron, BP 1996",+253 21 35 07 77,11.6087927,43.1480797,google_places,geolocalise
+292,"Africa Global Logistics (AGL, ex-Bollore)",Transport & Logistique,Transit / fret / shipping,logistique,logistique,Djibouti-ville,139 Imm. Semiramis,+253 21 32 96 00,11.825138,42.590275,google_places,geolocalise
+293,Bollore Transport & Logistics (ancien site),Transport & Logistique,Transit / fret / shipping,logistique,logistique,Djibouti-ville,Rue de Venise,+253 21 32 96 00,11.5819413,43.1311939,google_places,geolocalise
+294,Oceangate International Shipping,Transport & Logistique,Transit / fret / shipping,logistique,shipping,Djibouti-ville,Heron,+253 77 32 79 24,11.6107086,43.1525432,google_places,geolocalise
+295,Djibouti National Shipping Company,Transport & Logistique,Transit / fret / shipping,logistique,armement national,Djibouti-ville,Rue de Venise,+253 21 34 25 18,11.581171,43.1304303,google_places,geolocalise
+296,Ecole primaire Balbala 2,Éducation & Formation,École primaire,education,ecole primaire,Balbala,Balbala 2,+253 21 36 42 45,11.5500317,43.1109207,google_places,geolocalise
+297,Ecole primaire Balbala 7,Éducation & Formation,École primaire,education,ecole primaire,Balbala,Balbala 7,+253 77 73 01 23,11.5531483,43.1011258,google_places,geolocalise
+298,Ecole primaire Balbala 10,Éducation & Formation,École primaire,education,ecole primaire,Balbala,Balbala 10,,11.5614986,43.0957475,google_places,geolocalise
+299,Lycee de Balbala,Éducation & Formation,Lycée (public / privé),education,lycee public,Balbala,Balbala,+253 77 68 18 46,11.5525034,43.112016,google_places,geolocalise
+300,CEM Hodan 1,Éducation & Formation,Collège,education,college public,Balbala,Cite Hodan,,11.5564801,43.0982652,google_places,geolocalise
+301,College de Fukuzawa,Éducation & Formation,Collège,education,college public,Balbala,Balbala,+253 21 36 08 15,11.5617909,43.1183633,google_places,geolocalise
+302,CEM d'Ambouli,Éducation & Formation,Collège,education,college public,Djibouti-ville,Ambouli,+253 21 34 00 02,11.5705398,43.1344395,google_places,geolocalise
+303,College de Hodan 2,Éducation & Formation,Collège,education,college public,Balbala,Hodan II,+253 21 36 48 99,11.5527405,43.09272,google_places,geolocalise
+304,College de Boulaos,Éducation & Formation,Collège,education,college public,Djibouti-ville,Boulaos,+253 77 21 21 21,11.584363,43.1533705,google_places,geolocalise
+305,Ecole Privee Victoire,Éducation & Formation,Lycée (public / privé),education,ecole privee,Balbala,Balbala,,11.560045,43.1127474,google_places,geolocalise
+306,Cabinet d'Avocat Mohamed Hared,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,cabinet d'avocat,Djibouti-ville,Plateau du Serpent,+253 77 66 45 47,11.6063352,43.1510869,google_places,geolocalise
+307,CAA Djib Law Firm - Abayazid & Abdourahman,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,cabinet d'avocats,Djibouti-ville,"Route de la Siesta, BP 1740",+253 21 35 40 17,11.5974609,43.1513399,google_places,geolocalise
+308,Cabinet d'Avocat Ayman Said,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,cabinet d'avocat,Djibouti-ville,"Rue Bourhan Bey, BP 2069",+253 21 35 47 02,11.5993138,43.1488655,google_places,geolocalise
+309,Cabinet d'Avocat Wais,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,cabinet d'avocat,Djibouti-ville,"Salines Ouest, Lot 175",+253 77 22 92 03,11.5841045,43.1348643,google_places,geolocalise
+310,Office Notarial Ali Moussa Mohamed,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,notaire,Djibouti-ville,"Ave Mahamoud Haid, Marabout, BP 1774",+253 77 59 99 80,11.6083462,43.1479796,google_places,geolocalise
+311,"Cabinet Me Ali Abayazid, Notaire",Services financiers & juridiques,Cabinet d'avocat / notaire,justice,notaire,Djibouti-ville,"Ave Franchet d'Esperey, BP 4113",+253 77 56 12 13,11.6063443,43.1510188,google_places,geolocalise
+312,Cabinet d'Avocat Boulboul,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,cabinet d'avocat,Djibouti-ville,"Place du 27 Juin, Imm. Yacin Yabeh",+253 21 35 11 67,11.5950539,43.1475562,google_places,geolocalise
+313,Etude Notariale Mahamoud,Services financiers & juridiques,Cabinet d'avocat / notaire,justice,notaire,Djibouti-ville,Centre-ville,+253 21 35 40 20,11.5952237,43.1463949,google_places,geolocalise
+314,Al-Qarn Translation Services,Services financiers & juridiques,Cabinet d'avocat / notaire,services,traduction assermentee,Djibouti-ville,Rue de Madrid,+253 77 19 58 85,11.5933179,43.1477738,google_places,geolocalise
+315,PB Jet (impression / photocopie),Services à la personne,Photographie / impression,services,imprimerie,Djibouti-ville,Centre-ville,+253 77 12 62 88,11.593111,43.1489405,google_places,geolocalise
+316,Djib Impression Numerique,Services à la personne,Photographie / impression,services,imprimerie numerique,Djibouti-ville,Bd de Gaulle,+253 77 83 84 66,11.5896575,43.1515614,google_places,geolocalise
+317,Imprimerie Nationale de Djibouti,Administration & Services publics,Ministère / institution d'État,administration,imprimerie d'Etat,Djibouti-ville,Route de l'aeroport,+253 21 35 01 63,11.5674429,43.1535522,google_places,geolocalise
+318,Weprint,Services à la personne,Photographie / impression,services,imprimerie,Djibouti-ville,"Q3, Bd de Gaulle",+253 21 34 30 00,11.5884407,43.1521163,google_places,geolocalise
+319,Imprimerie MAK,Services à la personne,Photographie / impression,services,imprimerie,Balbala,PK12,+253 77 30 49 10,11.5567787,43.1022087,google_places,geolocalise
+320,Spectrum Printing,Services à la personne,Photographie / impression,services,imprimerie,Djibouti-ville,Route du Casino,+253 77 27 98 45,11.5712393,43.1561245,google_places,geolocalise
+321,Multi-Services Olympiques Prints,Services à la personne,Photographie / impression,services,impression / services,Djibouti-ville,Rue de Madrid,+253 21 35 35 57,11.593515,43.1478253,google_places,geolocalise
+322,Modern Photo (Hindi Photo),Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,66 Rue de Paris,+253 77 82 48 06,11.5953292,43.1472408,google_places,geolocalise
+323,Art Studio,Services à la personne,Photographie / impression,services,studio photo / impression,Djibouti-ville,Rue de Bender,+253 77 04 77 77,11.59237,43.1454351,google_places,geolocalise
+324,Vrinda Photo Studio,Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,Rue de Soleillet,+253 77 72 87 77,11.5930667,43.1462507,google_places,geolocalise
+325,Studio Daous,Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,Q6 Avenue 26,+253 77 81 11 13,11.5843842,43.1463809,google_places,geolocalise
+326,Photo Central,Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,Q4,,11.5883184,43.1454855,google_places,geolocalise
+327,Flash Studio,Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,Rue de Bir Hakeim,+253 77 16 37 09,11.5930648,43.1455574,google_places,geolocalise
+328,RS Prods (sonorisation / evenementiel),Services à la personne,Photographie / impression,services,audiovisuel / evenementiel,Balbala,Balbala,+253 77 24 01 01,11.567279,43.1079091,google_places,geolocalise
+329,Quick Photo,Services à la personne,Photographie / impression,services,studio photo,Djibouti-ville,Rue de Paris,+253 77 87 29 85,11.5942941,43.1469799,google_places,geolocalise
+330,Okar Studio Demha,Services à la personne,Photographie / impression,services,studio photo,Dikhil,Dikhil,+253 77 21 83 65,11.1097686,42.3707617,google_places,geolocalise
+331,Studio Aladin,Services à la personne,Photographie / impression,services,studio photo,Tadjourah,Quartier 5,+253 77 12 96 23,11.8247087,42.5901384,google_places,geolocalise
+332,Blanchisserie Pressing One,Services à la personne,Pressing / laverie,services,pressing,Djibouti-ville,Ave Georges Clemenceau,+253 21 35 12 16,11.5940635,43.1454713,google_places,geolocalise
+333,Laundry King Djibouti,Services à la personne,Pressing / laverie,services,laverie,Djibouti-ville,Ave Mahamoud Haid,+253 21 25 35 35,11.6083623,43.1483224,google_places,geolocalise
+334,Djibouti Laundry,Services à la personne,Pressing / laverie,services,laverie,Djibouti-ville,Gabode,+253 21 35 99 50,11.5692844,43.1462345,google_places,geolocalise
+335,9 Pressing,Services à la personne,Pressing / laverie,services,pressing,Djibouti-ville,Heron,+253 77 55 99 99,11.6095759,43.149952,google_places,geolocalise
+336,Atelier Hakam (soudure / menuiserie),Services à la personne,Informatique / réparation,artisanat,soudure / menuiserie,Balbala,Barwaqo,+253 77 76 90 14,11.5690601,43.1157172,google_places,geolocalise
+337,Eye & Watch,Commerce & Courses,Optique / horlogerie,commerce,optique / horlogerie,Djibouti-ville,Bawadi Mall,+253 77 54 13 58,11.5909381,43.1325603,google_places,geolocalise
+338,Optique Zivraj Prabhudas,Commerce & Courses,Optique / horlogerie,commerce,optique,Djibouti-ville,Rue de Londres,+253 21 35 09 02,11.5941755,43.146831,google_places,geolocalise
+339,Laboratoire d'Analyses Medicales Abrar,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,"Bd Hassan Gouled, Cite Wadajir 1",+253 21 35 50 00,11.5739201,43.1347986,google_places,geolocalise
+340,Bio Gene Laboratories,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,Bd de Gaulle,+253 77 62 06 91,11.5903723,43.1516682,google_places,geolocalise
+341,Laboratoire d'Analyse BIO24,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,"Q1, Waberi Business Center",+253 21 34 91 97,11.590455,43.1447052,google_places,geolocalise
+342,Laboratoire Abdan,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,Cite Saoudite,+253 21 35 03 60,11.5906365,43.1415526,google_places,geolocalise
+343,LANAA (laboratoire national d'analyses),Santé,Laboratoire d'analyses médicales,sante,laboratoire (eau/aliments),Djibouti-ville,Rue de Venise,+253 21 35 80 67,11.5950265,43.1336127,google_places,geolocalise
+344,Laboratoire LBM Mer Rouge,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,Rue de Moscou,+253 21 35 30 12,11.5942941,43.1469799,google_places,geolocalise
+345,Librairie Victor Hugo (Rue de Rome),Commerce & Courses,Librairie / papeterie,commerce,librairie,Djibouti-ville,Rue de Rome,+253 21 35 67 57,11.5951546,43.1475582,google_places,geolocalise
+346,Librairie Victor Hugo (Moulk),Commerce & Courses,Librairie / papeterie,commerce,librairie,Djibouti-ville,Route de l'aeroport,+253 77 57 60 99,11.5683721,43.1525917,google_places,geolocalise
+347,PBIS SARL (papeterie / bureautique),Commerce & Courses,Librairie / papeterie,commerce,papeterie / bureautique,Djibouti-ville,Centre-ville,+253 21 35 05 63,11.595659,43.1467479,google_places,geolocalise
+348,Discorama (librairie / jouets),Commerce & Courses,Librairie / papeterie,commerce,librairie / jouets,Djibouti-ville,"Zone industrielle sud, BP 511",+253 21 35 06 64,11.5720656,43.1574108,google_places,geolocalise
+349,CIBS (papeterie),Commerce & Courses,Librairie / papeterie,commerce,papeterie,Djibouti-ville,"10 Rue de Paris, Imm. Ambalach",+253 21 35 82 25,11.5953406,43.1471252,google_places,geolocalise
+350,Hafad Housing - Agence Immobiliere,Commerce & Courses,Agence immobilière,immobilier,agence immobiliere,Djibouti-ville,Haramous,+253 77 32 97 00,11.5598488,43.1535903,google_places,geolocalise
+351,Alhamdani Real Estate Investments,Commerce & Courses,Agence immobilière,immobilier,promotion immobiliere,Djibouti-ville,Gabode 5 Lot 105,+253 77 44 44 74,11.564412,43.1455612,google_places,geolocalise
+352,Janaat Immobilier,Commerce & Courses,Agence immobilière,immobilier,agence immobiliere,Djibouti-ville,Rue de Soleillet,+253 77 06 93 49,11.5932886,43.1454153,google_places,geolocalise
+353,Societe Immobiliere de Djibouti (SID),Administration & Services publics,Office / agence publique sectorielle,immobilier,societe publique,Djibouti-ville,Q1,+253 21 35 19 77,11.5910121,43.1436829,google_places,geolocalise
+354,City Life Agency,Commerce & Courses,Agence immobilière,immobilier,agence immobiliere,Djibouti-ville,Haramous,+253 21 25 05 05,11.5720813,43.1575082,google_places,geolocalise
+355,Dream House Real Estate,Commerce & Courses,Agence immobilière,immobilier,agence immobiliere,Djibouti-ville,Ave Bernard,+253 77 83 46 35,11.5720558,43.1455324,google_places,geolocalise
+356,Iibiy (plateforme immobiliere),Commerce & Courses,Agence immobilière,immobilier,plateforme en ligne,Djibouti-ville,,+253 77 78 08 08,11.5586589,43.1392678,google_places,geolocalise
+357,Regus - Salaam Tower (coworking),Services à la personne,Informatique / réparation,services,coworking / bureaux,Djibouti-ville,"5e etage, Salaam Tower, Rue de Geneve",+253 21 33 46 14,11.5918896,43.1429604,google_places,geolocalise
+358,ARULOS - Agence de Rehabilitation Urbaine et du Logement Social,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - logement social,Djibouti-ville,Zone industrielle,+253 21 35 43 44,11.5785715,43.158588,google_places,geolocalise
+359,Alkhalil For Money Transfer,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,transfert d'argent,Djibouti-ville,"Ave Roosevelt, face Mosquee Hamoudi",+253 21 35 91 11,11.5926314,43.1461653,google_places,geolocalise
+360,Bab Al-Yemen Jewelery,Commerce & Courses,Bijouterie / parfumerie,commerce,bijouterie,Djibouti-ville,Ave Brazzaville,+253 77 51 95 80,11.5928942,43.1487342,google_places,geolocalise
+361,Bijouterie Mukesh Ranpara,Commerce & Courses,Bijouterie / parfumerie,commerce,bijouterie,Djibouti-ville,Rue de Bender,+253 77 82 88 02,11.592764,43.1482879,google_places,geolocalise
+362,Ali Baba Treasures (souvenirs),Commerce & Courses,Boutique spécialisée,commerce,souvenirs / artisanat,Djibouti-ville,Centre-ville,+253 77 46 66 95,11.5930854,43.1488594,google_places,geolocalise
+363,Alanwar Bijouterie,Commerce & Courses,Bijouterie / parfumerie,commerce,bijouterie,Djibouti-ville,Rue de Bender,,11.5928145,43.1484876,google_places,geolocalise
+364,Boutique AFIA (miel yemenite),Commerce & Courses,Bijouterie / parfumerie,commerce,miel / produits naturels,Djibouti-ville,Ave Brazzaville,+253 77 32 21 74,11.593046,43.148689,google_places,geolocalise
+365,Aqua Club Diving Center,Tourisme & Loisirs,Centre de plongée / sports nautiques,tourisme,centre de plongee,Djibouti-ville,Rue de Moscou,+253 77 82 31 50,11.5938634,43.1485556,google_places,geolocalise
+366,Dolphin Excursions (plongee / requin-baleine),Tourisme & Loisirs,Centre de plongée / sports nautiques,tourisme,excursions maritimes,Djibouti-ville,"Haramous, Massida compound",+253 77 36 79 46,11.5708154,43.1590162,google_places,geolocalise
+367,Ets Wassel SARL (electromenager),Commerce & Courses,Électroménager / mobilier,commerce,electromenager / mobilier,Djibouti-ville,Bd de Gaulle,+253 21 35 55 55,11.5904756,43.1517112,google_places,geolocalise
+368,Dico Meubles / Chez Dico,Commerce & Courses,Électroménager / mobilier,commerce,mobilier,Djibouti-ville,Ave Georges Clemenceau,+253 21 35 15 37,11.5939275,43.1469652,google_places,geolocalise
+369,Rage Electronics,Commerce & Courses,Électroménager / mobilier,commerce,electromenager,Djibouti-ville,Rue de Geneve,+253 21 35 12 77,11.5930462,43.1450607,google_places,geolocalise
+370,Airmost (climatisation),Commerce & Courses,Électroménager / mobilier,commerce,climatisation,Djibouti-ville,Route du Kempinski,+253 77 43 39 76,11.6098248,43.1456186,google_places,geolocalise
+371,Wassel Meubles,Commerce & Courses,Électroménager / mobilier,commerce,mobilier,Djibouti-ville,Rue de Bender,+253 21 35 19 10,11.5928935,43.1479452,google_places,geolocalise
+372,Skylife Homes,Commerce & Courses,Électroménager / mobilier,commerce,mobilier,Djibouti-ville,"Zone industrielle sud, Boulaos",+253 21 35 66 67,11.5740029,43.1522306,google_places,geolocalise
+373,Ceramica Wassel,Commerce & Courses,Quincaillerie / bricolage,commerce,carrelage / peinture,Djibouti-ville,Bd de Gaulle,+253 21 35 70 70,11.5905885,43.1513265,google_places,geolocalise
+374,Happy Home,Commerce & Courses,Électroménager / mobilier,commerce,mobilier,Djibouti-ville,"Hamoudi Center, Ave Roosevelt",,11.5926792,43.1451208,google_places,geolocalise
+375,Cyb-ista Solutions,Services à la personne,Informatique / réparation,services,developpement web / IT,Djibouti-ville,Rue de Rome,+253 77 14 30 88,11.5953166,43.1477185,google_places,geolocalise
+376,AfricoTech Solutions,Services à la personne,Informatique / réparation,services,services informatiques,Djibouti-ville,Q7,+253 77 43 49 58,11.5885948,43.1453647,google_places,geolocalise
+377,Dasi-max Technologie,Services à la personne,Informatique / réparation,services,reseaux informatiques,Djibouti-ville,Centre-ville,+253 77 23 40 61,11.5885948,43.1453647,google_places,geolocalise
+378,SDSI,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,Rue de Venise,+253 21 35 13 22,11.5900094,43.1350767,google_places,geolocalise
+379,Tech Right Multi Services,Commerce & Courses,Électronique / téléphonie,commerce,informatique / electronique,Djibouti-ville,"Rue Nelson Mandela, Aviation",+253 77 01 74 24,11.5581568,43.1413213,google_places,geolocalise
+380,Mastertic,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,"Rue de Bruxelles, Res. Ougoul",+253 77 42 19 78,11.5950871,43.1481785,google_places,geolocalise
+381,Choufa Tech,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,Ave Georges Clemenceau,+253 77 79 59 39,11.5934047,43.1476757,google_places,geolocalise
+382,"Smarttech Zone (IT & Security, Hikvision)",Services à la personne,Informatique / réparation,services,securite electronique / IT,Djibouti-ville,Hamoudi Trading Center,+253 77 16 79 03,11.5927141,43.1450277,google_places,geolocalise
+383,CraftNova Solutions,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,"Imm. Elmi Guessod, Rue de Geneve",+253 77 50 54 20,11.5969175,43.145749,google_places,geolocalise
+384,East Network Engineering,Services à la personne,Informatique / réparation,services,reseaux / cybersecurite,Djibouti-ville,"Ave Guelleh Batal, Ambouli",+253 77 19 76 58,11.5745953,43.1443081,google_places,geolocalise
+385,Caritas Djibouti,Associations & ONG,ONG internationale,ONG_association,ONG,Djibouti-ville,"Rue Capitaine Briard, BP 94",+253 21 35 39 81,11.5994452,43.1506682,google_places,geolocalise
+386,International Children Action Network,Associations & ONG,ONG internationale,ONG_association,ONG enfance,Djibouti-ville,Heron,,11.6153413,43.1480098,google_places,geolocalise
+387,HCR Djibouti (UNHCR),Diplomatie & Organisations internationales,Agence ONU,organisation_internationale,agence ONU,Djibouti-ville,Heron,,11.6131725,43.1512345,google_places,geolocalise
+388,CICR Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,Croix-Rouge internationale,Djibouti-ville,Heron,+253 21 35 26 11,11.61593,43.1488426,google_places,geolocalise
+389,Croissant-Rouge de Djibouti,Associations & ONG,Organisation humanitaire,ONG_association,societe nationale,Balbala,Balbala,+253 21 33 98 50,11.5564955,43.1240322,google_places,geolocalise
+390,Campement Ras Bir - Houguef Beach,Hébergement,Campement / écolodge,hebergement,campement touristique,Obock,Ras Bir,+253 77 83 75 49,11.9798926,43.3277791,google_places,geolocalise
+391,Campement de la Foret du Day,Hébergement,Campement / écolodge,hebergement,campement touristique,Region de Tadjourah,Day,+253 77 82 94 74,11.7831026,42.6411398,google_places,geolocalise
+392,Auberge de l'Avenue 13,Hébergement,Auberge / guesthouse,hebergement,auberge,Djibouti-ville,Bd de Gaulle,+253 21 25 43 43,11.5897035,43.1514986,google_places,geolocalise
+393,Campement de Ras Ali,Hébergement,Campement / écolodge,hebergement,campement touristique,Tadjourah,Ras Ali,+253 77 02 92 84,11.7726585,42.9355097,google_places,geolocalise
+394,Hotel Auberge Boulaos,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Zone industrielle sud,+253 21 33 43 43,11.5731645,43.155897,google_places,geolocalise
+395,Campement de Dittilou,Hébergement,Campement / écolodge,hebergement,campement touristique,Region de Tadjourah,Dittilou,,11.7808009,42.6933558,google_places,geolocalise
+396,La Mer Rouge Village (Obock),Hébergement,Auberge / guesthouse,hebergement,guesthouse,Obock,Obock,+253 77 70 69 95,11.9646882,43.2883982,google_places,geolocalise
+397,Hotel Ali Sabieh (Djibouti-ville),Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Centre-ville,+253 21 35 32 64,11.5940132,43.145854,google_places,geolocalise
+398,Auberge de Dikhil,Hébergement,Auberge / guesthouse,hebergement,auberge,Dikhil,Quartier TP,+253 77 43 90 92,11.1066257,42.3620982,google_places,geolocalise
+399,Hotel-Restaurant Palmeraie Dikhil,Hébergement,Hôtel (standard),hebergement,hotel,Dikhil,Dikhil,+253 77 10 31 46,11.1072126,42.3742485,google_places,geolocalise
+400,La Taverne Restaurant,Alimentation & Restauration,Restaurant international,restauration,restaurant francais,Djibouti-ville,Haramous,+253 77 64 74 74,11.5647288,43.1640215,google_places,geolocalise
+401,Poissonnerie Ocean,Commerce & Courses,Boutique spécialisée,commerce,poissonnerie,Djibouti-ville,Q4,+253 77 85 47 20,11.58924,43.143951,google_places,geolocalise
+402,L'Elixir Parfumerie & Cosmetiques,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Centre-ville,+253 21 35 28 38,11.5933878,43.1446375,google_places,geolocalise
+403,Jewel Perfume and Cosmetics,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Centre-ville,+253 77 08 30 64,11.592868,43.1458687,google_places,geolocalise
+404,Parfumerie Saidati,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Moulk,+253 77 13 46 71,11.5682591,43.152618,google_places,geolocalise
+405,Touch Me Perfumes and Cosmetics,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,"Rue d'Ethiopie, pres Mosquee Hamoudi",+253 77 72 72 72,11.5928125,43.1460625,google_places,geolocalise
+406,Rasasi Perfumes & Cosmetics,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Ligne bus Hayableh,+253 77 26 46 30,11.5909638,43.1468773,google_places,geolocalise
+407,Djibouti Cosmetiques,Commerce & Courses,Bijouterie / parfumerie,commerce,cosmetiques,Djibouti-ville,Centre-ville,+253 77 86 43 85,11.5928502,43.1460237,google_places,geolocalise
+408,Abu Alghaith Trading (parfums),Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Place Rainbow / Daqsila,+253 77 20 96 54,11.5898088,43.1467595,google_places,geolocalise
+409,Rose Paris (parfums / oud),Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Ave Roosevelt,+253 77 58 18 79,11.5927041,43.1460857,google_places,geolocalise
+410,Parfumerie Modarek,Commerce & Courses,Bijouterie / parfumerie,commerce,parfumerie,Djibouti-ville,Centre-ville,+253 21 35 19 68,11.5938513,43.1463053,google_places,geolocalise
+411,O'nasty Herbal,Commerce & Courses,Bijouterie / parfumerie,commerce,produits naturels,Balbala,Pres commissariat Al Rahma,+253 77 38 65 62,11.5578655,43.0986812,google_places,geolocalise
+412,Boutique Okar Abdillahi Said,Commerce & Courses,Boutique spécialisée,commerce,boutique-restaurant,Dikhil,Centre de Dikhil,+253 27 42 01 80,11.1069625,42.3699844,google_places,geolocalise
+413,Okareh Boys Band Ethio Fast Food,Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Dikhil,Dikhil,+253 77 82 88 52,11.1054525,42.370419,google_places,geolocalise
+414,Mosquee de Tadjourah (front de mer),Culture & Culte,Mosquée,culte,mosquee,Tadjourah,Tadjourah,,11.7850525,42.8688206,google_places,geolocalise
+415,Ecole D'Ileys (CEM Gabode II),Éducation & Formation,École primaire,education,ecole / college,Djibouti-ville,Gabode II,+253 21 35 37 85,11.5707206,43.1493266,google_places,geolocalise
+416,Ecole La Farandole,Éducation & Formation,Lycée (public / privé),education,ecole privee,Djibouti-ville,"Gabode, face hotel Red Sea",+253 77 85 98 92,11.5681224,43.1488148,google_places,geolocalise
+417,Ecole de la Nativite,Éducation & Formation,École internationale / française,education,ecole privee catholique,Djibouti-ville,Plateau du Serpent,+253 21 35 09 72,11.6058441,43.155674,google_places,geolocalise
+418,Ecole primaire de Gabal,Éducation & Formation,École primaire,education,ecole primaire,Djibouti-ville,Gabal,,11.5615862,43.1419269,google_places,geolocalise
+419,Ecole Privee des Lumieres,Éducation & Formation,Lycée (public / privé),education,ecole privee,Djibouti-ville,Ambouli,+253 21 35 62 61,11.5647813,43.132423,google_places,geolocalise
+420,Police - 5e arrondissement,Administration & Services publics,Police / gendarmerie,securite,commissariat,Balbala,Balbala,+253 77 33 07 96,11.5614184,43.1169154,google_places,geolocalise
+421,Police - 2e arrondissement,Administration & Services publics,Police / gendarmerie,securite,commissariat,Djibouti-ville,RN2,,11.5793209,43.1436579,google_places,geolocalise
+422,Police - 3e arrondissement,Administration & Services publics,Police / gendarmerie,securite,commissariat,Djibouti-ville,Ambouli,+253 77 11 55 30,11.5670347,43.1323002,google_places,geolocalise
+423,Bureau du 2e arrondissement - Commune de Boulaos,Administration & Services publics,Collectivité territoriale,administration,arrondissement,Djibouti-ville,RN2,,11.5792411,43.1436579,google_places,geolocalise
+424,Cabinet Veterinaire (Route de l'aeroport),Santé,Vétérinaire,sante,veterinaire,Djibouti-ville,Airport Road,+253 21 34 01 19,11.5556636,43.148312,google_places,geolocalise
+425,Splash City (parc aquatique),Tourisme & Loisirs,Parc aquatique / cinéma,loisirs,parc aquatique,Djibouti-ville,Heron,+253 77 33 40 00,11.6189102,43.1509704,google_places,geolocalise
+426,Star Cinemas (Bawadi Mall),Tourisme & Loisirs,Parc aquatique / cinéma,loisirs,cinema,Djibouti-ville,"Bawadi Mall, Rue de Venise",+253 21 25 21 21,11.5906444,43.1330092,google_places,geolocalise
+427,Complexe Djicimbir (foot 5 / aire de jeux),Tourisme & Loisirs,Complexe sportif / salle de sport,loisirs,complexe sportif,Balbala,"Hodan 4, Rue d'Arta",+253 77 85 53 99,11.5506112,43.0905593,google_places,geolocalise
+428,Complexe Sportif et des Loisirs (Haramous),Tourisme & Loisirs,Complexe sportif / salle de sport,loisirs,terrains de football,Djibouti-ville,Haramous,+253 77 49 24 66,11.5684572,43.1591155,google_places,geolocalise
+429,Joyland Centre de Loisirs,Tourisme & Loisirs,Complexe sportif / salle de sport,loisirs,aire de jeux / evenements,Djibouti-ville,Aviation,+253 77 40 79 86,11.5577404,43.1536669,google_places,geolocalise
+430,Irmaan Exchange,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,transfert d'argent / change,Djibouti-ville,Centre-ville,+253 21 34 57 57,11.5937662,43.1452405,google_places,geolocalise
+431,CPEC de Djibouti,Services financiers & juridiques,Microfinance,finance,microfinance,Djibouti-ville,Q6,+253 21 35 35 95,11.5782658,43.1367142,google_places,geolocalise
+432,Fonds de Developpement Economique de Djibouti (FDED),Administration & Services publics,Institution publique / fonds,finance,fonds public,Djibouti-ville,Ave Mohamed Farah Dirir,+253 21 35 33 91,11.5936625,43.1479844,google_places,geolocalise
+433,ADDS - Agence Djiboutienne de Developpement Social,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - developpement social,Djibouti-ville,"Ave Mohamed Djama Elabeh, Plateau du Serpent, BP 4298",,11.6044139,43.1536764,google_places,geolocalise
+434,UNFD - Union Nationale des Femmes Djiboutiennes,Associations & ONG,Association locale,ONG_association,association nationale,Djibouti-ville,Q6,+253 21 35 04 21,11.5781869,43.137525,google_places,geolocalise
+435,Securit'as Djibouti,Services à la personne,Sécurité privée,services,securite privee,Djibouti-ville,Route de l'aeroport,+253 21 34 20 87,11.5618654,43.1480991,google_places,geolocalise
+436,Group One Security,Services à la personne,Sécurité privée,services,securite privee,Djibouti-ville,Plateau du Serpent,+253 21 32 38 40,11.606953,43.1556761,google_places,geolocalise
+437,Select Security Services,Services à la personne,Sécurité privée,services,securite privee,Djibouti-ville,Haramous,,11.5683832,43.1618061,google_places,geolocalise
+438,Mosquee Dar Al-Rahma,Culture & Culte,Mosquée,culte,mosquee,Balbala,Balbala,+253 77 05 42 09,11.5710558,43.0988542,google_places,geolocalise
+439,Mosquee Aicha,Culture & Culte,Mosquée,culte,mosquee,Balbala,Balbala,,11.5555065,43.1024244,google_places,geolocalise
+440,Mosquee Ummu Salamah,Culture & Culte,Mosquée,culte,mosquee,Balbala,PK12,,11.5757819,43.0825855,google_places,geolocalise
+441,Mosquee Fatouma-Zahra (et ecole coranique),Culture & Culte,Mosquée,culte,mosquee / madrasa,Balbala,PK12,+253 77 60 46 04,11.553296,43.0833106,google_places,geolocalise
+442,Mosquee Agadalis,Culture & Culte,Mosquée,culte,mosquee,Balbala,Balbala,,11.5614903,43.1068416,google_places,geolocalise
+443,Mosquee Bab Al-Rahma,Culture & Culte,Mosquée,culte,mosquee,Balbala,Balbala,,11.5623125,43.0868594,google_places,geolocalise
+444,Mosquee Sourour,Culture & Culte,Mosquée,culte,mosquee,Balbala,"Daisteh, 4e arrondissement",+253 77 88 75 34,11.5527437,43.1161385,google_places,geolocalise
+445,Mosquee Barwaqo,Culture & Culte,Mosquée,culte,mosquee,Balbala,Barwaqo,+253 77 30 98 18,11.568612,43.1100812,google_places,geolocalise
+446,Le Sporting (articles de sport),Commerce & Courses,Articles de sport,commerce,articles de sport,Djibouti-ville,Place du 27 Juin,+253 21 35 06 59,11.5945638,43.1468851,google_places,geolocalise
+447,Le Sporting - Bawadi Mall,Commerce & Courses,Articles de sport,commerce,articles de sport,Djibouti-ville,Bawadi Mall,+253 21 35 88 47,11.5909456,43.1333649,google_places,geolocalise
+448,Pharmacie de l'Hopital (Bawadi),Santé,Pharmacie,sante,pharmacie,Djibouti-ville,,,11.570767,43.132526,nearplace_annuaire,a_verifier
+449,Pharmacie de la Republique,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Avenue 13,,11.589538,43.150844,nearplace_annuaire,a_verifier
+450,Pharmacie Al Nour,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Centre-ville,,11.593657,43.147885,nearplace_annuaire,a_verifier
+451,Pharmacie de la Corne d'Afrique,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue d'Athenes,,11.595586,43.14796,nearplace_annuaire,a_verifier
+452,Pharmacie de Balbala,Santé,Pharmacie,sante,pharmacie,Balbala,Balbala,,11.558142,43.111108,nearplace_annuaire,a_verifier
+453,Pharmacie Al-Ouma,Santé,Pharmacie,sante,pharmacie,Balbala,Balbala,,11.549374,43.111411,nearplace_annuaire,a_verifier
+454,Pharmacie de Hayableh,Santé,Pharmacie,sante,pharmacie,Balbala,Hayableh,,11.566848,43.103485,nearplace_annuaire,a_verifier
+455,Pharmacie Populaire,Santé,Pharmacie,sante,pharmacie,Balbala,Balbala,,11.557606,43.100492,nearplace_annuaire,a_verifier
+456,Pharmacie PK12,Santé,Pharmacie,sante,pharmacie,Balbala,PK12,,11.557463,43.080948,nearplace_annuaire,a_verifier
+457,Optic 2000,Commerce & Courses,Optique / horlogerie,commerce,optique,Djibouti-ville,Rue d'Ethiopie,,11.593496,43.145965,nearplace_annuaire,a_verifier
+458,Cabinet Dr. Georgialis,Santé,Centre médical spécialisé,sante,medecin generaliste,Djibouti-ville,Centre-ville,,11.596327,43.147794,nearplace_annuaire,a_verifier
+459,Boulangerie de Hayableh,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie,Balbala,Hayableh,,11.566706,43.105137,nearplace_annuaire,a_verifier
+460,L'O Delices Patisserie,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,patisserie,Djibouti-ville,Plateau du Serpent,,11.609873,43.14729,nearplace_annuaire,a_verifier
+461,Sharaf Hotel et Resto,Hébergement,Hôtel (standard),hebergement,hotel-restaurant,Djibouti-ville,Gabode,,11.567167,43.148771,nearplace_annuaire,a_verifier
+462,Hotel Chinois Honglou (Red Building),Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,"Route Nelson Mandela, Ambouli",,11.557838,43.139774,nearplace_annuaire,a_verifier
+463,Appart Hotel Moulk Center,Hébergement,Appart-hôtel / résidence,hebergement,appart-hotel,Djibouti-ville,"Route de l'aeroport, BP 3648",,11.568574,43.152364,nearplace_annuaire,a_verifier
+464,African Village Hotel,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Aviation,,11.557805,43.146397,nearplace_annuaire,a_verifier
+465,Sixteen Eleven Kitchen,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,Route n.4,,11.572077,43.145647,nearplace_annuaire,a_verifier
+466,Urban Kitchen,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,Aviation,,11.560767,43.146174,nearplace_annuaire,a_verifier
+467,Point Burger - Ambouli,Alimentation & Restauration,Fast-food & snack,restauration,fast-food,Djibouti-ville,Ambouli,,11.563129,43.13363,nearplace_annuaire,a_verifier
+468,Sun Shine Restaurant,Alimentation & Restauration,Restaurant africain / local,restauration,restaurant,Djibouti-ville,Aviation,,11.559882,43.14782,nearplace_annuaire,a_verifier
+469,ADVANCE TECHNOLOGY SARL,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,Distributeur officiel LG,+253 21 34 18 80,11.5736754,43.1589559,google_places,geolocalise
+470,DICO MUEBLES,Commerce & Courses,Électroménager / mobilier,commerce,mobilier,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+471,ENTREPRISE GENERALE D'ELECTRICITE,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,electricite,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+472,TRADE AGENCY,Commerce & Courses,Import-export / négoce,commerce,negoce,Balbala,Lot PK12,+253 77 73 49 12,11.5520721,43.0462122,google_places,geolocalise
+473,GROUPE TANI,Commerce & Courses,Import-export / négoce,commerce,groupe diversifie,Djibouti-ville,"Zone industrielle sud, Boulaos",+253 21 25 09 80,11.5772987,43.1577309,google_places,a_verifier
+474,DJIB TREX,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+475,PHARMACIE AL RAZI,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+476,SARL TAWAKALE,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+477,B & GA GENERAL TRADING & LOGISTIC FZCO,Transport & Logistique,Zone franche / industrielle,logistique,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+478,AGENCE IMMOBILIERE AVI,Commerce & Courses,Agence immobilière,immobilier,agence immobiliere,Djibouti-ville,,+253 21 35 08 56,11.5950453,43.1461528,google_places,geolocalise
+479,DITA TRANSIT,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+480,PRODIMA SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+481,ETS IBRAHIM AHMED AL-DOUBAI,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+482,MASSIDA TRANSIT SARL,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+483,SABA AFRICAN BANK,Services financiers & juridiques,Banque / agence bancaire,finance,banque,Djibouti-ville,Rue Mohamed Kamel,+253 21 35 57 77,11.5922891,43.1438868,google_places,geolocalise
+484,BATECH,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+485,RED SEA BUNKERING FZCO,Transport & Logistique,Transit / fret / shipping,logistique,soutage maritime,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+486,PHARMACIE DE LA NATION,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Rue de Bender,,11.591574,43.145869,google_places,a_verifier
+487,LABORATOIRE D'ANALYSES MEDICALES MER ROUGE,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,Rue de Moscou,+253 21 35 30 12,11.5942941,43.1469799,google_places,geolocalise
+488,NURIE EXPRESS TRANSIT SERVICES,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+489,HORN AFRICA TECHNOLOGY SARL,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,,+253 21 34 67 72,11.5924131,43.1442541,google_places,a_verifier
+490,EAST AFRICAN LOGISTICS,Transport & Logistique,Transit / fret / shipping,logistique,logistique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+491,ETS DJAMA OMAR SAID,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+492,ETS NAGUIB SA,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+493,MADASONS SARL,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,+253 21 35 05 63,11.595659,43.1467479,google_places,a_verifier
+494,ELECTRO-TECH,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+495,ELITE TECH SARL,Services à la personne,Informatique / réparation,services,informatique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+496,S.R TRADING,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+497,HORIZON DJIBOUTI TERMINALS LTD FZCO,Transport & Logistique,Port / terminal,logistique,terminal petrolier,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+498,NEGOCE INTERNATIONALE,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+499,VEDIOR GM SARL,Services à la personne,Informatique / réparation,services,services,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+500,SOCIETE TRANSIT MODERNE,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+501,ENTREPRISE LOUL,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+502,DJIB-FAYADE SARL,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+503,SODICOM SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,"Salines Ouest, Batiment Al Galuxe",+253 21 35 85 12,11.5925822,43.1440085,google_places,geolocalise
+504,DAIL PHARMACIE,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,,,11.5902027,43.1513592,google_places,geolocalise
+505,MAGASIN DUBAI ELECTRONIC,Commerce & Courses,Électronique / téléphonie,commerce,electronique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+506,FURREH INTERNATIONAL TRADING,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+507,AL CHADILY INTERNATIONAL GROUP,Commerce & Courses,Import-export / négoce,commerce,groupe,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+508,GROUPE KAMAJ,Commerce & Courses,Import-export / négoce,commerce,groupe,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+509,CABINET DENTAIRE DJAOUI-FATHI-PER,Santé,Cabinet dentaire,sante,cabinet dentaire,Djibouti-ville,Rue d'Ethiopie,+253 21 35 67 69,11.5952356,43.1463867,google_places,a_verifier
+510,MARITIME TRANSPORT INTERNATIONAL,Transport & Logistique,Transit / fret / shipping,logistique,transport maritime,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+511,GLOBAL GATEWAY SOLUTIONS SARL,Transport & Logistique,Transit / fret / shipping,logistique,logistique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+512,ETHIO TRADE GENERAL TRADING FZCO,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+513,L'INCANDESCENCE SARL,Services à la personne,Informatique / réparation,services,services,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+514,LABORATOIRE D'ANALYSES ABDAN,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+515,ALUMINIUM 2000 FZCO,"Industrie, Énergie & Grandes entreprises",Production industrielle,industrie,aluminium,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+516,BAGAWAD ENTREPRISE,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+517,LIMOBCO MANAGEMENT SERVICES SARL,Services à la personne,Informatique / réparation,services,gestion,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+518,GREAT HORN INVESTMENT HOLDING SAS (GHIH),"Industrie, Énergie & Grandes entreprises",Holding / groupe,finance,holding d'Etat,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+519,SOCIETE DJIBOUTIENNE D'HOTELLERIE ET TOURISME,Hébergement,Hôtel (standard),tourisme,hotellerie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+520,HOTEL AUBERGE SABLE BLANC,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,,+253 21 35 29 85,11.600547,43.1493577,google_places,geolocalise
+521,OVIYAM INTERNATIONAL FZCO,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+522,INTERMODAL SHIPPING AND LOGISTICS SARL,Transport & Logistique,Transit / fret / shipping,logistique,shipping,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+523,SANITAIREPLUS,Commerce & Courses,Quincaillerie / bricolage,commerce,sanitaire,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+524,TECNO TRANS SERVICE SARL,Transport & Logistique,Transit / fret / shipping,logistique,transport,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+525,ETS AHMED TAHER OMAR,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+526,ETABLISSEMENT WASSEL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,+253 21 35 10 75,11.5816489,43.1562502,google_places,a_verifier
+527,PHARMACIE DE LA PLACE D'AMBOULI,Santé,Pharmacie,sante,pharmacie,Djibouti-ville,Ambouli,,11.5626264,43.1362913,google_places,geolocalise
+528,SOCIETE MARITIME LOUIS SAVON & RIES SA,Transport & Logistique,Transit / fret / shipping,logistique,consignation maritime,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+529,OKAR TRANSIT SERVICE,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+530,DJIBOUTI MARINE SERVICES (DMS) SAS,Transport & Logistique,Transit / fret / shipping,logistique,services maritimes,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+531,DJIBOUTI AIRPORT CARGO FZCO,Transport & Logistique,Compagnie aérienne / fret aérien,logistique,fret aerien,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+532,HOTEL LA SIESTA,Hébergement,Hôtel (standard),hebergement,hotel,Djibouti-ville,Route de la Siesta,+253 77 69 25 11,11.602056,43.1531332,google_places,geolocalise
+533,BANMAR FZCO,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+534,LE MOULIN SARL,Alimentation & Restauration,Pâtisserie / boulangerie,restauration,boulangerie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+535,CEGELEM DJIBOUTI SARL,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,electricite,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+536,L'EQUATEUR,Commerce & Courses,Boutique spécialisée,commerce,commerce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+537,AHMED STEEL COMPANY,"Industrie, Énergie & Grandes entreprises",Production industrielle,industrie,acier,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+538,DIS-PRO SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+539,SECURITY MAX,Services à la personne,Sécurité privée,services,securite privee,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+540,CGMR - COMPAGNIE DES GAZ DE LA MER ROUGE,"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,industrie,gaz industriels,Djibouti-ville,,+253 21 35 01 78,11.5739866,43.1602984,google_places,geolocalise
+541,ANDRE MARILL (Groupe Marill),Services automobile,Concessionnaire auto,commerce,distribution / auto,Djibouti-ville,57 RN2,+253 21 32 94 00,11.5731212,43.1516851,google_places,geolocalise
+542,WAAFI,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,mobile money,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+543,AL CHADILY COMMERCIAL STORES SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+544,NATIONAL OIL DJIBOUTI (NOC) SAS,"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,energie,hydrocarbures,Djibouti-ville,Heron,+253 21 35 20 55,11.6087142,43.1460848,google_places,geolocalise
+545,NALCO CONSTRUCTION & LOGISTICS,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+546,IVORY JET SERVICES,Transport & Logistique,Compagnie aérienne / fret aérien,logistique,aviation,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+547,CHINA MERCHANTS HOLDINGS (DJIBOUTI) FZE,Transport & Logistique,Port / terminal,logistique,investissement portuaire,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+548,NAJWAL ALUMINIUM DE DJIBOUTI SARL,"Industrie, Énergie & Grandes entreprises",Production industrielle,industrie,aluminium,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+549,HOMAN ENGINEERING SARL,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,ingenierie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+550,DJIBOUTI HOLDING COMPANY SA,"Industrie, Énergie & Grandes entreprises",Holding / groupe,finance,holding,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+551,DIBCO,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+552,AU CHIC PARISIEN CHEZ ALI,Commerce & Courses,Vêtements & accessoires,commerce,habillement,Djibouti-ville,Rue de Paris,+253 21 35 17 27,11.5940712,43.1468221,google_places,geolocalise
+553,ABUSAMI STATIONERY,Commerce & Courses,Librairie / papeterie,commerce,papeterie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+554,IMPEX SOLUTION FZCO,Commerce & Courses,Import-export / négoce,commerce,import-export,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+555,SABA INTERNATIONAL TRADING COMPANY SARL,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,"Saba Building, Saline Ouest, 2e etage",+253 21 35 66 69,11.5844911,43.1345994,google_places,geolocalise
+556,ETABLISSEMENTS WABERI SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+557,IKRAM INTERNATIONAL TRANSIT SARL,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+558,LIBRAIRIE LE POINT SARL,Commerce & Courses,Librairie / papeterie,commerce,librairie,Djibouti-ville,Rue de Rome,+253 21 35 67 57,11.5951546,43.1475582,google_places,a_verifier
+559,CHALLENGE TRANSIT SERVICES,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+560,ASSOCIATION AL-BIRI CHARITABLE,Associations & ONG,Organisation humanitaire,ONG_association,association caritative,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+561,ASSOCIATION AUTRE REGARD,Associations & ONG,Association locale,ONG_association,association,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+562,MASSIDA SHIPPING SARL,Transport & Logistique,Transit / fret / shipping,logistique,shipping,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+563,PLEIN SOLEIL MER ROUGE SARL,Tourisme & Loisirs,Complexe sportif / salle de sport,tourisme,loisirs,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+564,SORAM INDUSTRIES LIMITED,"Industrie, Énergie & Grandes entreprises",Production industrielle,industrie,industrie,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+565,SOCIETE DJIBOUTIENNE DE VENTE DE KEROSENE (SDVK),"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,energie,kerosene,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+566,BEACON FZE,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+567,SOCIETE IMMOBILIERE DE DJIBOUTI,Commerce & Courses,Agence immobilière,immobilier,promotion immobiliere,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+568,CAPITAL RENT A CAR,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+569,ENTREPRISE DAWALEH CONSTRUCTION,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+570,CONSPLANT JV,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+571,ETABLISSEMENTS TANI SARL,Commerce & Courses,Import-export / négoce,commerce,distribution,Djibouti-ville,"Zone industrielle sud, Boulaos",+253 21 25 09 80,11.5772987,43.1577309,google_places,a_verifier
+572,M & A CARE SARL,Santé,Centre médical spécialisé,sante,services medicaux,Djibouti-ville,,+253 21 33 50 15,11.595589,43.1480956,google_places,a_verifier
+573,EASTERN RIRACHE GROUP,Commerce & Courses,Import-export / négoce,commerce,groupe,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+574,SOVEREIGN GLOBAL DJIBOUTI FZE,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+575,GULF TRANSIT AND TRANSPORT SERVICE,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+576,RIFT VALLEY PRINTING PRESS,Services à la personne,Photographie / impression,industrie,imprimerie,Djibouti-ville,,,11.593111,43.1489405,google_places,a_verifier
+577,ETABLISSEMENT WASSEL AMOUD,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,Waberi Group Point of Sales,+253 77 80 40 91,11.5907223,43.1455025,google_places,a_verifier
+578,DENTER F.Z.C.O,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+579,SOCIETE DE TRANSIT ET DE COMMERCE SARL,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+580,GARAGE DJIB AUTO-CLIM,Services automobile,Garage / réparation,services,garage / climatisation,Djibouti-ville,,+253 77 74 50 50,11.5879226,43.1335205,google_places,a_verifier
+581,LA LORRAINE SARL,Commerce & Courses,Boutique spécialisée,commerce,commerce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+582,ROYAL GENERAL TRADING,Commerce & Courses,Import-export / négoce,commerce,negoce,Djibouti-ville,"Rue de Rome, 2e etage",+253 77 17 81 45,11.5948724,43.1474588,google_places,geolocalise
+583,ETS ABDOUL BASSET,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+584,SELECT SECURITY AND SERVICES,Services à la personne,Sécurité privée,services,securite privee,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+585,FUJITA CORPORATION DJIBOUTI BRANCH,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+586,TRANSVRAC SARL,Transport & Logistique,Transit / fret / shipping,logistique,transport vrac,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+587,ENTREPRISE STAR GENERAL LOGISTICS,Transport & Logistique,Transit / fret / shipping,logistique,logistique,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+588,AFRICA SOVEREIGN CARBON REGISTRY SAS,Services à la personne,Informatique / réparation,services,registre carbone,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+589,ETABLISSEMENT ABDOU ALI MODAREK,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+590,ZEHABU GENERAL TRADING FZE,Transport & Logistique,Zone franche / industrielle,commerce,zone franche,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+591,EAST AFRICA CONSULTING SARL,Services à la personne,Informatique / réparation,services,conseil,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+592,ENTREPRISE DE CONSTRUCTION OKIEH,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+593,TAMAMOUL MOTORS SARL,Services automobile,Concessionnaire auto,commerce,automobile,Djibouti-ville,Route Aicha Bogoreh,+253 21 35 27 71,11.570895,43.1540726,google_places,geolocalise
+594,MOBIL OIL DJIBOUTI SA,"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,energie,hydrocarbures,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+595,SOCIETE DE CONSTRUCTION GENERALE KAARCH,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,construction,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+596,PYRAMID CAR RENTAL SARL,Services automobile,Location de voitures,services,location de voitures,Djibouti-ville,Route de la Siesta,+253 21 35 82 03,11.5793235,43.1574742,google_places,geolocalise
+597,OAB ARCHITECTURE AND CONSTRUCTION,"Industrie, Énergie & Grandes entreprises",Construction / BTP,BTP,architecture,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+598,RED SEA TRANSIT & TRANSPORT SERVICE,Transport & Logistique,Transit / fret / shipping,logistique,transit,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+599,RED SEA SHIPPING AGENCY,Transport & Logistique,Transit / fret / shipping,logistique,agence maritime,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+600,MAWE,Commerce & Courses,Boutique spécialisée,commerce,commerce,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+601,ABDOURAHMAN AHMED TAHA,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+602,IBRAHIM ABDI KAHEN,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+603,ALI MAWEL,Commerce & Courses,Boutique spécialisée,commerce,etablissement,Djibouti-ville,,,,,registre_infoclipper,registre_commerce
+604,Sahaal Ride,Transport & Logistique,Gare routière / ferroviaire,services,VTC / ride-hailing,Djibouti-ville,,,,,annuaire_web,a_verifier
+605,AGS Securite,Services à la personne,Sécurité privée,services,securite privee (depuis 1998),Djibouti-ville,,,,,annuaire_web,a_verifier
+606,Presidence de la Republique,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,Plateau du Serpent,+253 77 56 14 78,11.5964474,43.1431087,google_places,geolocalise
+607,Assemblee Nationale,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,Rue de Bruxelles,,11.5960603,43.1483343,google_places,geolocalise
+608,Conseil Constitutionnel,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+609,Cour Supreme,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+610,Cour des Comptes et de Discipline Budgetaire,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+611,Mediateur de la Republique,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+612,Commission Nationale des Droits de l'Homme (CNDH),Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+613,Secretariat General du Gouvernement,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,"Primature, Plateau du Serpent",+253 21 32 52 13,11.5982996,43.1470974,google_places,geolocalise
+614,Commission Electorale Nationale Independante (CENI),Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+615,Grand Mufti de la Republique,Administration & Services publics,Ministère / institution d'État,administration,institution de l'Etat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+616,Ministere de l'Interieur,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+617,Ministere de la Defense,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+618,"Ministere de la Justice et des Affaires Penitentiaires, charge des Droits de l'Homme",Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+619,Ministere de l'Economie et des Finances charge de l'Industrie,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+620,Ministere du Budget,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+621,Ministere de la Sante,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Rue de la Siesta,,11.5910213,43.1520918,google_places,geolocalise
+622,Ministere du Travail charge de la Formalisation et de la Protection Sociale,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+623,Ministere de l'Energie charge des Ressources Naturelles,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,"Ancienne Gare, Plateau du Serpent",,11.5885948,43.1453647,google_places,geolocalise
+624,Ministere des Infrastructures et de l'Equipement,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,11.6041759,43.1568768,google_places,geolocalise
+625,"Ministere de la Ville, de l'Urbanisme et de l'Habitat",Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+626,"Ministere des Affaires Musulmanes, de la Culture et des Biens Waqfs",Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,+253 21 35 78 89,11.5966302,43.1451275,google_places,geolocalise
+627,Ministere de la Jeunesse et de la Culture,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,Sans Fil,,11.5822504,43.142762,google_places,geolocalise
+628,Ministere de l'Environnement et du Developpement Durable,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+629,Ministere du Commerce et du Tourisme,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,+253 77 74 65 41,11.5972843,43.1464121,google_places,geolocalise
+630,Ministere des Affaires Sociales et des Solidarites,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,11.6071437,43.152771,google_places,a_verifier
+631,Secretariat d'Etat charge de la Decentralisation,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+632,Secretariat d'Etat aux Investissements et au Developpement du Secteur Prive,Administration & Services publics,Ministère / institution d'État,administration,ministere,Djibouti-ville,,,,,connaissance_generale,a_verifier
+633,Cour d'Appel de Djibouti,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,"Palais de Justice, ZPS",+253 77 49 21 66,11.6010594,43.150523,google_places,a_verifier
+634,Tribunal de Premiere Instance de Djibouti,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,"Palais de Justice, ZPS",+253 77 49 21 66,11.6010594,43.150523,google_places,geolocalise
+635,Tribunal Administratif,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+636,Tribunal du Travail,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+637,Tribunal de Commerce,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+638,Tribunal du Statut Personnel (charia),Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+639,Parquet General,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+640,Maison d'arret de Gabode,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,Gabode,,11.5761159,43.1591282,google_places,geolocalise
+641,Ordre des Avocats de Djibouti (Barreau),Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+642,Chambre des Notaires de Djibouti,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+643,Tribunal de Premiere Instance d'Ali Sabieh,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Ali Sabieh,,,,,connaissance_generale,a_verifier
+644,Tribunal de Premiere Instance de Dikhil,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Dikhil,,,,,connaissance_generale,a_verifier
+645,Tribunal de Premiere Instance de Tadjourah,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Tadjourah,,,,,connaissance_generale,a_verifier
+646,Tribunal de Premiere Instance d'Obock,Administration & Services publics,"Justice (tribunal, palais)",justice,juridiction / profession juridique,Obock,,,,,connaissance_generale,a_verifier
+647,Direction Generale des Impots (DGI),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - fiscalite,Djibouti-ville,"Hotel des Impots, Plateau du Serpent",+253 21 33 15 11,11.5961606,43.1458969,google_places,geolocalise
+648,Direction des Douanes et des Droits Indirects,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - douanes,Djibouti-ville,Ave General Galleni,,11.6082378,43.1430484,google_places,geolocalise
+649,Tresorerie Generale / Tresor National,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - finances publiques,Djibouti-ville,,,,,connaissance_generale,a_verifier
+650,Caisse Nationale de Securite Sociale (CNSS),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - protection sociale,Djibouti-ville,,+253 21 35 03 21,11.6026127,43.1511177,google_places,geolocalise
+651,"ANEFIP - Agence Nationale de l'Emploi, de la Formation et de l'Insertion Professionnelle",Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - emploi,Djibouti-ville,Bd de la Republique,,11.5998189,43.1502214,google_places,geolocalise
+652,ANPI - Agence Nationale pour la Promotion des Investissements,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - investissement,Djibouti-ville,Saline Ouest,,11.583818,43.1341178,google_places,geolocalise
+653,ODPIC - Office Djiboutien de la Propriete Industrielle et Commerciale,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - propriete industrielle / RCS,Djibouti-ville,,,,,connaissance_generale,a_verifier
+654,ANSIE - Agence Nationale des Systemes d'Information de l'Etat,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - numerique,Djibouti-ville,"Presidence, Ave Bernard, BP 2000",+253 21 35 20 32,11.5967898,43.1439522,google_places,geolocalise
+655,ARMD - Autorite de Regulation Multisectorielle de Djibouti,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - regulation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+656,INSTAD - Institut National de la Statistique de Djibouti,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - statistique,Djibouti-ville,Heron,+253 77 08 09 34,11.6116152,43.1483277,google_places,geolocalise
+657,Agence Djiboutienne des Routes (ADR),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - routes,Djibouti-ville,,,,,connaissance_generale,a_verifier
+658,Fonds de l'Habitat,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - logement,Djibouti-ville,,,,,connaissance_generale,a_verifier
+659,Office de la Voirie de Djibouti (OVD),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - voirie,Djibouti-ville,,,11.5784354,43.1469369,google_places,geolocalise
+660,ONARS - Office National d'Assistance aux Refugies et Sinistres,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - refugies,Djibouti-ville,,,,,connaissance_generale,a_verifier
+661,Agence Nationale de la Meteorologie,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - meteorologie,Djibouti-ville,,,,,connaissance_generale,a_verifier
+662,Journal Officiel de la Republique de Djibouti,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - publication officielle,Djibouti-ville,,,,,connaissance_generale,a_verifier
+663,La Poste de Djibouti (siege),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - poste,Djibouti-ville,Bd de la Republique,+253 21 35 48 02,11.5981218,43.1487636,google_places,geolocalise
+664,CAMME - Centrale d'Achat des Medicaments et Materiels Essentiels,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - achats medicaux,Djibouti-ville,,,,,connaissance_generale,a_verifier
+665,Direction de la Population et de la Famille,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - population,Djibouti-ville,,,,,connaissance_generale,a_verifier
+666,Direction de la Protection Civile (Sapeurs-Pompiers),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - protection civile,Djibouti-ville,Bd Hassan Gouled,+253 21 35 25 18,11.5831815,43.1421803,google_places,geolocalise
+667,Office National des Eaux et Forets / Direction de l'Environnement,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - environnement,Djibouti-ville,,,,,connaissance_generale,a_verifier
+668,Centre de Leadership et de l'Entrepreneuriat (CLE),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - entrepreneuriat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+669,Guichet Unique de l'ANPI,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - creation d'entreprise,Djibouti-ville,Bd de la Republique,,11.5975426,43.1487108,google_places,geolocalise
+670,Direction de la Nationalite et des Titres de Voyage,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - etat civil / passeports,Djibouti-ville,,,,,connaissance_generale,a_verifier
+671,Direction de l'Immigration,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - immigration,Djibouti-ville,,,11.5720558,43.1455324,google_places,a_verifier
+672,Haut Commissariat a la Diaspora,Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - diaspora,Djibouti-ville,,,,,connaissance_generale,a_verifier
+673,Autorite des Ports et des Zones Franches de Djibouti (DPFZA),Administration & Services publics,Office / agence publique sectorielle,administration,agence / office public - ports et zones franches,Djibouti-ville,,,,,connaissance_generale,a_verifier
+674,Mairie de Djibouti,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Djibouti-ville,Rue de Bruxelles,+253 21 32 05 44,11.5945239,43.14804,google_places,geolocalise
+675,Commune de Ras-Dika,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Djibouti-ville,,,,,connaissance_generale,a_verifier
+676,Commune de Boulaos,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Djibouti-ville,,,,,connaissance_generale,a_verifier
+677,Commune de Balbala,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Balbala,,,,,connaissance_generale,a_verifier
+678,Prefecture de Djibouti,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Djibouti-ville,,,,,connaissance_generale,a_verifier
+679,Conseil Regional d'Ali Sabieh,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Ali Sabieh,,,11.1568676,42.7047298,google_places,geolocalise
+680,Prefecture d'Ali Sabieh,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Ali Sabieh,,,11.1545802,42.7062231,google_places,geolocalise
+681,Conseil Regional de Dikhil,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Dikhil,,,,,connaissance_generale,a_verifier
+682,Prefecture de Dikhil,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Dikhil,,+253 27 42 00 68,11.1088161,42.3735065,google_places,geolocalise
+683,Conseil Regional de Tadjourah,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Tadjourah,,,,,connaissance_generale,a_verifier
+684,Prefecture de Tadjourah,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Tadjourah,,,11.786623,42.8843963,google_places,geolocalise
+685,Conseil Regional d'Obock,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Obock,,,,,connaissance_generale,a_verifier
+686,Prefecture d'Obock,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Obock,,,11.9615905,43.2916662,google_places,geolocalise
+687,Conseil Regional d'Arta,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Arta,,,,,connaissance_generale,a_verifier
+688,Prefecture d'Arta,Administration & Services publics,Collectivité territoriale,administration,collectivite territoriale,Arta,RN4,+253 77 34 58 16,11.5211559,42.8447321,google_places,geolocalise
+689,Forces Armees Djiboutiennes (Etat-major general),Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+690,Garde Republicaine,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+691,Garde-Cotes de Djibouti,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+692,Marine Nationale Djiboutienne,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+693,Force Aerienne Djiboutienne,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+694,Academie Militaire d'Arta,Administration & Services publics,Police / gendarmerie,securite,defense / police,Arta,RN4,+253 27 42 22 15,11.5272787,42.8525054,google_places,geolocalise
+695,Service National Adapte (SNA),Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+696,Commissariat de police de Balbala,Administration & Services publics,Police / gendarmerie,securite,defense / police,Balbala,,+253 77 85 84 09,11.5584182,43.0974786,google_places,geolocalise
+697,Commissariat de police du 1er arrondissement,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+698,Brigade des Mineurs,Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+699,Police de l'Air et des Frontieres (PAF),Administration & Services publics,Police / gendarmerie,securite,defense / police,Djibouti-ville,,,,,connaissance_generale,a_verifier
+700,Camp Lemonnier (base americaine),Défense internationale,Base militaire étrangère,defense_internationale,base militaire USA,Djibouti-ville,,,,,connaissance_generale,a_verifier
+701,Forces Francaises stationnees a Djibouti (FFDj) - Base aerienne 188,Défense internationale,Base militaire étrangère,defense_internationale,base militaire France,Djibouti-ville,,,,,connaissance_generale,a_verifier
+702,Base d'appui de l'Armee Populaire de Liberation (Chine),Défense internationale,Base militaire étrangère,defense_internationale,base militaire Chine - Doraleh,Djibouti-ville,,,,,connaissance_generale,a_verifier
+703,Base des Forces d'Autodefense Japonaises,Défense internationale,Base militaire étrangère,defense_internationale,base militaire Japon,Djibouti-ville,,,,,connaissance_generale,a_verifier
+704,Base Militaire Italienne Amedeo Guillet,Défense internationale,Base militaire étrangère,defense_internationale,base militaire Italie,Djibouti-ville,,,,,connaissance_generale,a_verifier
+705,EUNAVFOR Atalanta - presence UE,Défense internationale,Mission navale internationale,defense_internationale,mission navale UE,Djibouti-ville,,,,,connaissance_generale,a_verifier
+706,IGAD - Autorite Intergouvernementale pour le Developpement (siege),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Ave Georges Clemenceau,,11.5942781,43.1456097,google_places,geolocalise
+707,PNUD Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Rue de Venise,,11.5948267,43.1398019,google_places,geolocalise
+708,Programme Alimentaire Mondial (PAM),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,"Rue Ibrahim M. Sultan, Heron, BP 10011",+253 77 83 45 02,11.6114968,43.1521477,google_places,geolocalise
+709,Organisation Mondiale de la Sante (OMS) Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Rue de la Siesta,,11.5913236,43.1525708,google_places,geolocalise
+710,FAO Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Route du Kempinski,+253 21 35 32 98,11.6134703,43.1467219,google_places,geolocalise
+711,OIM Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Heron,,11.6134815,43.1507909,google_places,geolocalise
+712,ONUDC Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+713,Bureau de la Banque Mondiale,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+714,Banque Africaine de Developpement (bureau),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+715,Delegation de l'Union Europeenne,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Rue de Venise,,11.5947555,43.139935,google_places,geolocalise
+716,Agence Francaise de Developpement (AFD),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,Plateau du Serpent,,11.6088574,43.1512439,google_places,geolocalise
+717,JICA Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,"Mezz Tower, 15e etage, Rue de Venise, BP 2627",+253 21 25 02 51,11.5949026,43.1397432,google_places,geolocalise
+718,USAID Djibouti,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+719,UNESCO (antenne),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+720,Fonds Mondial / partenaires sante,Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+721,Ligue Arabe (representation),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+722,COMESA (point focal),Diplomatie & Organisations internationales,Organisation internationale,organisation_internationale,organisation / cooperation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+723,Ambassade d'Ethiopie,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,Plateau du Serpent,+253 21 35 18 07,11.6080167,43.1549628,google_places,geolocalise
+724,Ambassade de Somalie,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+725,Ambassade du Soudan,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+726,Ambassade d'Egypte,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+727,Ambassade d'Arabie Saoudite,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,Haramous,+253 21 25 06 60,11.5645258,43.1604565,google_places,geolocalise
+728,Ambassade des Emirats Arabes Unis,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,"Haramous, Villa 356",+253 21 32 33 03,11.5679375,43.1596875,google_places,geolocalise
+729,Ambassade du Koweit,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,Haramous,,11.5647011,43.1682658,google_places,geolocalise
+730,Ambassade de Chine,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,Rue Addis-Abeba,+253 21 25 04 95,11.6181819,43.1485396,google_places,geolocalise
+731,Ambassade d'Inde,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,"Lootah Village Compound, Haramous",+253 21 34 62 54,11.561516,43.16758,google_places,geolocalise
+732,Ambassade du Kenya,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,Route de la Siesta,+253 21 25 24 24,11.5681582,43.1652867,google_places,geolocalise
+733,Consulat General d'Oman,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+734,Consulat honoraire de Belgique,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+735,Consulat honoraire des Pays-Bas,Diplomatie & Organisations internationales,Ambassade / consulat,diplomatie,ambassade / consulat,Djibouti-ville,,,,,connaissance_generale,a_verifier
+736,"BCIMR - Banque pour le Commerce et l'Industrie Mer Rouge (siege, groupe BRED)",Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,Rue Clochette,+253 21 31 33 00,11.6084798,43.1466154,google_places,geolocalise
+737,Bank of Africa Mer Rouge (siege),Services financiers & juridiques,Banque / agence bancaire,finance,banque commerciale,Djibouti-ville,Aeroport,+253 21 35 35 00,11.5601138,43.1541575,google_places,a_verifier
+738,Salaam African Bank,Services financiers & juridiques,Banque / agence bancaire,finance,banque islamique,Djibouti-ville,Avenue 13,+253 21 35 15 44,11.5893155,43.1492651,google_places,geolocalise
+739,Silk Road International Bank,Services financiers & juridiques,Banque / agence bancaire,finance,banque,Djibouti-ville,,,,,connaissance_generale,a_verifier
+740,Shoura Bank? / banques islamiques diverses,Services financiers & juridiques,Banque / agence bancaire,finance,banque islamique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+741,CPEC - Caisse Populaire d'Epargne et de Credit,Services financiers & juridiques,Microfinance,finance,microfinance,Djibouti-ville,,+253 21 35 35 95,11.5782658,43.1367142,google_places,geolocalise
+742,Dahabshiil Djibouti,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,transfert d'argent,Ali Sabieh,Agence Ali Sabieh,,11.1528527,42.7070089,google_places,a_verifier
+743,Western Union (reseau d'agences),Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,transfert d'argent,Djibouti-ville,"Plusieurs agences (Taiba, Avenue 13, Ambouli)",+253 21 35 63 63,11.595517,43.147327,google_places,geolocalise
+744,D-Money (Djibouti Telecom),Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,mobile money,Djibouti-ville,,,,,connaissance_generale,a_verifier
+745,CAC Pay,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,mobile money,Djibouti-ville,,,,,connaissance_generale,a_verifier
+746,Fonds Souverain de Djibouti (FSD),"Industrie, Énergie & Grandes entreprises",Holding / groupe,finance,fonds souverain,Djibouti-ville,"Salaam Tower, 10e etage, Ave Mohamed Kamil",+253 21 34 69 69,11.591913,43.1429426,google_places,geolocalise
+747,Bureaux de change de la Place Rimbaud,Services financiers & juridiques,Transfert d'argent / change / mobile money,finance,change manuel,Djibouti-ville,Place Rimbaud (Mahamoud Harbi),,11.5912156,43.1462865,google_places,geolocalise
+748,Port de Djibouti SA (PDSA),Transport & Logistique,Port / terminal,logistique,autorite portuaire,Djibouti-ville,Ave General Galleni,+253 77 81 62 48,11.6087133,43.1425491,google_places,geolocalise
+749,Doraleh Multipurpose Port (DMP),Transport & Logistique,Port / terminal,logistique,port polyvalent,Balbala,Plage de Doraleh,,11.5980782,43.0700715,google_places,geolocalise
+750,Terminal petrolier Horizon Djibouti,Transport & Logistique,Port / terminal,logistique,terminal petrolier,Doraleh,,,,,connaissance_generale,a_verifier
+751,Port de Tadjourah,Transport & Logistique,Port / terminal,logistique,port regional,Tadjourah,,,,,connaissance_generale,a_verifier
+752,Port du Goubet (export de sel),Transport & Logistique,Port / terminal,logistique,port mineralier,Balbala,Doraleh,,11.5938528,43.1056507,google_places,a_verifier
+753,Djibouti Free Zone (DFZ),Transport & Logistique,Zone franche / industrielle,logistique,zone franche,Djibouti-ville,,+253 77 31 80 49,11.5813396,43.1302204,google_places,geolocalise
+754,DIFTZ - Djibouti International Free Trade Zone,Transport & Logistique,Zone franche / industrielle,logistique,zone franche internationale,Balbala,,+253 77 31 80 49,11.5625633,43.0098448,google_places,geolocalise
+755,Djibouti Damerjog Industrial Development (DDID),Transport & Logistique,Zone franche / industrielle,logistique,zone industrielle,Damerjog,,,,,connaissance_generale,a_verifier
+756,Aeroport International de Djibouti-Ambouli (AIA),Transport & Logistique,Aéroport / aérodrome,logistique,aeroport international,Djibouti-ville,,+253 21 34 01 01,11.5520514,43.14968,google_places,geolocalise
+757,Aerodrome de Tadjourah,Transport & Logistique,Aéroport / aérodrome,logistique,aerodrome,Tadjourah,,,11.7873625,42.9170153,google_places,geolocalise
+758,Aerodrome d'Obock,Transport & Logistique,Aéroport / aérodrome,logistique,aerodrome,Obock,,,11.9648851,43.2844995,google_places,geolocalise
+759,Air Djibouti (compagnie nationale),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,9-11 Rue de Geneve,+253 21 34 37 37,11.5947334,43.145452,google_places,geolocalise
+760,Ethio-Djibouti Railways (SDCF) - Gare de Nagad,Transport & Logistique,Gare routière / ferroviaire,logistique,chemin de fer,Djibouti-ville,Nagad,+253 21 35 46 29,11.5235251,43.1282094,google_places,geolocalise
+761,Ethiopian Airlines (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Bd Cheik Osman,+253 21 35 10 07,11.5953699,43.1460325,google_places,geolocalise
+762,Air France (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Place du 27 Juin,+253 21 35 10 10,11.594609,43.146659,google_places,geolocalise
+763,Turkish Airlines (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Place du 27 Juin,,11.594609,43.146659,google_places,a_verifier
+764,flydubai (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,,+253 77 65 51 06,11.595506,43.1462687,google_places,geolocalise
+765,Qatar Airways (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Djibouti Palace Kempinski,+253 21 34 71 17,11.61865,43.146029,google_places,geolocalise
+766,Kenya Airways (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Rue de Bruxelles,+253 21 35 30 36,11.5946286,43.1482134,google_places,geolocalise
+767,Daallo Airlines (agence Djibouti),Transport & Logistique,Compagnie aérienne / fret aérien,logistique,compagnie aerienne,Djibouti-ville,Rue de Londres,+253 21 35 34 01,11.5932715,43.1468112,google_places,geolocalise
+768,Gare routiere de Djibouti (bus regionaux),Transport & Logistique,Gare routière / ferroviaire,logistique,transport routier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+769,Poste frontiere de Loyada (Somaliland),Transport & Logistique,Gare routière / ferroviaire,logistique,poste frontiere,Region d'Arta,,,,,connaissance_generale,a_verifier
+770,Poste frontiere de Galafi (Ethiopie),Transport & Logistique,Gare routière / ferroviaire,logistique,poste frontiere,Region de Dikhil,,,,,connaissance_generale,a_verifier
+771,Poste frontiere de Guelile / PK51 (Ethiopie),Transport & Logistique,Gare routière / ferroviaire,logistique,poste frontiere,Region d'Ali Sabieh,,,,,connaissance_generale,a_verifier
+772,"Societe Coubeche (distribution, Coca-Cola)",Commerce & Courses,Import-export / négoce,entreprise,distribution,Djibouti-ville,Glaciere Coubeche,+253 21 35 10 27,11.6070448,43.1449853,google_places,geolocalise
+773,Groupe Marill / J.J. Marill,Services automobile,Concessionnaire auto,entreprise,distribution / automobile,Djibouti-ville,57 RN2,+253 21 32 94 00,11.5731212,43.1516851,google_places,a_verifier
+774,Rubis Energie Djibouti,"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,entreprise,distribution carburants,Djibouti-ville,Ave Georges Pompidou,+253 21 35 06 62,11.6071724,43.1441886,google_places,geolocalise
+775,"Total Energies Djibouti (historique, repris par Rubis)","Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,entreprise,carburants,Djibouti-ville,,,,,connaissance_generale,a_verifier
+776,Oil Libya Djibouti,"Industrie, Énergie & Grandes entreprises",Gaz / hydrocarbures,entreprise,carburants,Djibouti-ville,,,,,connaissance_generale,a_verifier
+777,Brasseries de Djibouti? (eaux/boissons),"Industrie, Énergie & Grandes entreprises",Production industrielle,entreprise,boissons,Djibouti-ville,,,,,connaissance_generale,a_verifier
+778,Societe des Eaux de Tadjourah? / eau minerale locale,"Industrie, Énergie & Grandes entreprises",Production industrielle,entreprise,boissons,Djibouti-ville,,,,,connaissance_generale,a_verifier
+779,Grands Moulins de Djibouti,"Industrie, Énergie & Grandes entreprises",Production industrielle,entreprise,minoterie,Djibouti-ville,,,,,connaissance_generale,a_verifier
+780,SIAF - Societe Industrielle?,"Industrie, Énergie & Grandes entreprises",Production industrielle,entreprise,industrie,Djibouti-ville,,,,,connaissance_generale,a_verifier
+781,Salt Investment / Lac Assal Salt Project,"Industrie, Énergie & Grandes entreprises",Production industrielle,entreprise,exploitation du sel,Djibouti-ville,,,,,connaissance_generale,a_verifier
+782,Djibouti Data Center,Télécom & Tech,Datacenter / câbles sous-marins,entreprise,datacenter / cables sous-marins,Djibouti-ville,,,,,connaissance_generale,a_verifier
+783,Djibouti Telecom - Djibouti Internet Exchange (DjIX),Télécom & Tech,Datacenter / câbles sous-marins,entreprise,interconnexion internet,Djibouti-ville,,,,,connaissance_generale,a_verifier
+784,RTD - Radiodiffusion-Television de Djibouti,Culture & Culte,"Média (radio, presse)",media,television / radio publique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+785,La Nation (quotidien national),Culture & Culte,"Média (radio, presse)",media,presse ecrite,Djibouti-ville,,,,,connaissance_generale,a_verifier
+786,Al-Qarn (journal en arabe),Culture & Culte,"Média (radio, presse)",media,presse ecrite,Djibouti-ville,,,,,connaissance_generale,a_verifier
+787,ADI - Agence Djiboutienne d'Information,Culture & Culte,"Média (radio, presse)",media,agence de presse,Djibouti-ville,,+253 77 60 30 80,11.5504385,43.1278293,google_places,a_verifier
+788,Radio Sawa Djibouti?,Culture & Culte,"Média (radio, presse)",media,radio,Djibouti-ville,,,,,connaissance_generale,a_verifier
+789,La Voix de Djibouti (diaspora),Culture & Culte,"Média (radio, presse)",media,radio / web,Djibouti-ville,,,,,connaissance_generale,a_verifier
+790,Hopital Dar El Hanan (maternite),Santé,Centre médical spécialisé,sante,maternite,Djibouti-ville,,+253 77 25 31 61,11.5747579,43.1356699,google_places,geolocalise
+791,Hopital Medico-Chirurgical Bouffard (cooperation militaire),Santé,Hôpital public,sante,hopital,Djibouti-ville,Bd de Gaulle,,11.5874786,43.1527932,google_places,a_verifier
+792,Centre Paul Faure (pneumo-phtisiologie),Santé,Centre médical spécialisé,sante,centre specialise,Djibouti-ville,,+253 21 35 11 79,11.5868871,43.1522698,google_places,geolocalise
+793,Polyclinique de la CNSS,Santé,Clinique privée / polyclinique,sante,polyclinique,Djibouti-ville,,+253 21 25 06 97,11.6023003,43.150354,google_places,geolocalise
+794,Centre Yonis Toussaint,Santé,Centre médical spécialisé,sante,centre de sante,Djibouti-ville,,+253 77 33 36 08,11.5936858,43.1487695,google_places,geolocalise
+795,Hopital regional d'Ali Sabieh,Santé,Hôpital public,sante,hopital regional,Ali Sabieh,,,11.1502021,42.6960001,google_places,geolocalise
+796,Hopital regional de Dikhil,Santé,Hôpital public,sante,hopital regional,Dikhil,,,,,connaissance_generale,a_verifier
+797,Hopital regional de Tadjourah,Santé,Hôpital public,sante,hopital regional,Tadjourah,,+253 77 62 28 04,11.7913933,42.8796938,google_places,a_verifier
+798,Hopital regional d'Obock,Santé,Hôpital public,sante,hopital regional,Obock,,+253 27 42 80 23,11.9621795,43.2895309,google_places,geolocalise
+799,Centre medico-hospitalier d'Arta,Santé,Hôpital public,sante,hopital regional,Arta,,,11.5272787,42.8525054,google_places,a_verifier
+800,Croissant-Rouge - dispensaires,Santé,Centre médical spécialisé,sante,dispensaire,Djibouti-ville,,,,,connaissance_generale,a_verifier
+801,Programme National de Lutte contre le Paludisme,Santé,Centre médical spécialisé,sante,programme de sante,Djibouti-ville,,,,,connaissance_generale,a_verifier
+802,Laboratoire National de Sante Publique?,Santé,Laboratoire d'analyses médicales,sante,laboratoire,Djibouti-ville,,,,,connaissance_generale,a_verifier
+803,Universite de Djibouti - Campus historique (Djibouti-ville),Éducation & Formation,Université / institut supérieur,education,universite,Djibouti-ville,Ave Georges Clemenceau,,11.5936198,43.1501852,google_places,geolocalise
+804,Faculte de Medecine de Djibouti,Éducation & Formation,Université / institut supérieur,education,faculte,Djibouti-ville,,+253 21 35 21 70,11.6098125,43.1523125,google_places,geolocalise
+805,Lycee Industriel et Commercial (LIC),Éducation & Formation,Lycée (public / privé),education,lycee technique,Djibouti-ville,,+253 77 21 28 52,11.5810662,43.1344395,google_places,geolocalise
+806,Lycee de Gabode,Éducation & Formation,Lycée (public / privé),education,lycee public,Djibouti-ville,Gabode,+253 77 64 53 82,11.561919,43.1450211,google_places,a_verifier
+807,Lycee Hassan Gouled Aptidon?,Éducation & Formation,Lycée (public / privé),education,lycee public,Arta,,+253 27 42 22 04,11.5255528,42.8479474,google_places,a_verifier
+808,College de Fukuzawa?,Éducation & Formation,Collège,education,college public,Djibouti-ville,,,,,connaissance_generale,a_verifier
+809,CFPA - Centre de Formation Professionnelle des Adultes,Éducation & Formation,Centre de formation,education,formation professionnelle,Djibouti-ville,,+253 21 35 12 17,11.5794294,43.1477549,google_places,a_verifier
+810,Lycee de Tadjourah,Éducation & Formation,Lycée (public / privé),education,lycee public,Tadjourah,,+253 77 05 59 61,11.7914105,42.8822778,google_places,geolocalise
+811,Lycee d'Obock,Éducation & Formation,Lycée (public / privé),education,lycee public,Obock,RN14,+253 77 24 11 65,11.9634451,43.2882772,google_places,geolocalise
+812,Lycee d'Arta,Éducation & Formation,Lycée (public / privé),education,lycee public,Arta,,+253 27 42 22 04,11.5255528,42.8479474,google_places,a_verifier
+813,Centre de Formation de l'Universite? / IUT-I,Éducation & Formation,Université / institut supérieur,education,institut technologique,Djibouti-ville,,,,,connaissance_generale,a_verifier
+814,Ecole Hoteliere d'Arta,Éducation & Formation,Centre de formation,education,formation hoteliere,Arta,,+253 77 63 17 10,11.5255528,42.8479474,google_places,geolocalise
+815,Ecole Nationale du Commerce?,Éducation & Formation,Centre de formation,education,formation,Djibouti-ville,,,,,connaissance_generale,a_verifier
+816,Madrasa Al-Ouns? / ecoles coraniques,Culture & Culte,Mosquée,education,enseignement religieux,Djibouti-ville,,,,,connaissance_generale,a_verifier
+817,Swiss School? / autres ecoles privees,Éducation & Formation,Lycée (public / privé),education,ecole privee,Djibouti-ville,,,,,connaissance_generale,a_verifier
+818,Palais du Peuple,Culture & Culte,Institut / centre culturel,culture,palais des congres,Djibouti-ville,,+253 21 35 40 60,11.5995302,43.1471873,google_places,geolocalise
+819,Theatre des Salines (historique),Culture & Culte,Institut / centre culturel,culture,theatre,Djibouti-ville,,,,,connaissance_generale,a_verifier
+820,Stade National Hassan Gouled Aptidon,Tourisme & Loisirs,Complexe sportif / salle de sport,culture,stade,Djibouti-ville,Stade Municipal,+253 77 88 32 97,11.578911,43.1487048,google_places,a_verifier
+821,Stade du Ville? / Stade El Hadj Hassan Gouled,Tourisme & Loisirs,Complexe sportif / salle de sport,culture,stade,Djibouti-ville,,+253 77 61 99 10,11.5741717,43.1319262,google_places,a_verifier
+822,Bibliotheque Universitaire de Djibouti,Culture & Culte,Bibliothèque / archives,culture,bibliotheque,Djibouti-ville,,,,,connaissance_generale,a_verifier
+823,Archives Nationales de Djibouti,Culture & Culte,Bibliothèque / archives,culture,archives,Djibouti-ville,,,,,connaissance_generale,a_verifier
+824,Federation Djiboutienne de Football,Tourisme & Loisirs,Complexe sportif / salle de sport,culture,federation sportive,Djibouti-ville,Stade Municipal,+253 77 62 00 53,11.578911,43.1487048,google_places,geolocalise
+825,Comite National Olympique Djiboutien,Tourisme & Loisirs,Complexe sportif / salle de sport,culture,sport,Djibouti-ville,,,,,connaissance_generale,a_verifier
+826,Cathedrale Notre-Dame du Bon Pasteur,Culture & Culte,Église,culture,eglise catholique,Djibouti-ville,,+253 77 19 94 82,11.6001158,43.1512891,google_places,geolocalise
+827,Eglise Ethiopienne Orthodoxe de Djibouti,Culture & Culte,Église,culture,eglise orthodoxe,Djibouti-ville,,,,,connaissance_generale,a_verifier
+828,Eglise Protestante de Djibouti,Culture & Culte,Église,culture,eglise protestante,Djibouti-ville,,,11.5992953,43.1495819,google_places,geolocalise
+829,Chambre de Commerce de Djibouti (CCD),Associations & ONG,Chambre consulaire,ONG_association,chambre consulaire,Djibouti-ville,,,,,connaissance_generale,a_verifier
+830,Association Bender Djedid pour le developpement?,Associations & ONG,Association locale,ONG_association,association,Djibouti-ville,,,,,connaissance_generale,a_verifier
+831,EVA - association de protection de l'enfance?,Associations & ONG,Association locale,ONG_association,association,Djibouti-ville,,,,,connaissance_generale,a_verifier
+832,Paix et Lait? (developpement rural),Associations & ONG,Association locale,ONG_association,association,Djibouti-ville,,,,,connaissance_generale,a_verifier
+833,Association des Consommateurs de Djibouti?,Associations & ONG,Association locale,ONG_association,association,Djibouti-ville,,,,,connaissance_generale,a_verifier
+834,Scouts de Djibouti,Associations & ONG,Association locale,ONG_association,mouvement de jeunesse,Djibouti-ville,,,,,connaissance_generale,a_verifier
+835,Decan - Refuge animalier,Associations & ONG,Association locale,ONG_association,refuge animalier / ecotourisme,Djibouti-ville,,,,,connaissance_generale,a_verifier
+836,Lac Assal,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,lac sale - point le plus bas d'Afrique,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+837,Lac Abbe,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,lac et cheminees calcaires,Region de Dikhil,,,,,connaissance_generale,a_verifier
+838,Foret du Day (Parc national),Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,foret primaire,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+839,Massif du Goda,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,massif montagneux,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+840,Mont Moussa Ali,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,point culminant (2028 m),Region de Tadjourah,,,,,connaissance_generale,a_verifier
+841,Volcan Ardoukoba,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,volcan,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+842,Goubet al-Kharab,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,baie volcanique,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+843,Ile du Diable,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,ilot volcanique,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+844,Iles Moucha,Géographie & Patrimoine naturel,Île / archipel - plongée,tourisme,ile et plongee,Djibouti-ville,,,,,connaissance_generale,a_verifier
+845,Ile Maskali,Géographie & Patrimoine naturel,Île / archipel - plongée,tourisme,ile et plongee,Djibouti-ville,,,,,connaissance_generale,a_verifier
+846,Iles des Sept Freres (Sawabi),Géographie & Patrimoine naturel,Île / archipel - plongée,tourisme,archipel - plongee,Region d'Obock,,,,,connaissance_generale,a_verifier
+847,Ras Bir et son phare,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,cap et phare,Region d'Obock,,,,,connaissance_generale,a_verifier
+848,Plage de Khor Ambado,Géographie & Patrimoine naturel,Plage,tourisme,plage,Region d'Arta,,,,,connaissance_generale,a_verifier
+849,Grand Bara,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,desert d'argile,Region d'Ali Sabieh,,,,,connaissance_generale,a_verifier
+850,Petit Bara,Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,desert d'argile,Region d'Ali Sabieh,,,,,connaissance_generale,a_verifier
+851,Grand Canyon d'Arta (Canyon de Dimbiya),Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,canyon,Region d'Arta,,,,,connaissance_generale,a_verifier
+852,Vallee de Dittilou,Hébergement,Campement / écolodge,tourisme,oasis de montagne - campements,Region de Tadjourah,,,11.7808009,42.6933558,google_places,a_verifier
+853,Bankouale,Hébergement,Campement / écolodge,tourisme,village de montagne - campements,Djibouti-ville,,,11.6143387,43.1482078,google_places,a_verifier
+854,Randa,Géographie & Patrimoine naturel,Localité / quartier,tourisme,bourg de montagne,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+855,Les Allols (plaine d'Allol),Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,depression saline,Region de Dikhil,,,,,connaissance_generale,a_verifier
+856,Abourma (gravures rupestres),Géographie & Patrimoine naturel,Monument / lieu historique,tourisme,site archeologique,Region de Tadjourah,,,,,connaissance_generale,a_verifier
+857,Handoga (site archeologique),Géographie & Patrimoine naturel,Monument / lieu historique,tourisme,site archeologique,Region de Dikhil,,,,,connaissance_generale,a_verifier
+858,Tropique de l'observation des requins-baleines (Baie de Ghoubet),Tourisme & Loisirs,Centre de plongée / sports nautiques,tourisme,ecotourisme marin,Region d'Arta,,,,,connaissance_generale,a_verifier
+859,Aquarium Tropical de Djibouti?,Tourisme & Loisirs,Parc aquatique / cinéma,tourisme,aquarium,Djibouti-ville,,,,,connaissance_generale,a_verifier
+860,Jardin d'Ambouli (palmeraie),Géographie & Patrimoine naturel,"Site naturel (désert, lac, volcan...)",tourisme,palmeraie,Djibouti-ville,,,,,connaissance_generale,a_verifier
+861,Ville d'Ali Sabieh,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Ali Sabieh,,,,,connaissance_generale,a_verifier
+862,Ville de Dikhil,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Dikhil,,,,,connaissance_generale,a_verifier
+863,Ville de Tadjourah,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Tadjourah,,,,,connaissance_generale,a_verifier
+864,Ville d'Obock,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Obock,,,,,connaissance_generale,a_verifier
+865,Ville d'Arta,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Arta,,,,,connaissance_generale,a_verifier
+866,Holhol,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Ali Sabieh,,,,,connaissance_generale,a_verifier
+867,Ali Adde,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Ali Sabieh,,,,,connaissance_generale,a_verifier
+868,Goubetto,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Ali Sabieh,,,,,connaissance_generale,a_verifier
+869,Assamo,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Ali Sabieh,,,,,connaissance_generale,a_verifier
+870,As Eyla,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Dikhil,,,,,connaissance_generale,a_verifier
+871,Yoboki,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Dikhil,,,,,connaissance_generale,a_verifier
+872,Mouloud,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Dikhil,,,,,connaissance_generale,a_verifier
+873,Galafi,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Dikhil,,,,,connaissance_generale,a_verifier
+874,Dorra,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Tadjourah,,,,,connaissance_generale,a_verifier
+875,Balho,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Tadjourah,,,,,connaissance_generale,a_verifier
+876,Khor Angar,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Obock,,,,,connaissance_generale,a_verifier
+877,Alaili Dadda,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Obock,,,,,connaissance_generale,a_verifier
+878,Damerjog,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Arta,,,,,connaissance_generale,a_verifier
+879,Wea,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Arta,,,,,connaissance_generale,a_verifier
+880,Douda,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Arta,,,,,connaissance_generale,a_verifier
+881,Loyada,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Arta,,,,,connaissance_generale,a_verifier
+882,Quartier 1 a 7 (Djibouti-ville),Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+883,Balbala,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Balbala,,,,,connaissance_generale,a_verifier
+884,Haramous,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+885,Heron,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+886,Gabode,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+887,Plateau du Serpent,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+888,Marabout,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+889,Salines Ouest,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+890,Ambouli,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Djibouti-ville,,,,,connaissance_generale,a_verifier
+891,PK12,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Balbala,,,,,connaissance_generale,a_verifier
+892,Hayableh,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Balbala,,,,,connaissance_generale,a_verifier
+893,Cite Hodan,Géographie & Patrimoine naturel,Localité / quartier,lieu,localite / quartier,Balbala,,,,,connaissance_generale,a_verifier
+894,Camp de refugies d'Ali Adde,Associations & ONG,Organisation humanitaire,humanitaire,camp de refugies,Ali Sabieh,,,,,connaissance_generale,a_verifier
+895,Camp de refugies de Holl-Holl,Associations & ONG,Organisation humanitaire,humanitaire,camp de refugies,Ali Sabieh,,,,,connaissance_generale,a_verifier
+896,Camp de refugies de Markazi,Associations & ONG,Organisation humanitaire,humanitaire,camp de refugies,Obock,,,,,connaissance_generale,a_verifier
+897,Bac Tadjourah-Obock-Djibouti (liaison maritime),Transport & Logistique,Gare routière / ferroviaire,logistique,ferry / transport maritime de passagers,Djibouti-ville,,,,,connaissance_generale,a_verifier
+898,Gare maritime de Djibouti (L'Escale),Transport & Logistique,Port / terminal,logistique,gare maritime / marina,Djibouti-ville,,,,,connaissance_generale,a_verifier
+899,Ligne de bus urbains de Djibouti-ville (transport collectif prive),Transport & Logistique,Gare routière / ferroviaire,logistique,transport urbain,Djibouti-ville,,,,,connaissance_generale,a_verifier

@@ -87,6 +87,9 @@ class ChatController extends ChangeNotifier {
   final Map<String, NoteResult> noteResults = {};
   final Map<String, EventResult> eventResults = {};
 
+  // Métriques d'usage par message (tokens Claude/Jina, outils) — clé = message.id
+  final Map<String, Map<String, dynamic>> messageUsage = {};
+
   // Suggestion proactive de note (une seule à la fois)
   String? noteSuggestionMsgId;
   String? noteSuggestionText;
@@ -217,6 +220,7 @@ class ChatController extends ChangeNotifier {
 
     List<Map<String, dynamic>>? pendingReads;
     List<Map<String, dynamic>>? toolResults;
+    ChatStreamDone? lastDone; // conserve le dernier done pour les métriques
 
     try {
       for (var pass = 1; pass <= _maxPasses; pass++) {
@@ -257,6 +261,7 @@ class ChatController extends ChangeNotifier {
             }
           } else if (event is ChatStreamDone) {
             done = event;
+            lastDone = event;
             break;
           } else if (event is ChatStreamError) {
             throw Exception(event.detail);
@@ -299,6 +304,11 @@ class ChatController extends ChangeNotifier {
         return null;
       }
 
+      // Stocker les métriques d'usage (tokens Claude/Jina) pour l'affichage
+      if (lastDone?.usage != null) {
+        messageUsage[streamId] = lastDone!.usage!;
+      }
+
       // ── Finalisation inconditionnelle (même si la connexion est tombée) ──
       final reply = content;
       if (bubbleCreated) {
@@ -320,6 +330,18 @@ class ChatController extends ChangeNotifier {
           content:
               'Désolé, la connexion a été interrompue avant que je puisse répondre. Réessayez.',
           timestamp: msgTimestamp,
+        ));
+      } else {
+        // Claude n'a produit aucun texte mais a appelé des outils.
+        // On persiste un message de confirmation pour que l'historique
+        // soit complet — sans ça, Claude répète les mêmes outils au prochain
+        // message car il croit que la demande n'a pas été traitée.
+        _addMessage(ChatMessage(
+          id: streamId,
+          role: 'agent',
+          content: _buildActionConfirmation(allActions),
+          timestamp: msgTimestamp,
+          actions: allActions,
         ));
       }
       _loading = false;
@@ -477,6 +499,24 @@ class ChatController extends ChangeNotifier {
       default:
         return name;
     }
+  }
+
+  String _buildActionConfirmation(List<AgentAction> actions) {
+    const labels = {
+      'create_event': 'Rendez-vous créé',
+      'update_event': 'Rendez-vous mis à jour',
+      'delete_event': 'Rendez-vous supprimé',
+      'create_note': 'Note enregistrée',
+      'update_note': 'Note mise à jour',
+      'delete_note': 'Note supprimée',
+      'start_demarche': 'Démarche démarrée',
+      'search_services': 'Annuaire consulté',
+    };
+    final parts = actions
+        .map((a) => labels[a.name] ?? a.name)
+        .toSet() // déduplique si plusieurs fois le même outil
+        .toList();
+    return '${parts.join(' et ')}. C\'est fait !';
   }
 
   Future<void> _executeActions(List<AgentAction> actions,

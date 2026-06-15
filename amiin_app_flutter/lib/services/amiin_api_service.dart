@@ -19,16 +19,18 @@ class ChatStreamToken extends ChatStreamEvent {
   ChatStreamToken(this.text);
 }
 
-/// Fin du stream : tool calls + sources + durée
+/// Fin du stream : tool calls + sources + durée + métriques usage
 class ChatStreamDone extends ChatStreamEvent {
   final List<Map<String, dynamic>> toolCalls;
   final List<Map<String, dynamic>> sources;
   final double processingTime;
+  final Map<String, dynamic>? usage;
 
   ChatStreamDone({
     required this.toolCalls,
     required this.sources,
     required this.processingTime,
+    this.usage,
   });
 }
 
@@ -64,6 +66,7 @@ ChatStreamEvent? parseSseLine(String line) {
           sources:
               (json['sources'] as List?)?.cast<Map<String, dynamic>>() ?? [],
           processingTime: (json['processing_time'] as num?)?.toDouble() ?? 0.0,
+          usage: json['usage'] as Map<String, dynamic>?,
         );
       case 'error':
         return ChatStreamError(json['detail'] as String? ?? 'Erreur inconnue');

@@ -185,23 +185,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                               color: ColorsAmiin.muted,
                             )),
                             const SizedBox(height: 8),
-                            ...s.hours!.map((h) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(h.days, style: TextStyle(
-                                    fontFamily: FontFamily.sansMedium,
-                                    fontSize: 13,
-                                    color: ColorsAmiin.ink,
-                                  )),
-                                  Text(h.hours, style: TextStyle(
-                                    fontFamily: FontFamily.sans,
-                                    fontSize: 13,
-                                    color: ColorsAmiin.muted,
-                                  )),
-                                ],
-                              ),
+                            Text(s.hours!, style: TextStyle(
+                              fontFamily: FontFamily.sans,
+                              fontSize: 14,
+                              color: ColorsAmiin.mid,
                             )),
                           ],
                         ),

@@ -1,20 +1,66 @@
-// ─── AnnuaireScreen ──────────────────────────────────────────────────────────
+// ─── AnnuaireScreen ───────────────────────────────────────────────────────────
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
-import '../../widgets/search_bar.dart';
+import '../../widgets/search_bar.dart' as amiin;
 import '../../widgets/card.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/skeleton.dart';
 import '../../services/annuaire_service.dart';
+
+// ── Mapping catégorie → couleur + emoji ──────────────────────────────────────
+
+const Map<String, Color> _catColors = {
+  'Alimentation & Restauration':               Color(0xFFE07B39),
+  'Hébergement':                               Color(0xFF1A7A6E),
+  'Santé':                                     Color(0xFFC0392B),
+  'Commerce & Courses':                        Color(0xFF6B7C3A),
+  'Transport & Logistique':                    Color(0xFF2980B9),
+  'Éducation & Formation':                     Color(0xFF8C6D3F),
+  'Administration & Services publics':         Color(0xFF3D5A8A),
+  'Services financiers & juridiques':          Color(0xFF8B6914),
+  'Culture & Culte':                           Color(0xFF7B4B94),
+  'Tourisme & Loisirs':                        Color(0xFF0097A7),
+  'Services automobile':                       Color(0xFF546E7A),
+  'Services à la personne':                    Color(0xFF6D4C7E),
+  'Géographie & Patrimoine naturel':           Color(0xFF388E3C),
+  'Diplomatie & Organisations internationales':Color(0xFF1A3A5C),
+  'Industrie, Énergie & Grandes entreprises':  Color(0xFF4E4E4E),
+  'Télécom & Tech':                            Color(0xFF1565C0),
+  'Associations & ONG':                        Color(0xFFAD1457),
+  'Défense internationale':                    Color(0xFF33691E),
+};
+
+const Map<String, String> _catEmoji = {
+  'Alimentation & Restauration':               '🍽️',
+  'Hébergement':                               '🏨',
+  'Santé':                                     '🏥',
+  'Commerce & Courses':                        '🛒',
+  'Transport & Logistique':                    '🚛',
+  'Éducation & Formation':                     '🎓',
+  'Administration & Services publics':         '🏛️',
+  'Services financiers & juridiques':          '⚖️',
+  'Culture & Culte':                           '🕌',
+  'Tourisme & Loisirs':                        '🌊',
+  'Services automobile':                       '🚗',
+  'Services à la personne':                    '💈',
+  'Géographie & Patrimoine naturel':           '🗺️',
+  'Diplomatie & Organisations internationales':'🌐',
+  'Industrie, Énergie & Grandes entreprises':  '⚙️',
+  'Télécom & Tech':                            '📡',
+  'Associations & ONG':                        '🤝',
+  'Défense internationale':                    '🎖️',
+};
+
+// ── Widget principal ──────────────────────────────────────────────────────────
 
 class AnnuaireScreen extends StatefulWidget {
   const AnnuaireScreen({super.key});
@@ -24,111 +70,181 @@ class AnnuaireScreen extends StatefulWidget {
 }
 
 class _AnnuaireScreenState extends State<AnnuaireScreen> {
-  List<AmiinService> _services = [];
-  String _query = '';
-  ServiceCategory? _category;
-  bool _nearbyMode = false;
-  bool _loading = false;
-  Timer? _debounce;
-  final ScrollController _scrollController = ScrollController();
-  bool _showBackToTop = false;
+  // Données locales
+  AnnuaireLocalData? _localData;
 
-  final List<({String key, String label, ServiceCategory? category})> _categories = const [
-    (key: 'all', label: 'Tous', category: null),
-    (key: 'ministere', label: 'Ministères', category: ServiceCategory.ministere),
-    (key: 'mairie', label: 'Mairies', category: ServiceCategory.mairie),
-    (key: 'sante', label: 'Santé', category: ServiceCategory.sante),
-    (key: 'education', label: 'Éducation', category: ServiceCategory.education),
-    (key: 'justice', label: 'Justice', category: ServiceCategory.justice),
-    (key: 'securite', label: 'Sécurité', category: ServiceCategory.securite),
-    (key: 'transport', label: 'Transport', category: ServiceCategory.transport),
-  ];
+  // État de la navigation
+  String? _selectedCat;
+  String? _selectedSousCat;
+  String? _selectedQuartier;
+
+  // État de la recherche
+  String _query = '';
+  List<AmiinService> _results = [];
+  bool _loading = false;
+  bool _nearbyMode = false;
+  Timer? _debounce;
+
+  final ScrollController _scroll = ScrollController();
+  bool _showTop = false;
 
   @override
   void initState() {
     super.initState();
-    _search();
-    _scrollController.addListener(_onScroll);
+    _loadLocal();
+    _scroll.addListener(() {
+      final show = _scroll.offset > 200;
+      if (show != _showTop) setState(() => _showTop = show);
+    });
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    final show = _scrollController.offset > 200;
-    if (show != _showBackToTop) setState(() => _showBackToTop = show);
-  }
-
-  void _scrollToTop() {
-    _scrollController.animateTo(0,
-        duration: const Duration(milliseconds: 350), curve: Curves.easeOut);
-  }
-
-  Future<void> _search() async {
+  Future<void> _loadLocal() async {
     setState(() => _loading = true);
     try {
-      List<AmiinService> results;
+      final d = await annuaireService.loadLocal();
+      if (!mounted) return;
+      setState(() => _localData = d);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  // ── Recherche ──────────────────────────────────────────────────────────────
+
+  void _onQueryChanged(String v) {
+    _query = v;
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), _doSearch);
+  }
+
+  Future<void> _doSearch() async {
+    if (_query.isEmpty && !_nearbyMode) {
+      setState(() => _results = []);
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      List<AmiinService> res;
       if (_nearbyMode) {
-        LocationPermission permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-        }
-        if (permission == LocationPermission.deniedForever) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Permission de localisation refusée')));
-          setState(() => _nearbyMode = false);
-          return;
-        }
-        final position = await Geolocator.getCurrentPosition();
-        results = await annuaireService.getNearby(position.latitude, position.longitude);
+        final perm = await Geolocator.checkPermission();
+        if (perm == LocationPermission.denied) await Geolocator.requestPermission();
+        final pos = await Geolocator.getCurrentPosition();
+        res = await annuaireService.getNearby(pos.latitude, pos.longitude,
+            categorie: _selectedCat);
       } else {
-        results = await annuaireService.search(_query, category: _category);
+        res = await annuaireService.search(
+          _query,
+          categorie: _selectedCat,
+          sousCategorie: _selectedSousCat,
+          quartier: _selectedQuartier,
+        );
       }
       if (!mounted) return;
-      setState(() => _services = results);
-    } catch (e) {
+      setState(() => _results = res);
+    } catch (_) {
       // ignore
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  void _onSearch(String text) {
-    _query = text;
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 400), _search);
-  }
-
-  void _onCategory(ServiceCategory? cat) {
-    _category = cat;
-    _search();
-  }
-
   void _toggleNearby() {
     setState(() {
       _nearbyMode = !_nearbyMode;
-      if (_nearbyMode) _category = null;
+      _query = '';
+      _results = [];
     });
-    _search();
+    if (_nearbyMode) _doSearch();
   }
 
-  Color _categoryColor(ServiceCategory? category) {
-    switch (category) {
-      case ServiceCategory.ministere: return ColorsAmiin.terra;
-      case ServiceCategory.mairie: return ColorsAmiin.indigo;
-      case ServiceCategory.sante: return const Color(0xFFC0392B);
-      case ServiceCategory.education: return const Color(0xFF8C6D3F);
-      case ServiceCategory.justice: return ColorsAmiin.ink;
-      case ServiceCategory.securite: return ColorsAmiin.olive;
-      case ServiceCategory.transport: return const Color(0xFF2980B9);
-      default: return ColorsAmiin.muted;
-    }
+  // ── Navigation ─────────────────────────────────────────────────────────────
+
+  void _selectCat(String cat) {
+    setState(() {
+      _selectedCat   = cat;
+      _selectedSousCat = null;
+      _query = '';
+      _results = [];
+      _nearbyMode = false;
+    });
   }
+
+  void _selectSousCat(String? sc) {
+    setState(() {
+      _selectedSousCat = sc;
+      _query = '';
+      _results = [];
+    });
+  }
+
+  void _selectQuartier(String? q) {
+    setState(() {
+      _selectedQuartier = q;
+      _query = '';
+      _results = [];
+    });
+  }
+
+  void _goBack() {
+    setState(() {
+      if (_selectedSousCat != null) {
+        _selectedSousCat = null;
+      } else {
+        _selectedCat = null;
+        _selectedQuartier = null;
+      }
+      _results = [];
+      _query = '';
+    });
+  }
+
+  // ── UI helpers ─────────────────────────────────────────────────────────────
+
+  bool get _inSearch => _query.isNotEmpty || _nearbyMode;
+  bool get _inCategory => _selectedCat != null && !_inSearch;
+
+  List<AmiinService> get _browseEntries {
+    if (_localData == null) return [];
+    return _localData!.entries.where((e) {
+      if (_selectedCat != null && e.category != _selectedCat) return false;
+      if (_selectedSousCat != null && e.sousCategorie != _selectedSousCat) return false;
+      if (_selectedQuartier != null && e.quartier != _selectedQuartier) return false;
+      return true;
+    }).toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+  }
+
+  List<String> get _availableSousCats {
+    if (_localData == null || _selectedCat == null) return [];
+    return _localData!.entries
+        .where((e) => e.category == _selectedCat && e.sousCategorie.isNotEmpty)
+        .map((e) => e.sousCategorie)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  List<String> get _availableQuartiers {
+    if (_localData == null) return [];
+    final cats = _localData!.entries
+        .where((e) =>
+            (_selectedCat == null || e.category == _selectedCat) &&
+            e.quartier.isNotEmpty)
+        .map((e) => e.quartier)
+        .toSet()
+        .toList()
+      ..sort();
+    return cats;
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -137,176 +253,20 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const AmiinHeader(title: 'Annuaire'),
-            Padding(
-              padding: const EdgeInsets.all(Spacing.lg),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: AmiinSearchBar(
-                      value: _query,
-                      onChanged: _onSearch,
-                      hintText: 'Ministère, service, nom…',
-                    ),
-                  ),
-                  const SizedBox(width: Spacing.sm),
-                  GestureDetector(
-                    onTap: _toggleNearby,
-                    child: Container(
-                      height: 44,
-                      padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
-                      decoration: BoxDecoration(
-                        color: _nearbyMode ? ColorsAmiin.terraLt : ColorsAmiin.white,
-                        borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                        border: Border.all(color: ColorsAmiin.border),
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.string(_locationSvg, width: 16, height: 16,
-                            colorFilter: ColorFilter.mode(_nearbyMode ? ColorsAmiin.terraDk : ColorsAmiin.muted, BlendMode.srcIn),
-                          ),
-                          const SizedBox(width: 4),
-                          Text('Proche', style: TextStyle(
-                            fontFamily: FontFamily.sansMedium,
-                            fontSize: 12,
-                            color: _nearbyMode ? ColorsAmiin.terraDk : ColorsAmiin.muted,
-                          )),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 44,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: Spacing.sm),
-                itemBuilder: (context, index) {
-                  final cat = _categories[index];
-                  final selected = (_nearbyMode && cat.key == 'all') || (!_nearbyMode && _category == cat.category);
-                  return GestureDetector(
-                    onTap: () => _onCategory(cat.category),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: selected ? ColorsAmiin.terra : ColorsAmiin.white,
-                        borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                        border: Border.all(color: ColorsAmiin.border),
-                      ),
-                      child: Text(cat.label, style: TextStyle(
-                        fontFamily: FontFamily.sansMedium,
-                        fontSize: 12,
-                        color: selected ? ColorsAmiin.white : ColorsAmiin.mid,
-                      )),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: Spacing.sm),
-            Expanded(
-              child: _loading
-                  ? const SkeletonList()
-                  : _services.isEmpty
-                      ? const EmptyState(title: 'Aucun résultat', subtitle: 'Modifiez votre recherche ou la catégorie.')
-                      : RefreshIndicator(
-                          onRefresh: _search,
-                          color: ColorsAmiin.terra,
-                          child: ListView.separated(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.all(Spacing.lg),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: _services.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
-                          itemBuilder: (context, index) {
-                            final s = _services[index];
-                            return GestureDetector(
-                              onTap: () => context.push('/annuaire/${s.id}'),
-                              child: AmiinCard(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 10, height: 10,
-                                          decoration: BoxDecoration(
-                                            color: _categoryColor(s.category),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: Spacing.sm),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(s.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
-                                                fontFamily: FontFamily.sansBold,
-                                                fontSize: 14,
-                                                color: ColorsAmiin.ink,
-                                              )),
-                                              if (s.ministry != null)
-                                                Text(s.ministry!, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(
-                                                  fontFamily: FontFamily.sans,
-                                                  fontSize: 12,
-                                                  color: ColorsAmiin.muted,
-                                                )),
-                                            ],
-                                          ),
-                                        ),
-                                        if (s.distanceKm != null)
-                                          Text('${s.distanceKm!.toStringAsFixed(1)} km', style: TextStyle(
-                                            fontFamily: FontFamily.sansBold,
-                                            fontSize: 11,
-                                            color: ColorsAmiin.terra,
-                                          )),
-                                      ],
-                                    ),
-                                    const SizedBox(height: Spacing.sm),
-                                    Row(
-                                      children: [
-                                        SvgPicture.string(_locationSvg, width: 12, height: 12,
-                                          colorFilter: const ColorFilter.mode(ColorsAmiin.muted, BlendMode.srcIn),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text('${s.address.street}, ${s.address.district}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(
-                                            fontFamily: FontFamily.sans,
-                                            fontSize: 12,
-                                            color: ColorsAmiin.muted,
-                                          )),
-                                        ),
-                                      ],
-                                    ),
-                                    if (s.phone != null) ...[
-                                      const SizedBox(height: 4),
-                                      Text(s.phone!, style: TextStyle(
-                                        fontFamily: FontFamily.sans,
-                                        fontSize: 12,
-                                        color: ColorsAmiin.indigo,
-                                      )),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        ),  // RefreshIndicator
-            ),
+            _buildTopBar(),
+            if (_inCategory) _buildSubCatBar(),
+            if (_inCategory || _inSearch) _buildQuartierBar(),
+            Expanded(child: _buildBody()),
           ],
         ),
       ),
       floatingActionButton: AnimatedScale(
-        scale: _showBackToTop ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
+        scale: _showTop ? 1 : 0,
+        duration: const Duration(milliseconds: 180),
         child: FloatingActionButton.small(
-          heroTag: 'annuaireScrollTop',
-          onPressed: _scrollToTop,
+          heroTag: 'annTop',
+          onPressed: () => _scroll.animateTo(0,
+              duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
           backgroundColor: ColorsAmiin.white,
           foregroundColor: ColorsAmiin.terra,
           elevation: 2,
@@ -316,10 +276,382 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
     );
   }
 
-  static const String _locationSvg = '''
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 1a5 5 0 015 5c0 3.5-5 9-5 9S3 9.5 3 6a5 5 0 015-5z" stroke="currentColor" stroke-width="1.4"/>
-      <circle cx="8" cy="6" r="1.5" fill="currentColor"/>
+  Widget _buildTopBar() {
+    return Column(
+      children: [
+        AmiinHeader(
+          title: _selectedCat ?? 'Annuaire',
+          back: _selectedCat != null,
+          onBack: _goBack,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Spacing.lg, Spacing.sm, Spacing.lg, Spacing.sm),
+          child: Row(
+            children: [
+              Expanded(
+                child: amiin.AmiinSearchBar(
+                  value: _query,
+                  onChanged: _onQueryChanged,
+                  hintText: _selectedCat != null
+                      ? 'Rechercher dans ${_selectedCat!.split(' ').first}…'
+                      : 'Pharmacie, restaurant, banque…',
+                ),
+              ),
+              const SizedBox(width: Spacing.sm),
+              _NearbyButton(active: _nearbyMode, onTap: _toggleNearby),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubCatBar() {
+    final scs = _availableSousCats;
+    if (scs.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 36,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+        children: [
+          _FilterChip(
+            label: 'Toutes',
+            selected: _selectedSousCat == null,
+            onTap: () => _selectSousCat(null),
+          ),
+          ...scs.map((sc) => Padding(
+                padding: const EdgeInsets.only(left: Spacing.xs),
+                child: _FilterChip(
+                  label: sc,
+                  selected: _selectedSousCat == sc,
+                  onTap: () => _selectSousCat(_selectedSousCat == sc ? null : sc),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuartierBar() {
+    final qs = _availableQuartiers;
+    if (qs.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 36,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+        children: [
+          _FilterChip(
+            label: 'Partout',
+            selected: _selectedQuartier == null,
+            color: ColorsAmiin.indigo,
+            onTap: () => _selectQuartier(null),
+          ),
+          ...qs.map((q) => Padding(
+                padding: const EdgeInsets.only(left: Spacing.xs),
+                child: _FilterChip(
+                  label: q,
+                  selected: _selectedQuartier == q,
+                  color: ColorsAmiin.indigo,
+                  onTap: () =>
+                      _selectQuartier(_selectedQuartier == q ? null : q),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_loading && _localData == null) return const SkeletonList();
+
+    // Mode recherche ou proche
+    if (_inSearch) {
+      if (_loading) return const SkeletonList();
+      if (_results.isEmpty && _query.length > 1) {
+        return const EmptyState(
+            title: 'Aucun résultat',
+            subtitle: 'Essayez avec d\'autres mots ou ajustez les filtres.');
+      }
+      return _buildServiceList(_results);
+    }
+
+    // Mode navigation catégorie
+    if (_inCategory) {
+      if (_loading) return const SkeletonList();
+      final entries = _browseEntries;
+      if (entries.isEmpty) {
+        return const EmptyState(
+            title: 'Aucune entrée',
+            subtitle: 'Aucun service pour ces filtres.');
+      }
+      return _buildServiceList(entries);
+    }
+
+    // Grille d'accueil
+    return _buildCategoryGrid();
+  }
+
+  Widget _buildCategoryGrid() {
+    final cats = _localData?.categories ?? [];
+    if (cats.isEmpty) return const SkeletonList();
+    return GridView.builder(
+      controller: _scroll,
+      padding: const EdgeInsets.all(Spacing.lg),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: Spacing.sm,
+        crossAxisSpacing: Spacing.sm,
+        childAspectRatio: 1.55,
+      ),
+      itemCount: cats.length,
+      itemBuilder: (_, i) {
+        final cat = cats[i];
+        final count = _localData!.entries
+            .where((e) => e.category == cat)
+            .length;
+        return _CategoryTile(
+          label: cat,
+          count: count,
+          emoji: _catEmoji[cat] ?? '📍',
+          color: _catColors[cat] ?? ColorsAmiin.terra,
+          onTap: () => _selectCat(cat),
+        );
+      },
+    );
+  }
+
+  Widget _buildServiceList(List<AmiinService> services) {
+    return ListView.separated(
+      controller: _scroll,
+      padding: const EdgeInsets.all(Spacing.lg),
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: services.length,
+      separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
+      itemBuilder: (_, i) {
+        final s = services[i];
+        return GestureDetector(
+          onTap: () => context.push('/annuaire/${s.id}'),
+          child: AmiinCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _catColors[s.category] ?? ColorsAmiin.terra,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: Spacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(s.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontFamily: FontFamily.sansBold,
+                                  fontSize: 14,
+                                  color: ColorsAmiin.ink)),
+                          if (s.sousCategorie.isNotEmpty)
+                            Text(s.sousCategorie,
+                                style: TextStyle(
+                                    fontFamily: FontFamily.sans,
+                                    fontSize: 11,
+                                    color: ColorsAmiin.muted)),
+                        ],
+                      ),
+                    ),
+                    if (s.distanceKm != null)
+                      Text('${s.distanceKm!.toStringAsFixed(1)} km',
+                          style: TextStyle(
+                              fontFamily: FontFamily.sansBold,
+                              fontSize: 11,
+                              color: ColorsAmiin.terra)),
+                  ],
+                ),
+                if (s.address.street.isNotEmpty ||
+                    s.address.district.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      SvgPicture.string(_locSvg,
+                          width: 11,
+                          height: 11,
+                          colorFilter: const ColorFilter.mode(
+                              ColorsAmiin.muted, BlendMode.srcIn)),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          [s.address.street, s.address.district]
+                              .where((x) => x.isNotEmpty)
+                              .join(', '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontFamily: FontFamily.sans,
+                              fontSize: 12,
+                              color: ColorsAmiin.muted),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (s.phone != null && s.phone!.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(s.phone!,
+                      style: TextStyle(
+                          fontFamily: FontFamily.sans,
+                          fontSize: 12,
+                          color: ColorsAmiin.indigo)),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static const String _locSvg = '''
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 1a4 4 0 014 4C10 8.5 6 11 6 11S2 8.5 2 5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.3"/>
+      <circle cx="6" cy="5" r="1.3" fill="currentColor"/>
     </svg>
   ''';
+}
+
+// ── Widgets auxiliaires ───────────────────────────────────────────────────────
+
+class _CategoryTile extends StatelessWidget {
+  final String label;
+  final int count;
+  final String emoji;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _CategoryTile(
+      {required this.label,
+      required this.count,
+      required this.emoji,
+      required this.color,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontFamily: FontFamily.sansBold,
+                        fontSize: 12,
+                        color: color,
+                        height: 1.2)),
+                Text('$count entrées',
+                    style: TextStyle(
+                        fontFamily: FontFamily.sans,
+                        fontSize: 10,
+                        color: color.withValues(alpha: 0.7))),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Color? color;
+  final VoidCallback onTap;
+
+  const _FilterChip(
+      {required this.label,
+      required this.selected,
+      this.color,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? ColorsAmiin.terra;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? c : ColorsAmiin.white,
+          borderRadius: BorderRadius.circular(RadiusAmiin.full),
+          border: Border.all(color: selected ? c : ColorsAmiin.border),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontFamily: FontFamily.sansMedium,
+                fontSize: 11,
+                color: selected ? ColorsAmiin.white : ColorsAmiin.mid)),
+      ),
+    );
+  }
+}
+
+class _NearbyButton extends StatelessWidget {
+  final bool active;
+  final VoidCallback onTap;
+
+  const _NearbyButton({required this.active, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+        decoration: BoxDecoration(
+          color: active ? ColorsAmiin.terraLt : ColorsAmiin.white,
+          borderRadius: BorderRadius.circular(RadiusAmiin.full),
+          border: Border.all(color: ColorsAmiin.border),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.near_me,
+                size: 15,
+                color: active ? ColorsAmiin.terraDk : ColorsAmiin.muted),
+            const SizedBox(width: 4),
+            Text('Proche',
+                style: TextStyle(
+                    fontFamily: FontFamily.sansMedium,
+                    fontSize: 12,
+                    color: active ? ColorsAmiin.terraDk : ColorsAmiin.muted)),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -9,6 +9,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
   final bool back;
+  final VoidCallback? onBack;
   final Widget? rightAction;
   final bool dark;
 
@@ -17,6 +18,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.subtitle,
     this.back = false,
+    this.onBack,
     this.rightAction,
     this.dark = false,
   });
@@ -54,7 +56,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                           width: 22,
                           height: 22,
                         ),
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: onBack ?? () => Navigator.of(context).pop(),
                       )
                     : null,
               ),

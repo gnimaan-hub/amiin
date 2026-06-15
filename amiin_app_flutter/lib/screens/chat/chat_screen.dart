@@ -665,6 +665,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ],
           ),
         ),
+        // Métriques d'usage (tokens Claude / Jina / outils)
+        if (!isUser && chat.messageUsage.containsKey(msg.id))
+          _buildUsageBar(chat.messageUsage[msg.id]!),
         // Confirmation de suppression demandée par Amiin
         if (!isUser &&
             chat.pendingDeletionMsgId == msg.id &&
@@ -685,6 +688,36 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             onDismiss: chat.dismissNoteSuggestion,
           ),
       ],
+    );
+  }
+
+  // ── Barre métriques d'usage ───────────────────────────────────────────────
+
+  Widget _buildUsageBar(Map<String, dynamic> usage) {
+    final claudeIn  = usage['claude_input']      as int? ?? 0;
+    final claudeOut = usage['claude_output']     as int? ?? 0;
+    final cacheRead = usage['claude_cache_read'] as int? ?? 0;
+    final jinaTokens = usage['jina_tokens']      as int? ?? 0;
+    final tools = (usage['tools'] as List?)?.cast<String>() ?? const <String>[];
+
+    final parts = <String>[
+      'Claude ▲$claudeIn ▼$claudeOut',
+      if (cacheRead > 0) '💾 $cacheRead',
+      if (jinaTokens > 0) '· Jina $jinaTokens',
+      if (tools.isNotEmpty)
+        '· ${tools.map(ChatController.actionLabel).join(', ')}',
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 44, bottom: 6),
+      child: Text(
+        parts.join(' '),
+        style: TextStyle(
+          fontFamily: FontFamily.sans,
+          fontSize: 9,
+          color: ColorsAmiin.muted,
+        ),
+      ),
     );
   }
 
