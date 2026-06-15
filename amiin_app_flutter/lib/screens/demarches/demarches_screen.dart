@@ -385,18 +385,28 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
     );
   }
 
-  Widget _metaTag(String icon, String label) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(icon, style: const TextStyle(fontSize: 11)),
-      const SizedBox(width: 3),
-      Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted)),
-    ],
+  Widget _metaTag(String icon, String label) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 140),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(icon, style: const TextStyle(fontSize: 11)),
+        const SizedBox(width: 3),
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
+    ),
   );
 
   String _truncateCost(String cost) {
-    final lines = cost.split('.')[0].split('\n')[0].trim();
-    return lines.length > 40 ? '${lines.substring(0, 37)}…' : lines;
+    final first = cost.split('\n')[0].split('.')[0].trim();
+    return first.length > 28 ? '${first.substring(0, 25)}…' : first;
   }
 
   Widget _buildUserDemarchesList() {
