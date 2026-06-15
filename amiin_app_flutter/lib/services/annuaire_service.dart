@@ -237,8 +237,21 @@ class AnnuaireService {
     return response.data as Map<String, dynamic>;
   }
 
-  /// Détail d'un service.
+  /// Cherche une entrée par ID dans le JSON local.
+  Future<AmiinService?> getServiceLocal(String id) async {
+    final data = await loadLocal();
+    try {
+      return data.entries.firstWhere((e) => e.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Détail d'un service — local d'abord, backend en fallback.
   Future<AmiinService> getService(String id) async {
+    final local = await getServiceLocal(id);
+    if (local != null) return local;
+    // Fallback backend (pour les IDs venant d'une recherche sémantique)
     final response = await _dio.get('/annuaire/services/$id');
     return AmiinService.fromJson(response.data['service'] as Map<String, dynamic>);
   }

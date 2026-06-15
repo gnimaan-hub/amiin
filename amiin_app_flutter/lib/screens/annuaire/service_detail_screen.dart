@@ -106,12 +106,19 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       fontSize: 24,
                       color: ColorsAmiin.ink,
                     )),
-                    if (s.ministry != null)
-                      Text(s.ministry!, style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 13,
-                        color: ColorsAmiin.muted,
-                      )),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        if (s.sousCategorie.isNotEmpty)
+                          _tagChip(s.sousCategorie, ColorsAmiin.terra),
+                        if (s.quartier.isNotEmpty)
+                          _tagChip(s.quartier, ColorsAmiin.indigo),
+                        if (s.ministry != null)
+                          _tagChip(s.ministry!, ColorsAmiin.muted),
+                      ],
+                    ),
                     const SizedBox(height: Spacing.md),
                     AmiinCard(
                       child: Column(
@@ -243,6 +250,20 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       ),
     );
   }
+
+  Widget _tagChip(String label, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Text(label, style: TextStyle(
+          fontFamily: FontFamily.sansMedium,
+          fontSize: 11,
+          color: color,
+        )),
+      );
 
   static const String _heartSvg = '''
     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">

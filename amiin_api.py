@@ -1077,35 +1077,61 @@ async def annuaire_search(
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
     emb = await loop.run_in_executor(None, lambda: _jina_embed_batch([q])[0][0])
-    # Filtre annuaire si au moins un critère précis, sinon recherche globale
-    has_filter = any([categorie, sous_categorie, quartier, ville])
-    ann_filter = _annuaire_filter(categorie, sous_categorie, quartier, ville) if has_filter else None
-    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 20, query_filter=ann_filter))
+    # Toujours filtrer sur type=annuaire — évite que les docs juridiques dominent
+    ann_filter = _annuaire_filter(categorie, sous_categorie, quartier, ville)
+    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 25, query_filter=ann_filter))
     services = [
-        _chunk_to_service(c['id'], c['document'], c['metadata'],
-                          is_favorite=(c['metadata'].get('original_id', c['id']) in _favorites))
+        _chunk_to_service(
+            c['metadata'].get('original_id', c['id']),   # original_id stable pour le détail
+            c['document'], c['metadata'],
+            is_favorite=(c['metadata'].get('original_id', c['id']) in _favorites)
+        )
         for c in chunks
-        if c['metadata'].get('type') == 'annuaire' and c['distance'] <= 1.2
+        if c['distance'] <= 1.4   # seuil élargi — annuaire déjà filtré par type
     ]
     return {"services": services}
 
 @app.get("/v1/annuaire/services/nearby")
 async def annuaire_nearby(lat: float, lng: float, radius: int = 5,
                           categorie: Optional[str] = None):
-    if not jina_api_key or not qdrant_client:
+    """Scroller TOUTES les entrées annuaire géolocalisées et filtrer par distance.
+    Pas de recherche sémantique — retourne ce qui est réellement proche."""
+    if not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
     loop = asyncio.get_event_loop()
-    emb = await loop.run_in_executor(None, lambda: _jina_embed_batch(["services pratiques Djibouti annuaire"])[0][0])
-    ann_filter = _annuaire_filter(categorie=categorie)
-    chunks = await loop.run_in_executor(None, lambda: _search_with_embedding(emb, 50, query_filter=ann_filter))
-    services = []
-    for c in chunks:
-        svc = _chunk_to_service(c['id'], c['document'], c['metadata'],
-                                ref_lat=lat, ref_lng=lng,
-                                is_favorite=(c['metadata'].get('original_id', c['id']) in _favorites))
-        if svc['distanceKm'] is not None and svc['distanceKm'] <= radius:
-            services.append(svc)
-    services.sort(key=lambda s: s['distanceKm'] or 999)
+    def _fetch_nearby():
+        ann_filter = _annuaire_filter(categorie=categorie)
+        services = []
+        offset = None
+        while True:
+            hits, offset = qdrant_client.scroll(
+                collection_name=QDRANT_COLLECTION,
+                scroll_filter=ann_filter,
+                limit=500,
+                with_payload=True,
+                offset=offset,
+            )
+            for hit in hits:
+                p = hit.payload
+                svc_lat = p.get('latitude')
+                svc_lng = p.get('longitude')
+                if svc_lat is None or svc_lng is None:
+                    continue
+                dist = _haversine_km(lat, lng, float(svc_lat), float(svc_lng))
+                if dist <= radius:
+                    oid = p.get('original_id', str(hit.id))
+                    svc = _chunk_to_service(
+                        oid, p.get('document', ''),
+                        {k: v for k, v in p.items() if k != 'document'},
+                        ref_lat=lat, ref_lng=lng,
+                        is_favorite=(oid in _favorites)
+                    )
+                    services.append(svc)
+            if offset is None:
+                break
+        services.sort(key=lambda s: s['distanceKm'] or 999)
+        return services
+    services = await loop.run_in_executor(None, _fetch_nearby)
     return {"services": services}
 
 @app.get("/v1/annuaire/services/{service_id}")
