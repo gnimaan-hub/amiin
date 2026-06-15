@@ -54,9 +54,8 @@ class ChatController extends ChangeNotifier {
   ChatController({AmiinApiService? api}) : _api = api ?? AmiinApiService() {
     _messages.addAll(
         MemoryService().getRecentMessages(limit: loadedHistoryLimit));
-    // Préchargement du contexte (géoloc + météo) en arrière-plan :
-    // l'envoi d'un message ne doit jamais attendre le GPS.
     unawaited(_refreshEnvContextIfStale());
+    unawaited(_loadDemarchesCatalog());
   }
 
   final AmiinApiService _api;
@@ -66,7 +65,7 @@ class ChatController extends ChangeNotifier {
   static const int loadedHistoryLimit = 100; // messages chargés au démarrage
   static const int promptHistoryLimit = 10; // messages envoyés à l'API
   static const int _maxPasses = 3; // bornes de la boucle d'outils
-  static const Set<String> _readTools = {'get_events', 'get_notes'};
+  static const Set<String> _readTools = {'get_events', 'get_notes', 'get_demarche_detail'};
   static const Duration _envTtl = Duration(minutes: 15);
 
   // ── État conversation ─────────────────────────────────────────────────────
@@ -112,6 +111,17 @@ class ChatController extends ChangeNotifier {
   bool _located = false;
   DateTime? _gpsRefreshedAt;
   bool _gpsFetching = false;
+
+  // Catalogue des démarches (chargé une fois au démarrage)
+  String _demarchesCatalog = '';
+
+  Future<void> _loadDemarchesCatalog() async {
+    try {
+      _demarchesCatalog = await demarchesService.getCatalogSummaryForAmiin();
+    } catch (_) {
+      _demarchesCatalog = '';
+    }
+  }
 
   @override
   void dispose() {
@@ -455,6 +465,10 @@ class ChatController extends ChangeNotifier {
               }
               content = buf.toString();
             }
+          case 'get_demarche_detail':
+            final demarcheId = input['demarche_id'] as String? ?? '';
+            content = await demarchesService.getDemarcheDetailForAmiin(demarcheId);
+
           default:
             content = 'Outil inconnu : ${tc['name']}';
         }
@@ -496,6 +510,8 @@ class ChatController extends ChangeNotifier {
         return '📅 Agenda consulté';
       case 'get_notes':
         return '📝 Notes consultées';
+      case 'get_demarche_detail':
+        return '📋 Démarche consultée';
       default:
         return name;
     }
@@ -789,8 +805,16 @@ class ChatController extends ChangeNotifier {
         ? 'Localisation : ${_lat.toStringAsFixed(2)}, ${_lon.toStringAsFixed(2)}'
         : 'Localisation : Djibouti-ville (11.5721, 43.1456)');
 
-    // Mémoire : actions récentes de l'utilisateur → Amiin peut s'y référer
-    // au-delà des derniers messages de la conversation.
+    // Catalogue des démarches administratives
+    if (_demarchesCatalog.isNotEmpty) {
+      buffer.writeln('\n$_demarchesCatalog');
+      buffer.writeln(
+        'Pour obtenir le détail complet d\'une démarche (étapes, pièces, organisme, coût), '
+        'utilise l\'outil get_demarche_detail avec son ID (ex: "egouv_102").',
+      );
+    }
+
+    // Mémoire : actions récentes de l'utilisateur
     final actions = MemoryService().getRecentActions(limit: 8);
     if (actions.isNotEmpty) {
       buffer.writeln("\nActions récentes de l'utilisateur (mémoire) :");

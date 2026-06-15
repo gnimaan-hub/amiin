@@ -30,15 +30,18 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
   int _tabIndex = 0;
   Timer? _debounce;
 
-  final List<({DemarcheCategory? category, String label})> _categories = const [
-    (category: null, label: 'Toutes'),
-    (category: DemarcheCategory.identite, label: 'Identité'),
-    (category: DemarcheCategory.famille, label: 'Famille'),
-    (category: DemarcheCategory.emploi, label: 'Emploi'),
-    (category: DemarcheCategory.sante, label: 'Santé'),
-    (category: DemarcheCategory.logement, label: 'Logement'),
-    (category: DemarcheCategory.fiscal, label: 'Fiscal'),
-    (category: DemarcheCategory.transport, label: 'Transport'),
+  static const List<({DemarcheCategory? category, String label, String icon})> _categories = [
+    (category: null,                                   label: 'Toutes',         icon: '📋'),
+    (category: DemarcheCategory.identiteFamille,       label: 'Identité',       icon: '🪪'),
+    (category: DemarcheCategory.santeSocial,           label: 'Santé',          icon: '🏥'),
+    (category: DemarcheCategory.education,             label: 'Éducation',      icon: '🎓'),
+    (category: DemarcheCategory.habitatLogement,       label: 'Habitat',        icon: '🏠'),
+    (category: DemarcheCategory.transport,             label: 'Transport',      icon: '🚗'),
+    (category: DemarcheCategory.justice,               label: 'Justice',        icon: '⚖️'),
+    (category: DemarcheCategory.economieFinance,       label: 'Économie',       icon: '💼'),
+    (category: DemarcheCategory.etrangers,             label: 'Étrangers',      icon: '✈️'),
+    (category: DemarcheCategory.energieEau,            label: 'Énergie & Eau',  icon: '💡'),
+    (category: DemarcheCategory.securite,              label: 'Sécurité',       icon: '🔐'),
   ];
 
   @override
@@ -62,13 +65,15 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       );
       final userFuture = demarchesService.getUserDemarches();
       final results = await Future.wait([catalogFuture, userFuture]);
-      setState(() {
-        _catalog = results[0] as List<Demarche>;
-        _userDemarches = results[1] as List<UserDemarche>;
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _catalog = results[0] as List<Demarche>;
+          _userDemarches = results[1] as List<UserDemarche>;
+          _loading = false;
+        });
+      }
     } catch (e) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -79,34 +84,34 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
   }
 
   void _onCategory(DemarcheCategory? cat) {
-    _category = cat;
+    setState(() => _category = cat);
     _loadData();
   }
 
   String _statusLabel(DemarcheStatus status) {
     switch (status) {
-      case DemarcheStatus.aFaire: return 'À faire';
-      case DemarcheStatus.enCours: return 'En cours';
+      case DemarcheStatus.aFaire:   return 'À faire';
+      case DemarcheStatus.enCours:  return 'En cours';
       case DemarcheStatus.terminee: return 'Terminée';
-      case DemarcheStatus.expiree: return 'Expirée';
+      case DemarcheStatus.expiree:  return 'Expirée';
     }
   }
 
   Color _statusColor(DemarcheStatus status) {
     switch (status) {
-      case DemarcheStatus.aFaire: return ColorsAmiin.mid;
-      case DemarcheStatus.enCours: return ColorsAmiin.indigo;
+      case DemarcheStatus.aFaire:   return ColorsAmiin.mid;
+      case DemarcheStatus.enCours:  return ColorsAmiin.indigo;
       case DemarcheStatus.terminee: return ColorsAmiin.olive;
-      case DemarcheStatus.expiree: return ColorsAmiin.muted;
+      case DemarcheStatus.expiree:  return ColorsAmiin.muted;
     }
   }
 
   Color _statusBgColor(DemarcheStatus status) {
     switch (status) {
-      case DemarcheStatus.aFaire: return ColorsAmiin.sand;
-      case DemarcheStatus.enCours: return ColorsAmiin.indigoLt;
+      case DemarcheStatus.aFaire:   return ColorsAmiin.sand;
+      case DemarcheStatus.enCours:  return ColorsAmiin.indigoLt;
       case DemarcheStatus.terminee: return ColorsAmiin.oliveLt;
-      case DemarcheStatus.expiree: return ColorsAmiin.ecru;
+      case DemarcheStatus.expiree:  return ColorsAmiin.ecru;
     }
   }
 
@@ -118,7 +123,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
         child: Column(
           children: [
             const AmiinHeader(title: 'Démarches'),
-            // Tab selector
+            // Onglets Catalogue / Mes démarches
             Container(
               color: ColorsAmiin.white,
               child: Row(
@@ -130,42 +135,51 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             ),
             if (_tabIndex == 0) ...[
               Padding(
-                padding: const EdgeInsets.all(Spacing.lg),
+                padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.lg, Spacing.lg, Spacing.sm),
                 child: AmiinSearchBar(
                   value: _query,
                   onChanged: _onSearch,
-                  hintText: 'Carte nationale, passeport…',
+                  hintText: 'Passeport, carte grise, CNSS…',
                 ),
               ),
               SizedBox(
-                height: 44,
+                height: 40,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
                   itemCount: _categories.length,
-                  separatorBuilder: (_, __) => SizedBox(width: Spacing.sm),
+                  separatorBuilder: (_, __) => const SizedBox(width: Spacing.sm),
                   itemBuilder: (context, index) {
                     final cat = _categories[index];
                     final selected = _category == cat.category;
                     return GestureDetector(
                       onTap: () => _onCategory(cat.category),
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
                         decoration: BoxDecoration(
                           color: selected ? ColorsAmiin.terra : ColorsAmiin.white,
                           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                          border: Border.all(color: ColorsAmiin.border),
+                          border: Border.all(color: selected ? ColorsAmiin.terra : ColorsAmiin.border),
                         ),
-                        child: Text(cat.label, style: TextStyle(
-                          fontFamily: FontFamily.sansMedium,
-                          fontSize: 12,
-                          color: selected ? ColorsAmiin.white : ColorsAmiin.mid,
-                        )),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(cat.icon, style: const TextStyle(fontSize: 12)),
+                            const SizedBox(width: 4),
+                            Text(cat.label, style: TextStyle(
+                              fontFamily: FontFamily.sansMedium,
+                              fontSize: 12,
+                              color: selected ? ColorsAmiin.white : ColorsAmiin.mid,
+                            )),
+                          ],
+                        ),
                       ),
                     );
                   },
                 ),
               ),
+              const SizedBox(height: Spacing.sm),
             ],
             Expanded(
               child: _loading
@@ -192,9 +206,13 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: isActive ? ColorsAmiin.terra : Colors.transparent, width: 2)),
+            border: Border(bottom: BorderSide(
+              color: isActive ? ColorsAmiin.terra : Colors.transparent,
+              width: 2,
+            )),
           ),
-          child: Text(label,
+          child: Text(
+            label,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: FontFamily.sansMedium,
@@ -213,62 +231,172 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
         physics: AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.only(top: 80),
-          child: EmptyState(title: 'Aucune démarche trouvée', subtitle: 'Essayez un autre terme ou catégorie.'),
+          child: EmptyState(
+            title: 'Aucune démarche trouvée',
+            subtitle: 'Essayez un autre terme ou catégorie.',
+          ),
         ),
       );
     }
+
+    // Grouper par catégorie si pas de filtre actif
+    if (_category == null && _query.isEmpty) {
+      return _buildGroupedCatalog();
+    }
+
     return ListView.separated(
       padding: const EdgeInsets.all(Spacing.lg),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: _catalog.length,
-      separatorBuilder: (_, __) => SizedBox(height: Spacing.sm),
-      itemBuilder: (context, index) {
-        final d = _catalog[index];
-        return GestureDetector(
-          onTap: () => context.push('/demarches/${d.id}'),
-          child: AmiinCard(
-            child: Column(
+      separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
+      itemBuilder: (_, i) => _catalogCard(_catalog[i]),
+    );
+  }
+
+  Widget _buildGroupedCatalog() {
+    final Map<DemarcheCategory, List<Demarche>> grouped = {};
+    for (final d in _catalog) {
+      grouped.putIfAbsent(d.category, () => []).add(d);
+    }
+
+    final sections = <Widget>[];
+    for (final cat in DemarcheCategory.values) {
+      final items = grouped[cat];
+      if (items == null || items.isEmpty) continue;
+      sections.add(Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.lg, Spacing.lg, Spacing.sm),
+        child: Row(
+          children: [
+            Text(cat.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: Spacing.sm),
+            Text(cat.label, style: TextStyle(
+              fontFamily: FontFamily.sansBold,
+              fontSize: 13,
+              color: ColorsAmiin.ink,
+            )),
+            const SizedBox(width: Spacing.sm),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: ColorsAmiin.sand,
+                borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+              ),
+              child: Text('${items.length}', style: TextStyle(
+                fontFamily: FontFamily.sansBold, fontSize: 10, color: ColorsAmiin.mid,
+              )),
+            ),
+          ],
+        ),
+      ));
+      for (int i = 0; i < items.length; i++) {
+        sections.add(Padding(
+          padding: EdgeInsets.fromLTRB(
+            Spacing.lg, 0, Spacing.lg, i < items.length - 1 ? Spacing.sm : 0,
+          ),
+          child: _catalogCard(items[i]),
+        ));
+      }
+    }
+    sections.add(const SizedBox(height: Spacing.xl));
+
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: sections),
+    );
+  }
+
+  Widget _catalogCard(Demarche d) {
+    final isInfo = d.type == DemarcheType.information;
+    return GestureDetector(
+      onTap: () => context.push('/demarches/${d.id}'),
+      child: AmiinCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.description_outlined, size: 18, color: ColorsAmiin.muted),
-                    SizedBox(width: Spacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(d.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
-                            fontFamily: FontFamily.sansBold,
-                            fontSize: 14,
-                            color: ColorsAmiin.ink,
-                          )),
-                          SizedBox(height: 2),
-                          Text(d.summary, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(d.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: FontFamily.sansBold,
+                          fontSize: 14,
+                          color: ColorsAmiin.ink,
+                          height: 1.3,
+                        ),
+                      ),
+                      if (d.summary.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Text(d.summary,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
                             fontFamily: FontFamily.sans,
                             fontSize: 12,
                             color: ColorsAmiin.muted,
-                          )),
-                        ],
-                      ),
-                    ),
-                  ],
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-                SizedBox(height: Spacing.sm),
-                Wrap(
-                  spacing: Spacing.md,
-                  children: [
-                    if (d.duration != null) Text('⏱ ${d.duration}', style: TextStyle(fontSize: 11, color: ColorsAmiin.muted)),
-                    if (d.cost != null) Text('💰 ${d.cost}', style: TextStyle(fontSize: 11, color: ColorsAmiin.muted)),
-                    Text('📄 ${d.documents.length} pièces', style: TextStyle(fontSize: 11, color: ColorsAmiin.muted)),
-                  ],
+                const SizedBox(width: Spacing.sm),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isInfo ? ColorsAmiin.indigoLt : ColorsAmiin.oliveLt,
+                    borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+                  ),
+                  child: Text(
+                    isInfo ? 'Info' : 'Démarche',
+                    style: TextStyle(
+                      fontFamily: FontFamily.sansBold,
+                      fontSize: 10,
+                      color: isInfo ? ColorsAmiin.indigo : ColorsAmiin.olive,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        );
-      },
+            const SizedBox(height: Spacing.sm),
+            Wrap(
+              spacing: Spacing.md,
+              runSpacing: 4,
+              children: [
+                if (d.duration != null && d.duration!.isNotEmpty && d.duration != 'Non spécifié.')
+                  _metaTag('⏱', d.duration!),
+                if (d.cost != null && d.cost!.isNotEmpty && d.cost != 'Non spécifié.')
+                  _metaTag('💰', _truncateCost(d.cost!)),
+                if (!isInfo && d.documents.isNotEmpty)
+                  _metaTag('📄', '${d.documents.length} pièce${d.documents.length > 1 ? 's' : ''}'),
+                if (!isInfo && d.steps.isNotEmpty)
+                  _metaTag('📝', '${d.steps.length} étape${d.steps.length > 1 ? 's' : ''}'),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _metaTag(String icon, String label) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(icon, style: const TextStyle(fontSize: 11)),
+      const SizedBox(width: 3),
+      Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted)),
+    ],
+  );
+
+  String _truncateCost(String cost) {
+    final lines = cost.split('.')[0].split('\n')[0].trim();
+    return lines.length > 40 ? '${lines.substring(0, 37)}…' : lines;
   }
 
   Widget _buildUserDemarchesList() {
@@ -279,7 +407,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
           padding: EdgeInsets.only(top: 80),
           child: EmptyState(
             title: 'Aucune démarche en cours',
-            subtitle: 'Parcourez le catalogue pour démarrer une procédure.',
+            subtitle: 'Parcourez le catalogue et démarrez une procédure.',
           ),
         ),
       );
@@ -288,52 +416,72 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       padding: const EdgeInsets.all(Spacing.lg),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: _userDemarches.length,
-      separatorBuilder: (_, __) => SizedBox(height: Spacing.sm),
-      itemBuilder: (context, index) {
-        final ud = _userDemarches[index];
-        final total = ud.demarche.steps.length;
-        final progress = total > 0 ? ud.currentStep / total : 0.0;
+      separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
+      itemBuilder: (_, i) {
+        final ud = _userDemarches[i];
         return GestureDetector(
-          onTap: () => context.push('/demarches/user/${ud.id}'),
+          onTap: () async {
+            await context.push('/demarches/user/${ud.id}');
+            _loadData();
+          },
           child: AmiinCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(ud.demarche.title, style: TextStyle(
-                  fontFamily: FontFamily.sansBold,
-                  fontSize: 14,
-                  color: ColorsAmiin.ink,
-                )),
-                SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _statusBgColor(ud.status),
-                    borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                  ),
-                  child: Text(_statusLabel(ud.status), style: TextStyle(
-                    fontFamily: FontFamily.sansBold,
-                    fontSize: 11,
-                    color: _statusColor(ud.status),
-                  )),
-                ),
-                if (total > 0) ...[
-                  SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      backgroundColor: ColorsAmiin.border,
-                      color: ColorsAmiin.terra,
-                      minHeight: 4,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(ud.demarche.title, style: TextStyle(
+                        fontFamily: FontFamily.sansBold, fontSize: 14, color: ColorsAmiin.ink,
+                      )),
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _statusBgColor(ud.status),
+                        borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+                      ),
+                      child: Text(_statusLabel(ud.status), style: TextStyle(
+                        fontFamily: FontFamily.sansBold, fontSize: 11, color: _statusColor(ud.status),
+                      )),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(ud.demarche.category.label, style: TextStyle(
+                  fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.muted,
+                )),
+                if (ud.totalSteps > 0) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: ud.progress,
+                            backgroundColor: ColorsAmiin.border,
+                            color: ud.status == DemarcheStatus.terminee
+                                ? ColorsAmiin.olive
+                                : ColorsAmiin.terra,
+                            minHeight: 4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: Spacing.sm),
+                      Text(
+                        '${ud.completedSteps}/${ud.totalSteps}',
+                        style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 11, color: ColorsAmiin.mid),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 4),
-                  Text('${ud.currentStep}/$total étapes', style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 11,
-                    color: ColorsAmiin.muted,
-                  )),
+                  const SizedBox(height: 4),
+                  Text(
+                    ud.status == DemarcheStatus.terminee
+                        ? 'Terminée ✓'
+                        : 'Étape ${ud.currentStep} sur ${ud.totalSteps}',
+                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                  ),
                 ],
               ],
             ),

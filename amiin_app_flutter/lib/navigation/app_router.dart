@@ -13,25 +13,13 @@ import '../screens/agenda/event_detail_screen.dart';
 import '../screens/agenda/create_event_screen.dart';
 import '../screens/annuaire/service_detail_screen.dart';
 import '../screens/demarches/demarche_detail_screen.dart';
+import '../screens/demarches/user_demarche_tracking_screen.dart';
 import '../screens/notes/note_detail_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../widgets/connectivity_banner.dart';
 import '../services/agenda_badge_notifier.dart';
 
-// Placeholder pour UserDemarcheScreen
-class UserDemarcheScreen extends StatelessWidget {
-  final String userDemarcheId;
-  const UserDemarcheScreen({super.key, required this.userDemarcheId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Suivi de démarche')),
-      body: Center(child: Text('Détail de la démarche utilisateur $userDemarcheId')),
-    );
-  }
-}
 
 final GlobalKey<NavigatorState> _homeNavKey      = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _chatNavKey      = GlobalKey<NavigatorState>();
@@ -231,7 +219,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'userDemarche',
                   builder: (context, state) {
                     final userDemarcheId = state.pathParameters['userDemarcheId']!;
-                    return UserDemarcheScreen(userDemarcheId: userDemarcheId);
+                    return UserDemarcheTrackingScreen(userDemarcheId: userDemarcheId);
                   },
                 ),
                 GoRoute(

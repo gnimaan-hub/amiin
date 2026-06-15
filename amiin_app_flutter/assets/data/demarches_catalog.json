@@ -1,0 +1,1403 @@
+[
+  {
+    "id": 102,
+    "category_id": 5,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/102/5/1",
+    "title": "Obtention du numéro national d'identification",
+    "category": "Identité - Famille",
+    "type": "démarche",
+    "description": "Le numéro national d'identification (NNI) est un code unique permettant d'identifier les personnes physiques. Son utilisation est obligatoire pour les institutions publiques et parapubliques afin d'identifier les administrés et d'échanger des données entre services.",
+    "beneficiaires": "Personnes nées à Djibouti, personnes nées à l'étranger avec au moins un parent djiboutien, et étrangers résidant régulièrement sur le territoire national. L'enregistrement démographique est obligatoire pour tous les citoyens. L'enregistrement biométrique concerne les citoyens dès 18 ans.",
+    "conditions": "Déclaration obligatoire de naissance dans les trois jours suivant l'accouchement. Enregistrement démographique obligatoire pour tous les citoyens.",
+    "pieces_justificatives": [
+      {
+        "cas": "Nouveau-nés",
+        "documents": [
+          "Fiche de sortie de l'hôpital",
+          "Extrait d'acte de naissance des parents",
+          "Copie de la carte d'identité des parents"
+        ]
+      },
+      {
+        "cas": "Parents enrôlés",
+        "documents": [
+          "Fiche de sortie de l'hôpital",
+          "Copie recto-verso de la carte biométrique"
+        ]
+      },
+      {
+        "cas": "Enfants de moins de 12 ans",
+        "documents": [
+          "Extrait d'acte de naissance de l'enfant et des parents",
+          "Copie de la carte d'identité des parents"
+        ]
+      },
+      {
+        "cas": "Enfants de plus de 18 ans",
+        "documents": [
+          "Présence obligatoire de l'enfant",
+          "Extrait d'acte de naissance",
+          "Copie de la carte d'identité des parents"
+        ]
+      }
+    ],
+    "etapes": [
+      "Déclarer la naissance auprès de l'officier d'état civil du lieu d'accouchement",
+      "Fournir les pièces justificatives requises",
+      "Payer les frais de timbre",
+      "Recevoir le document d'identification"
+    ],
+    "delai": "Déclaration dans les 3 jours suivant l'accouchement. Traitement : 2 à 3 jours après dépôt.",
+    "cout": "Timbre : 1 000 FDJ. Duplicata : 1 500 FDJ. Jugement supplétif (JSAN) : 1 500 FDJ. Transcription : 1 500 FDJ. Nouveau-nés : 500 FDJ.",
+    "organisme": {
+      "nom": "Mairie de la ville de Djibouti / ANSIE",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "contact@ansie.dj / servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Obtention du numéro national d'identification permettant l'identification unique et univoque de la personne pour toutes les démarches administratives officielles."
+  },
+  {
+    "id": 103,
+    "category_id": 5,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/103/5/1",
+    "title": "Passeport",
+    "category": "Identité - Famille",
+    "type": "démarche",
+    "description": "Un passeport est un document de circulation délivré par le Gouvernement à ses citoyens, permettant de voyager à l'étranger. Depuis février 2017, tous les passeports émis sont biométriques et contiennent une puce électronique avec empreintes digitales numérisées.",
+    "beneficiaires": "Citoyens djiboutiens souhaitant voyager à l'étranger en tant que touristes, étudiants ou travailleurs.",
+    "conditions": "Être de nationalité djiboutienne. Pour les mineurs : acte de naissance et autorisation parentale. Pour les adultes : présenter une carte d'identité nationale. Pour les étudiants : certificat de scolarité. Pour les employés ou fonctionnaires : certificat de travail.",
+    "pieces_justificatives": [
+      "2 photos d'identité (35x45 mm)",
+      "Copie des pièces d'identité des parents",
+      "Acte de naissance (pour les mineurs)",
+      "Autorisation parentale (pour les mineurs)",
+      "Carte d'identité nationale (pour les adultes)",
+      "Certificat de scolarité (pour les étudiants)",
+      "Certificat de travail (pour les employés ou fonctionnaires)"
+    ],
+    "etapes": [
+      "Rassembler les pièces justificatives requises",
+      "Déposer le dossier auprès de la Direction de l'immigration et des renseignements généraux",
+      "Attendre la délivrance du passeport"
+    ],
+    "delai": "3 jours après dépôt.",
+    "cout": "1 timbre de 15 000 FDJ.",
+    "organisme": {
+      "nom": "Direction de l'immigration et des renseignements généraux",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Obtention d'un passeport biométrique valide pour voyager à l'étranger."
+  },
+  {
+    "id": 104,
+    "category_id": 5,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/104/5/1",
+    "title": "Certificat de résidence",
+    "category": "Identité - Famille",
+    "type": "démarche",
+    "description": "Le certificat de résidence renseigne sur la domiciliation de l'intéressé et inclut les adresses antérieures enregistrées au registre national des personnes physiques avec les dates correspondantes.",
+    "beneficiaires": "Citoyens djiboutiens et résidents étrangers.",
+    "conditions": "Pour les citoyens djiboutiens : présenter une carte d'identité valide et fournir une facture (EDD ou ONEAD). Pour les résidents étrangers : avoir résidé au moins six mois dans le pays, disposer d'un passeport avec visa valide, d'un permis de travail ou d'une patente, d'une facture (EDD ou ONEAD) et d'une demande timbrée.",
+    "pieces_justificatives": [
+      "Carte d'identité (nationaux) ou passeport (étrangers)",
+      "Facture de services publics (électricité EDD ou eau ONEAD)",
+      "Permis de travail ou patente (pour les étrangers)",
+      "Demande timbrée (pour les étrangers)"
+    ],
+    "etapes": [
+      "Rassembler les pièces justificatives",
+      "Déposer le dossier auprès du Cabinet de la préfecture",
+      "Recevoir le certificat dans un délai de 1 jour"
+    ],
+    "delai": "1 jour après dépôt du dossier.",
+    "cout": "1 000 FDJ (1 timbre) pour les nationaux. 2 000 FDJ (2 timbres) pour les étrangers.",
+    "organisme": {
+      "nom": "Cabinet de la Préfecture",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Document officiel attestant la domiciliation et l'historique résidentiel du demandeur."
+  },
+  {
+    "id": 105,
+    "category_id": 5,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/105/5/1",
+    "title": "Certificat de vie",
+    "category": "Identité - Famille",
+    "type": "démarche",
+    "description": "Le certificat de vie permet de prouver aux administrations le non-décès de l'usager.",
+    "beneficiaires": "Personnes résidant à Djibouti nécessitant une preuve de vie auprès des administrations.",
+    "conditions": "Présenter un justificatif d'identité (carte d'identité ou passeport) et des justificatifs de domicile (facture EDD ou ONEAD).",
+    "pieces_justificatives": [
+      "Justificatif d'identité (carte d'identité nationale ou passeport)",
+      "Justificatif de domicile (facture EDD ou ONEAD)"
+    ],
+    "etapes": [
+      "Se présenter à la préfecture avec les pièces requises",
+      "Recevoir le certificat de vie"
+    ],
+    "delai": "1 jour après dépôt.",
+    "cout": "1 timbre de 1 000 FDJ.",
+    "organisme": {
+      "nom": "Préfecture de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Document officiel attestant le non-décès de la personne auprès des administrations."
+  },
+  {
+    "id": 106,
+    "category_id": 5,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/106/5/1",
+    "title": "PV d'assimilation",
+    "category": "Identité - Famille",
+    "type": "démarche",
+    "description": "Processus visant à valider la connaissance suffisante de la langue, de l'histoire, de la culture et de la société djiboutienne, ainsi que l'adhésion aux valeurs nationales, dans le cadre d'une demande de naturalisation.",
+    "beneficiaires": "Demandeurs de la naturalisation djiboutienne.",
+    "conditions": "Connaissance suffisante de la langue, de l'histoire, de la culture et de la société djiboutienne. Démonstration d'adhésion aux valeurs de la société djiboutienne. Compréhension des droits et devoirs liés à la nationalité.",
+    "pieces_justificatives": [
+      "Dossier complet de naturalisation",
+      "Certificat de non-condamnation",
+      "Certificat médical",
+      "Acte de mariage",
+      "Carte nationale d'identité du parent possédant la nationalité djiboutienne",
+      "Pièces d'identité des enfants (le cas échéant)",
+      "Formulaire de demande de naturalisation dûment rempli"
+    ],
+    "etapes": [
+      "Rassembler le dossier complet",
+      "Déposer le dossier auprès du Cabinet de la préfecture"
+    ],
+    "delai": "1 jour après dépôt.",
+    "cout": "2 timbres de 1 000 FDJ.",
+    "organisme": {
+      "nom": "Cabinet de la Préfecture",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Obtention du procès-verbal d'assimilation validant l'intégration culturelle et civique du demandeur, étape nécessaire dans le processus de naturalisation."
+  },
+  {
+    "id": 163,
+    "category_id": 6,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/163/6/1",
+    "title": "Allocations familiales",
+    "category": "Santé et Social",
+    "type": "démarche",
+    "description": "L'allocation familiale est une prestation servie aux salariés et assimilés ayant la charge d'un ou plusieurs enfants résidant en République de Djibouti (six enfants au maximum).",
+    "beneficiaires": "Père de famille, femme salariée ayant la charge des enfants, femme divorcée, veuve, épouse dont le mari est au chômage, mère célibataire.",
+    "conditions": "Avoir des enfants légitimes, naturels ou adoptifs à charge, dans la limite de 6 enfants. Les enfants doivent résider en République de Djibouti.",
+    "pieces_justificatives": [
+      "Copie lisible de la carte d'identité nationale avec original",
+      "Attestation de présence au travail ou certificat d'emploi signé par l'employeur",
+      "Formulaire complété",
+      "Extrait d'acte de naissance des enfants",
+      "Contrat d'apprentissage (pour les enfants de 15 à 18 ans)",
+      "Certificat de scolarité (pour les enfants de 15 à 21 ans)",
+      "Certificat de responsabilité (pour les femmes salariées)",
+      "Acte de divorce (pour les femmes divorcées)",
+      "Acte de décès (pour les veuves)",
+      "Attestation de chômage du mari (pour les épouses concernées)"
+    ],
+    "etapes": [
+      "Rassembler le dossier complet",
+      "Déposer le dossier auprès de la CNSS"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Caisse nationale de la sécurité sociale (CNSS)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Allocation trimestrielle de 25 200 FDJ (soit 1 400 FDJ par mois et par enfant, pour 6 enfants au maximum)."
+  },
+  {
+    "id": 164,
+    "category_id": 6,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/164/6/1",
+    "title": "Allocations de mariage",
+    "category": "Santé et Social",
+    "type": "démarche",
+    "description": "Une allocation mensuelle attribuée aux travailleurs salariés mariés affiliés à la CNSS, versée trimestriellement.",
+    "beneficiaires": "Travailleurs salariés mariés relevant de la convention collective, déclarés et cotisant à la CNSS.",
+    "conditions": "La rémunération mensuelle du travailleur ne doit pas excéder 50 000 FDJ. L'épouse ne doit pas être titulaire d'une patente professionnelle, ni être salariée, fonctionnaire ou militaire.",
+    "pieces_justificatives": [
+      "Copie de la carte d'identité nationale (CIN)",
+      "Acte de mariage officiel",
+      "Attestation de l'employeur",
+      "Certificat annuel de vie et de résidence de l'épouse"
+    ],
+    "etapes": [
+      "Rassembler les pièces justificatives",
+      "Déposer le dossier auprès de la CNSS"
+    ],
+    "delai": "Le droit prend effet à compter du 1er du mois de dépôt du dossier complet.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Caisse nationale de la sécurité sociale (CNSS)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Allocation mensuelle de 2 500 FDJ versée par trimestre (7 500 FDJ), aux débuts des mois de février, mai, août et novembre."
+  },
+  {
+    "id": 165,
+    "category_id": 6,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/165/6/1",
+    "title": "Accident de travail",
+    "category": "Santé et Social",
+    "type": "démarche",
+    "description": "Procédure de déclaration et de reconnaissance d'un accident survenu durant l'exercice professionnel ou lors du trajet domicile-travail.",
+    "beneficiaires": "Salariés placés sous subordination juridique d'un employeur ayant subi un accident professionnel ou de trajet.",
+    "conditions": "Quatre critères doivent être réunis : le caractère soudain de l'événement ou l'apparition soudaine d'une lésion, l'existence d'une lésion corporelle, le caractère professionnel de l'accident, et pour les accidents de trajet, la survenance entre la résidence et le lieu de travail sans détournement personnel.",
+    "pieces_justificatives": [
+      "Certificat médical établi par le médecin de choix du salarié",
+      "Formulaire d'accident de travail (fourni par la CNSS)",
+      "Formulaire d'arrêt de travail (si applicable)",
+      "Certificats validés par le médecin de la CNSS"
+    ],
+    "etapes": [
+      "Informer l'employeur dans les 24 heures suivant l'accident",
+      "L'employeur déclare l'accident auprès de la CNSS dans les 48 heures",
+      "Le salarié consulte un médecin pour établir le certificat médical",
+      "Transmission des documents à l'employeur"
+    ],
+    "delai": "Notification à l'employeur : 24 heures maximum. Déclaration à la CNSS par l'employeur : 48 heures. Décision de la CNSS sur le caractère professionnel : 30 jours (prolongeable de 2 mois). Déclaration possible par le salarié jusqu'à 2 ans après l'accident.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Caisse nationale de la sécurité sociale (CNSS)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Reconnaissance du caractère professionnel de l'accident et accès aux droits sociaux correspondants."
+  },
+  {
+    "id": 166,
+    "category_id": 6,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/166/6/1",
+    "title": "Pension de retraite normale",
+    "category": "Santé et Social",
+    "type": "démarche",
+    "description": "Pension de retraite calculée à partir de la moyenne des salaires des 10 dernières années, appliquée à un taux d'annuité variable selon la période d'acquisition des droits.",
+    "beneficiaires": "Travailleurs salariés immatriculés à la CNSS, âgés d'au moins 60 ans révolus, et ayant la durée minimale de cotisations requise selon leur année de naissance.",
+    "conditions": "Être immatriculé à la CNSS. Être âgé d'au minimum 60 ans révolus. Avoir une durée minimale de cotisation vieillesse selon l'année de naissance (de 15 ans pour les nés en 1946 à 25 ans pour les nés à partir de 1951). Il est recommandé de déposer la demande 3 mois avant l'atteinte des 60 ans.",
+    "pieces_justificatives": [
+      "Demande de pension dûment remplie par l'employeur",
+      "Carte d'immatriculation CNSS",
+      "Attestation(s) de travail",
+      "Six photos d'identité"
+    ],
+    "etapes": [
+      "Constituer le dossier complet",
+      "Déposer la demande aux guichets de la CNSS contre récépissé",
+      "Après approbation, la pension est versée trimestriellement"
+    ],
+    "delai": "Demande déposée avant 60 ans : pension activée à la date des 60 ans. Demande déposée après 60 ans : pension effective au 1er jour du mois suivant le dépôt.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Caisse nationale de la sécurité sociale (CNSS)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Pension mensuelle variable (entre 30% et 81% du salaire déclaré), versée trimestriellement les 1er janvier, avril, juillet et octobre."
+  },
+  {
+    "id": 167,
+    "category_id": 6,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/167/6/1",
+    "title": "Pension de retraite par réversion",
+    "category": "Santé et Social",
+    "type": "démarche",
+    "description": "Allocation versée aux ayants droit lors du décès d'un travailleur retraité, basée sur la loi n°154/AN/02/4ème L régissant le régime général de retraite.",
+    "beneficiaires": "Conjoints du travailleur décédé réunissant les conditions légales, et orphelins du travailleur décédé.",
+    "conditions": "Pour les conjoints : mariage antérieur à l'admission à la retraite, mariage contracté au moins 5 ans avant le décès du travailleur, absence de remariage et de divorce au moment de la demande. Pour les orphelins : être enfant du travailleur décédé, scolarité certifiée pour les enfants de plus de 15 ans.",
+    "pieces_justificatives": [
+      "Acte de mariage",
+      "Formulaire de demande de pension de réversion",
+      "Certificat de bonne vie et mœurs",
+      "Certificat de non-remariage et de non-divorce",
+      "Acte de décès",
+      "Certificat de responsabilité",
+      "Certificat de scolarité (pour les enfants de plus de 15 ans)",
+      "Photos des assurés et des épouses",
+      "Certificats de vie et de résidence",
+      "Copie de la carte d'identité nationale de l'assuré",
+      "Copie de la carte d'identité nationale de l'épouse (ou des épouses)",
+      "Certificat d'inaptitude au travail (en cas de retraite anticipée)",
+      "Fiche familiale d'état civil",
+      "Actes de naissance des enfants"
+    ],
+    "etapes": [
+      "Rassembler le dossier complet",
+      "Déposer le dossier auprès de la CNSS"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Caisse nationale de la sécurité sociale (CNSS)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Attribution d'une pension de réversion égale à 50% de la pension du défunt, partagée entre les conjoints. Les orphelins reçoivent 30%, limité à 10% par enfant."
+  },
+  {
+    "id": 145,
+    "category_id": 7,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/145/7/1",
+    "title": "Horaires des écoles secondaires",
+    "category": "Éducation",
+    "type": "information",
+    "description": "Information sur les horaires de fonctionnement et les règles de discipline des établissements d'enseignement secondaire (collèges et lycées) à Djibouti. Collège : matin de 7h20 à 12h35 et après-midi de 15h20 à 18h35, du dimanche au jeudi. Les élèves doivent être présents 5 minutes avant le premier signal et ne peuvent pas quitter l'établissement durant les heures de cours. Lycée : les rendez-vous médicaux doivent être planifiés en dehors des horaires scolaires ; des dérogations exceptionnelles sont possibles sur demande écrite parentale adressée au conseiller d'éducation.",
+    "beneficiaires": "Élèves du collège et du lycée, parents d'élèves, personnel éducatif.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Ministère de l'Éducation nationale",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 146,
+    "category_id": 7,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/146/7/1",
+    "title": "Sécurité des biens et des élèves",
+    "category": "Éducation",
+    "type": "information",
+    "description": "L'établissement est responsable de la sécurité des élèves qui lui sont confiés. Les règles incluent l'accompagnement obligatoire des élèves exclus de classe, l'interdiction de rester sans surveillance, et la prohibition d'objets dangereux (couteaux, cutters) ainsi que de dispositifs électroniques personnels (téléphones portables, baladeurs). La responsabilité personnelle s'applique pour les biens personnels de valeur, et les parents sont tenus de payer les dégâts matériels causés.",
+    "beneficiaires": "Élèves des établissements scolaires secondaires et leurs parents ou responsables légaux.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Établissements scolaires secondaires de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 147,
+    "category_id": 7,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/147/7/1",
+    "title": "Assiduité scolaire et absentéisme",
+    "category": "Éducation",
+    "type": "information",
+    "description": "Les élèves doivent obligatoirement assister à tous les cours. Des contrôles d'absence sont effectués chaque heure par les professeurs, analysés quotidiennement par les surveillants, et rapportés au conseiller d'éducation. Les familles doivent notifier l'établissement de toute absence imprévue avant le retour de l'élève. À leur retour, les élèves doivent se présenter au bureau de surveillance. Le barème des sanctions progressives pour absences injustifiées est le suivant : 5 heures = convocation des parents ; 10 heures = 1er avertissement écrit ; 15 heures = 2ème avertissement écrit ; 20 heures = 1ère exclusion temporaire ; 25 heures = 2ème exclusion temporaire ; 35 heures = exclusion définitive automatique.",
+    "beneficiaires": "Élèves inscrits dans les établissements secondaires.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Établissements scolaires secondaires de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 148,
+    "category_id": 7,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/148/7/1",
+    "title": "La réforme du BAC",
+    "category": "Éducation",
+    "type": "information",
+    "description": "Réforme du baccalauréat mise en place à partir de la session 2016 à Djibouti. Le baccalauréat général comprend désormais quatre séries : ES (économique et sociale), L (littéraire), S (scientifique) et SG (sciences de gestion). Seule la série SG propose trois spécialisations : OGRH (organisation et gestion des ressources humaines), GFM (gestion financière et marketing) et IAG (informatique appliquée à la gestion). Les séries L, S et ES ont supprimé les options de spécialisation.",
+    "beneficiaires": "Élèves de terminale, enseignants et parents d'élèves.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Ministère de l'Éducation nationale / Direction des examens et concours (DEC)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 149,
+    "category_id": 7,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/149/7/1",
+    "title": "L'inscription au BAC",
+    "category": "Éducation",
+    "type": "démarche",
+    "description": "Processus permettant aux candidats de s'inscrire à l'examen du baccalauréat, soit via leur établissement scolaire (candidats scolarisés), soit directement auprès de la Direction des examens et concours (candidats libres).",
+    "beneficiaires": "Élèves inscrits dans les établissements secondaires (candidats scolarisés) et candidats libres.",
+    "conditions": "Les candidats scolarisés s'inscrivent via leur établissement. Les candidats libres doivent effectuer une préinscription directe auprès de la DEC et payer les frais d'inscription.",
+    "pieces_justificatives": [
+      "Quittance de paiement (candidats libres)",
+      "Fiche de préinscription (candidats libres)",
+      "Photocopie de la carte nationale d'identité, du passeport biométrique ou de la carte consulaire (candidats libres)",
+      "Relevé de notes de la session précédente (candidats libres)"
+    ],
+    "etapes": [
+      "Candidats scolarisés : soumettre le formulaire d'inscription via l'établissement → vérification par la DEC → confirmation envoyée aux établissements",
+      "Candidats libres : préinscription à la DEC → paiement des frais → validation par la DEC"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Frais d'inscription requis pour les candidats libres (montant non précisé).",
+    "organisme": {
+      "nom": "Direction des examens et concours (DEC)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": "Confirmation officielle d'inscription à l'examen du baccalauréat."
+  },
+  {
+    "id": 152,
+    "category_id": 8,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/152/8/1",
+    "title": "Autorisation des travaux de voirie",
+    "category": "Habitat - Logement",
+    "type": "démarche",
+    "description": "Cette procédure autorise l'occupation du domaine public pour des travaux de construction ou une utilisation temporaire de la voie publique.",
+    "beneficiaires": "Particuliers et entités nécessitant un accès à la voie publique pour des travaux ou une occupation temporaire.",
+    "conditions": "Les travaux ou l'occupation temporaire doivent être justifiés et conformes aux réglementations en vigueur.",
+    "pieces_justificatives": [
+      "Formulaire de demande d'autorisation des travaux de voirie",
+      "Copie du titre foncier",
+      "Copie du plan de situation",
+      "Copie du plan de masse cadastral",
+      "Copie du plan de vue en coupe"
+    ],
+    "etapes": [
+      "Déposer le dossier avec les pièces requises auprès de la Direction de l'habitat et de l'urbanisme",
+      "Instruction du dossier",
+      "Délivrance de la décision d'autorisation"
+    ],
+    "delai": "7 jours après dépôt.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Direction de l'habitat et de l'urbanisme",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Autorisation officielle de procéder aux travaux de voirie ou à l'occupation temporaire du domaine public."
+  },
+  {
+    "id": 153,
+    "category_id": 8,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/153/8/1",
+    "title": "Permis de démolition",
+    "category": "Habitat - Logement",
+    "type": "démarche",
+    "description": "Autorisation administrative permettant la démolition partielle ou totale d'une construction.",
+    "beneficiaires": "Propriétaires ou gestionnaires d'immeubles souhaitant procéder à une démolition.",
+    "conditions": "La construction à démolir doit faire l'objet d'une demande régulière auprès de la Direction de l'habitat et de l'urbanisme.",
+    "pieces_justificatives": [
+      "Formulaire de demande de permis de démolition",
+      "Copie du certificat d'inscription (titre foncier)",
+      "Copie du plan de situation",
+      "Copie du plan de masse cadastral"
+    ],
+    "etapes": [
+      "Déposer le dossier auprès de la Direction de l'habitat et de l'urbanisme",
+      "Instruction du dossier",
+      "Délivrance du permis"
+    ],
+    "delai": "7 jours après dépôt.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Direction de l'habitat et de l'urbanisme",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Autorisation administrative de procéder aux travaux de démolition."
+  },
+  {
+    "id": 154,
+    "category_id": 8,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/154/8/1",
+    "title": "Certificat de conformité générale",
+    "category": "Habitat - Logement",
+    "type": "démarche",
+    "description": "Attestation authentique délivrée par la Direction de l'habitat et de l'urbanisme confirmant l'achèvement des travaux de construction et leur conformité avec l'autorisation accordée.",
+    "beneficiaires": "Propriétaires ou maîtres d'ouvrage ayant achevé des travaux de construction.",
+    "conditions": "Les travaux doivent être achevés et conformes au permis de construire initial.",
+    "pieces_justificatives": [
+      "Formulaire de demande de certificat de conformité générale",
+      "Copie du certificat d'alignement (délivré par la Direction des domaines et de la conservation foncière)",
+      "Copie du certificat sanitaire (délivré par la Direction de l'hygiène)",
+      "Copie du certificat de conformité électrique (délivré par la Direction de l'habitat)",
+      "Copie du certificat de conformité parasismique (délivré par la Direction de l'habitat)",
+      "Copie du permis de construire (délivré par la Direction de l'habitat)"
+    ],
+    "etapes": [
+      "Rassembler les certificats préalables de conformité (alignement, sanitaire, électrique, parasismique)",
+      "Déposer le dossier complet auprès de la Direction de l'habitat et de l'urbanisme",
+      "Instruction du dossier",
+      "Délivrance du certificat de conformité générale"
+    ],
+    "delai": "7 jours après dépôt.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Direction de l'habitat et de l'urbanisme",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance du certificat de conformité générale attestant la conformité de la construction avec l'autorisation accordée."
+  },
+  {
+    "id": 155,
+    "category_id": 8,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/155/8/1",
+    "title": "Permis de construire simplifié",
+    "category": "Habitat - Logement",
+    "type": "démarche",
+    "description": "Le permis de construire est un document officiel qui autorise la construction ou la rénovation d'un bâtiment à usage d'habitation, industriel ou autre. Le projet doit être conforme aux dispositions législatives et réglementaires en matière d'urbanisme.",
+    "beneficiaires": "Toute personne souhaitant entreprendre des travaux de construction ou de rénovation de bâtiments.",
+    "conditions": "Le projet doit être conforme aux dispositions législatives et réglementaires en matière d'urbanisme.",
+    "pieces_justificatives": [
+      "Formulaire de permis de construire simplifié (à retirer auprès de la Direction des domaines et de la conservation foncière)",
+      "Copie du certificat d'inscription (titre foncier)",
+      "Copie du plan de situation",
+      "Copie du plan de masse cadastral",
+      "Taxe d'extraction des matériaux"
+    ],
+    "etapes": [
+      "Retirer le formulaire auprès de la Direction des domaines et de la conservation foncière",
+      "Constituer le dossier complet",
+      "Déposer le dossier auprès de la Direction de l'habitat et de l'urbanisme",
+      "Instruction du dossier",
+      "Délivrance du permis de construire"
+    ],
+    "delai": "7 jours après dépôt.",
+    "cout": "Taxe d'extraction des matériaux (montant non précisé).",
+    "organisme": {
+      "nom": "Direction de l'habitat et de l'urbanisme",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "7h à 14h du samedi au jeudi"
+    },
+    "resultat": "Obtention du permis de construire autorisant la réalisation du projet de construction ou de rénovation."
+  },
+  {
+    "id": 156,
+    "category_id": 8,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/156/8/1",
+    "title": "Permis de remblai",
+    "category": "Habitat - Logement",
+    "type": "démarche",
+    "description": "Les remblais de terrains constituent des exhaussements du sol devant respecter l'ensemble des règles affectant l'utilisation du sol. Les travaux nécessitent une autorisation spéciale et doivent satisfaire les conditions de sécurité et de salubrité publique. Les matériaux constitutifs du remblai doivent obligatoirement provenir d'un site d'extraction prévu à cet effet. L'arrosage et le compactage se font par couches de 0,25 m maximum, avec des tests obligatoires du Laboratoire central après chaque couche.",
+    "beneficiaires": "Propriétaires ou gestionnaires de terrains souhaitant effectuer des travaux de remblayage.",
+    "conditions": "Les matériaux de décaissement doivent être versés à la décharge publique. Les matériaux de remblai doivent provenir d'un site d'extraction agréé. Compactage par couches de 0,25 m maximum avec tests du Laboratoire central. Respect des règles de protection contre les inondations, effondrements et écroulements.",
+    "pieces_justificatives": [
+      "Demande adressée à la Direction de l'habitat et de l'urbanisme",
+      "Copie du titre foncier",
+      "Plan de situation",
+      "Autorisation d'extraction des matériaux (délivrée par la mairie de Djibouti)",
+      "Récépissé de versement des frais d'extraction"
+    ],
+    "etapes": [
+      "Déposer la demande à la Direction de l'habitat et de l'urbanisme",
+      "Contacter le Laboratoire central pour les essais de contrôle",
+      "Exécuter les travaux par couches avec contrôles obligatoires",
+      "Demander le certificat de conformité après achèvement des travaux",
+      "Vérification des côtes, du compactage et des autorisations"
+    ],
+    "delai": "3 jours après dépôt.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Direction de l'habitat et de l'urbanisme",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance du certificat de conformité de remblai après contrôles réglementaires."
+  },
+  {
+    "id": 117,
+    "category_id": 9,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/117/9/1",
+    "title": "Carte grise",
+    "category": "Transport",
+    "type": "démarche",
+    "description": "Le certificat d'immatriculation, communément appelé carte grise, est la carte d'identité du véhicule. Il permet l'identification du véhicule et sa circulation lorsqu'il est accompagné de la vignette et de l'assurance.",
+    "beneficiaires": "Propriétaires de véhicules nécessitant un certificat d'immatriculation.",
+    "conditions": "Disposer d'une pièce d'identité valide et des documents complets du véhicule.",
+    "pieces_justificatives": [
+      "Copie de la pièce d'identité du demandeur",
+      "Documents complets du véhicule"
+    ],
+    "etapes": [
+      "Prendre rendez-vous via le portail monespace.egouv.dj",
+      "Déposer le dossier auprès de la Direction des mines et de la sécurité routière",
+      "Attendre le traitement et la délivrance"
+    ],
+    "delai": "3 jours à une semaine après dépôt.",
+    "cout": "Calculé sur la base de la puissance du moteur : 4 500 FDJ par cheval-vapeur (exemple : 10 chevaux = 45 000 FDJ).",
+    "organisme": {
+      "nom": "Direction des mines et de la sécurité routière / Préfecture de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance du certificat d'immatriculation permettant la circulation légale du véhicule."
+  },
+  {
+    "id": 118,
+    "category_id": 9,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/118/9/1",
+    "title": "Vignette automobile",
+    "category": "Transport",
+    "type": "démarche",
+    "description": "La vignette automobile est un impôt annuel sur les véhicules en circulation, nécessitant l'achat et l'apposition d'une figurine fiscale sur le pare-brise.",
+    "beneficiaires": "Propriétaires de véhicules en circulation soumis à cet impôt.",
+    "conditions": "Présenter la carte grise du véhicule.",
+    "pieces_justificatives": [
+      "Carte grise du véhicule"
+    ],
+    "etapes": [
+      "Se présenter à l'Hôtel des impôts avec la carte grise",
+      "Payer le montant de la vignette selon la série du véhicule",
+      "Apposer la vignette sur le pare-brise"
+    ],
+    "delai": "Immédiat.",
+    "cout": "Série A (1 à 4 CV) : 18 000 FDJ (normal) / 70 000 FDJ (location). Série B (5 à 9 CV) : 25 000 FDJ (normal) / 70 000 FDJ (location). Série C (10 à 20 CV) : 30 000 FDJ (normal) / 70 000 FDJ (location). Série D (plus de 20 CV) : 35 000 FDJ (normal) / 70 000 FDJ (location).",
+    "organisme": {
+      "nom": "Hôtel des impôts",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Obtention et apposition de la vignette fiscale annuelle."
+  },
+  {
+    "id": 119,
+    "category_id": 9,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/119/9/1",
+    "title": "Immatriculation d'un véhicule neuf",
+    "category": "Transport",
+    "type": "démarche",
+    "description": "Procédure d'enregistrement d'un véhicule neuf auprès de la préfecture de Djibouti, applicable aux véhicules importés ou achetés auprès d'un concessionnaire local.",
+    "beneficiaires": "Tout particulier ou entité souhaitant immatriculer un véhicule neuf à Djibouti.",
+    "conditions": "Pour les véhicules importés : disposer de l'attestation pour l'immatriculation du véhicule (AIV) délivrée par les douanes. Pour les achats auprès d'un concessionnaire local : le concessionnaire se charge de l'immatriculation.",
+    "pieces_justificatives": [
+      "Attestation pour l'immatriculation du véhicule (AIV) délivrée par les douanes",
+      "Quittance douanière",
+      "Attestation INTERPOL délivrée par la police",
+      "Carte nationale d'identité du demandeur",
+      "Formulaires de déclaration de mise en circulation"
+    ],
+    "etapes": [
+      "Obtenir l'AIV auprès des douanes",
+      "Obtenir l'attestation INTERPOL auprès de la police",
+      "Déposer le dossier complet à la Préfecture de Djibouti",
+      "Récupérer la carte grise"
+    ],
+    "delai": "2 à 3 jours ouvrables.",
+    "cout": "Frais de carte grise. 3 timbres à 1 000 FDJ. 2 000 FDJ pour l'attestation INTERPOL. 450 FDJ pour les formulaires de déclaration de mise en circulation (Imprimerie nationale).",
+    "organisme": {
+      "nom": "Préfecture de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance de la carte grise (certificat d'immatriculation) du véhicule neuf."
+  },
+  {
+    "id": 120,
+    "category_id": 9,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/120/9/1",
+    "title": "Immatriculation d'un véhicule d'occasion",
+    "category": "Transport",
+    "type": "démarche",
+    "description": "Procédure d'enregistrement d'un véhicule d'occasion auprès des autorités compétentes de Djibouti.",
+    "beneficiaires": "Tout particulier ou entité souhaitant immatriculer un véhicule d'occasion à Djibouti.",
+    "conditions": "Disposer de l'attestation pour l'immatriculation du véhicule (AIV) des douanes et du rapport d'appréciation douanière (RAD) après contrôle technique.",
+    "pieces_justificatives": [
+      "Attestation pour l'immatriculation du véhicule (AIV) délivrée par les douanes",
+      "Quittance douanière",
+      "Attestation INTERPOL délivrée par la police",
+      "Carte nationale d'identité du demandeur",
+      "Formulaires de déclaration de mise en circulation",
+      "Rapport d'appréciation douanière (RAD) après contrôle technique"
+    ],
+    "etapes": [
+      "Obtenir l'AIV auprès des douanes",
+      "Faire effectuer le contrôle technique pour obtenir le RAD",
+      "Obtenir l'attestation INTERPOL auprès de la police",
+      "Déposer le dossier complet à la Préfecture de Djibouti",
+      "Récupérer la carte grise"
+    ],
+    "delai": "2 à 3 jours ouvrables.",
+    "cout": "Frais de carte grise. 3 timbres à 1 000 FDJ. 2 000 FDJ pour l'attestation INTERPOL. 450 FDJ pour les formulaires (Imprimerie nationale). 10 000 FDJ pour le RAD. Contrôle technique : 3 000 FDJ (taxi) ou 4 000 FDJ (bus).",
+    "organisme": {
+      "nom": "Préfecture de Djibouti",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance de la carte grise (certificat d'immatriculation) du véhicule d'occasion."
+  },
+  {
+    "id": 121,
+    "category_id": 9,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/121/9/1",
+    "title": "Demande d'un duplicata de la carte grise",
+    "category": "Transport",
+    "type": "démarche",
+    "description": "Procédure pour obtenir un document de remplacement du certificat d'immatriculation en cas de perte ou de vol.",
+    "beneficiaires": "Propriétaires ou titulaires de véhicules ayant perdu ou dont la carte grise a été volée.",
+    "conditions": "Avoir déclaré la perte ou le vol au commissariat de police et obtenu la déclaration officielle correspondante.",
+    "pieces_justificatives": [
+      "Déclaration officielle de perte ou de vol établie par le commissariat de police",
+      "Fiche de renseignement remplie et signée par la direction compétente"
+    ],
+    "etapes": [
+      "Se présenter au commissariat de police pour déclarer la perte ou le vol",
+      "Obtenir la fiche de renseignement dûment signée par les autorités",
+      "Obtenir la déclaration officielle de perte ou de vol",
+      "Se présenter à la direction compétente et payer les frais"
+    ],
+    "delai": "2 à 3 jours ouvrables après dépôt du dossier.",
+    "cout": "50% du coût de la carte grise.",
+    "organisme": {
+      "nom": "Direction des mines et de la sécurité routière / Préfecture de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance d'un duplicata de la carte grise."
+  },
+  {
+    "id": 86,
+    "category_id": 10,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/86/10/1",
+    "title": "Aide judiciaire",
+    "category": "Justice",
+    "type": "démarche",
+    "description": "L'aide judiciaire est une aide financière ou juridique que l'État accorde aux justiciables dont les revenus sont insuffisants pour accéder à la justice.",
+    "beneficiaires": "Personnes physiques ayant des ressources limitées souhaitant accéder au système judiciaire.",
+    "conditions": "Revenus mensuels inférieurs à 100 000 FDJ. Ce plafond est porté à 150 000 FDJ si le demandeur a au minimum trois enfants à charge.",
+    "pieces_justificatives": [
+      "Justificatif des ressources du demandeur"
+    ],
+    "etapes": [
+      "Se présenter au Tribunal de première instance",
+      "Présenter la demande avec justificatif de ressources",
+      "Attendre la décision d'attribution"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Gratuit pour le demandeur. L'État verse les indemnités suivantes aux auxiliaires de justice : avocat : 15 000 à 75 000 FDJ selon le tribunal ; huissier : 4 000 FDJ par acte, 10 000 FDJ par procès-verbal, 20 000 FDJ pour une expulsion.",
+    "organisme": {
+      "nom": "Tribunal de première instance",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Accès à l'assistance juridique et judiciaire financée par l'État pour les justiciables éligibles."
+  },
+  {
+    "id": 87,
+    "category_id": 10,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/87/10/1",
+    "title": "Extrait B3 du casier judiciaire",
+    "category": "Justice",
+    "type": "démarche",
+    "description": "Le casier judiciaire est un fichier recensant les condamnations pénales d'un individu. L'extrait B3 est mis à la disposition des autorités publiques.",
+    "beneficiaires": "Tout individu souhaitant obtenir son extrait de casier judiciaire.",
+    "conditions": "Présenter une copie de la carte nationale d'identité.",
+    "pieces_justificatives": [
+      "Copie de la carte nationale d'identité"
+    ],
+    "etapes": [
+      "Se présenter au Tribunal de première instance",
+      "Présenter la copie de la carte nationale d'identité",
+      "Recevoir l'extrait B3 dans un délai de 24 heures"
+    ],
+    "delai": "24 heures.",
+    "cout": "Gratuit.",
+    "organisme": {
+      "nom": "Tribunal de première instance",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Obtention de l'extrait B3 du casier judiciaire certifiant l'absence ou la présence de condamnations pénales."
+  },
+  {
+    "id": 88,
+    "category_id": 10,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/88/10/1",
+    "title": "Notaires",
+    "category": "Justice",
+    "type": "information",
+    "description": "Les notaires sont des officiers publics institués pour recevoir les actes et contrats auxquels les parties doivent ou veulent faire donner le caractère d'authenticité attaché aux actes de l'autorité publique. La profession notariale est régie par la loi n°170/AN/02/4ème L portant statut du notariat. Les honoraires des notaires sont fixés par les règlements en vigueur et leurs modifications éventuelles par décret en Conseil des ministres.",
+    "beneficiaires": "Toute personne physique ou morale souhaitant donner un caractère authentique à un acte juridique.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": "Tarifs fixés par décret en Conseil des ministres.",
+    "organisme": {
+      "nom": "Notaires de la République de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 89,
+    "category_id": 10,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/89/10/1",
+    "title": "Tribunal de statut personnel",
+    "category": "Justice",
+    "type": "information",
+    "description": "Les tribunaux de charia institués dans chaque arrondissement de Djibouti-ville et au chef-lieu de chaque district ont été remplacés par un tribunal de statut personnel de première instance, avec un ressort sur l'ensemble du territoire national. Le tribunal est compétent pour les affaires de statut personnel (mariage, divorce, succession, héritage), ainsi que pour les affaires civiles et commerciales n'excédant pas 5 000 000 FDJ. Les demandes sont soumises par écrit, signées par le demandeur ou son représentant, ou peuvent être faites par déclaration orale enregistrée par le greffier. Un extrait de l'enregistrement est délivré à la partie demanderesse.",
+    "beneficiaires": "Personnes ayant des litiges en matière de statut personnel, de succession, ou d'affaires civiles et commerciales n'excédant pas 5 000 000 FDJ.",
+    "conditions": "Les affaires doivent relever de la compétence du tribunal : statut personnel, succession, ou affaires civiles et commerciales inférieures à 5 000 000 FDJ.",
+    "pieces_justificatives": [],
+    "etapes": [
+      "Soumettre une demande écrite signée par le demandeur ou son représentant au greffe du tribunal",
+      "Alternative : déclaration orale avec enregistrement officiel par le greffier",
+      "Signature de la déclaration par le demandeur ou empreinte digitale si impossibilité de signer",
+      "Enregistrement dans le registre dédié",
+      "Délivrance d'un extrait de l'enregistrement à la partie demanderesse"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Tribunal de statut personnel",
+      "adresse": "Djibouti-ville (ressort : l'ensemble du territoire national)",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": "Jugement rendu sur les questions de statut personnel, de succession, et les litiges civils ou commerciaux éligibles."
+  },
+  {
+    "id": 90,
+    "category_id": 10,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/90/10/1",
+    "title": "Droits des enfants",
+    "category": "Justice",
+    "type": "information",
+    "description": "Les mineurs sont des personnes de moins de 18 ans n'ayant pas atteint l'âge de la majorité. Tout enfant a le droit de jouir des libertés et protections reconnues et garanties sans discrimination aucune fondée sur la race, l'ethnie, la couleur, le sexe, la langue ou la religion. L'enfant acquiert la personnalité juridique dès sa naissance. Il a droit à un nom et une nationalité, et le droit de connaître ses parents et d'être élevé par eux dans la mesure du possible. L'enregistrement de l'enfant à la naissance est indispensable pour exercer ces droits.",
+    "beneficiaires": "Tous les mineurs (personnes de moins de 18 ans).",
+    "conditions": "L'enfant doit être enregistré à la naissance.",
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "ANSIE / Portail e-gouvernement de Djibouti",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": null
+  },
+  {
+    "id": 134,
+    "category_id": 11,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/134/11/1",
+    "title": "Procédures administratives, fiscales et juridiques pour la création d'entreprise",
+    "category": "Économie et Finance",
+    "type": "information",
+    "description": "Processus complet permettant la création légale d'une entreprise à Djibouti, composé de sept étapes administratives successives : (1) obtention d'un certificat négatif, (2) rédaction des statuts, (3) dépôt de capital social, (4) enregistrement des statuts à l'Hôtel des impôts, (5) immatriculation au registre du commerce, (6) obtention de la patente, (7) immatriculation à la CNSS. Des formalités supplémentaires sont nécessaires : abonnements auprès d'EDD (électricité), ONEAD (eau) et Djibouti Télécom.",
+    "beneficiaires": "Entrepreneurs souhaitant créer une entreprise à Djibouti.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [
+      "Obtention d'un certificat négatif auprès de l'ODPIC",
+      "Rédaction des statuts de la société",
+      "Dépôt du capital social auprès d'une banque",
+      "Enregistrement des statuts et autres documents à l'Hôtel des impôts",
+      "Immatriculation au registre du commerce (ODPIC)",
+      "Obtention de la patente",
+      "Immatriculation à la CNSS"
+    ],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Office djiboutien de la propriété industrielle et commerciale (ODPIC)",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": "Entreprise légalement enregistrée et opérationnelle à Djibouti."
+  },
+  {
+    "id": 135,
+    "category_id": 11,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/135/11/1",
+    "title": "Obtention d'un certificat négatif",
+    "category": "Économie et Finance",
+    "type": "démarche",
+    "description": "La première étape qui marque l'existence d'une entreprise est l'attribution d'un nom ou d'une raison sociale. Le processus implique une recherche d'antériorité pour vérifier que le nom commercial souhaité n'appartient pas déjà à une autre entité.",
+    "beneficiaires": "Créateurs d'entreprise et représentants d'entreprises souhaitant enregistrer un nom commercial ou en modifier un existant.",
+    "conditions": "Vérification préalable que le nom commercial n'est pas déjà utilisé.",
+    "pieces_justificatives": [
+      "Copie de la carte d'identité nationale",
+      "Copie du registre de commerce (en cas de changement de nom)",
+      "Pouvoir du mandataire (le cas échéant)",
+      "Quittance de paiement"
+    ],
+    "etapes": [
+      "Se présenter à l'ODPIC",
+      "Effectuer la recherche d'antériorité du nom commercial",
+      "Obtenir le certificat négatif",
+      "Enregistrement du nom commercial"
+    ],
+    "delai": "10 minutes après dépôt.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Office djiboutien de la propriété industrielle et commerciale (ODPIC)",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Délivrance d'un certificat négatif et enregistrement du nom commercial de la nouvelle entité."
+  },
+  {
+    "id": 136,
+    "category_id": 11,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/136/11/1",
+    "title": "Dépôt de capital social",
+    "category": "Économie et Finance",
+    "type": "démarche",
+    "description": "Les créateurs d'entreprise ou leurs représentants doivent ouvrir un compte commercial au nom de la nouvelle entité et y déposer le capital minimum requis pour la constitution de la société.",
+    "beneficiaires": "Créateurs d'entreprise et représentants de sociétés en cours de constitution.",
+    "conditions": "Disposer des statuts de la société rédigés.",
+    "pieces_justificatives": [
+      "Statuts de la société"
+    ],
+    "etapes": [
+      "Ouvrir un compte commercial au nom de la nouvelle entité auprès d'une banque",
+      "Déposer le capital minimum requis",
+      "Présenter les statuts à l'ODPIC"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Office djiboutien de la propriété industrielle et commerciale (ODPIC) / Banque commerciale",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": "Capital déposé et vérifié pour la constitution de la société."
+  },
+  {
+    "id": 137,
+    "category_id": 11,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/137/11/1",
+    "title": "Enregistrement des statuts et autres documents à l'Hôtel des impôts",
+    "category": "Économie et Finance",
+    "type": "démarche",
+    "description": "Procédure de soumission des documents fondateurs pour l'enregistrement officiel auprès de la Direction générale des impôts, dans le cadre de la création d'une entreprise.",
+    "beneficiaires": "Entrepreneurs et entités commerciales créant une nouvelle société à Djibouti.",
+    "conditions": "Disposer de quatre exemplaires de chacun des documents requis.",
+    "pieces_justificatives": [
+      "4 exemplaires des statuts de la société",
+      "4 exemplaires du bail commercial",
+      "4 exemplaires de la déclaration de conformité (délivrée par un notaire ou autorité équivalente)",
+      "4 exemplaires de l'attestation bancaire"
+    ],
+    "etapes": [
+      "Rassembler quatre exemplaires de chaque document requis",
+      "Déposer les documents auprès de la Direction générale des impôts (Hôtel des impôts)"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Direction générale des impôts (Hôtel des impôts)",
+      "adresse": "Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": "Enregistrement officiel des statuts et documents constitutifs de la société auprès de l'administration fiscale."
+  },
+  {
+    "id": 138,
+    "category_id": 11,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/138/11/1",
+    "title": "Immatriculation au registre du commerce (RC)",
+    "category": "Économie et Finance",
+    "type": "démarche",
+    "description": "L'immatriculation au registre du commerce est traitée par l'ODPIC, qui délivre le récépissé et publie l'annonce de constitution de la société dans la presse.",
+    "beneficiaires": "Entités commerciales et entrepreneurs souhaitant enregistrer leur société.",
+    "conditions": "Disposer des documents préalablement enregistrés (statuts, attestation bancaire, déclaration de conformité) et du casier judiciaire du gérant.",
+    "pieces_justificatives": [
+      "Un exemplaire des statuts enregistrés",
+      "Un exemplaire de l'attestation bancaire enregistrée",
+      "Un exemplaire de la déclaration de conformité enregistrée",
+      "Copie de la pièce d'identité du gérant",
+      "Deux photos d'identité du gérant",
+      "Casier judiciaire du gérant (délivré par le tribunal)",
+      "Formulaire du registre du commerce (disponible en téléchargement)"
+    ],
+    "etapes": [
+      "Rassembler les pièces justificatives",
+      "Déposer le dossier auprès de l'ODPIC",
+      "L'ODPIC délivre le récépissé et publie l'annonce légale dans la presse"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Office djiboutien de la propriété industrielle et commerciale (ODPIC)",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": "Immatriculation officielle de la société au registre du commerce avec délivrance d'un récépissé et publication de l'annonce légale."
+  },
+  {
+    "id": 159,
+    "category_id": 12,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/159/12/1",
+    "title": "Carte d'identité étrangère",
+    "category": "Étrangers",
+    "type": "information",
+    "description": "Pour les demandes de carte d'identité étrangère, l'intéressé doit s'adresser au consulat ou à l'ambassade de son pays d'origine résidant à Djibouti.",
+    "beneficiaires": "Ressortissants étrangers résidant à Djibouti.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [
+      "Se présenter au consulat ou à l'ambassade de son pays d'origine à Djibouti"
+    ],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Consulat ou ambassade du pays d'origine du demandeur",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": null
+    },
+    "resultat": "Obtention d'une carte d'identité étrangère valide."
+  },
+  {
+    "id": 160,
+    "category_id": 12,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/160/12/1",
+    "title": "Demande d'autorisation de travail",
+    "category": "Étrangers",
+    "type": "démarche",
+    "description": "Procédure permettant aux ressortissants étrangers d'obtenir une autorisation officielle pour exercer une activité professionnelle à Djibouti, délivrée après signature d'un contrat de travail.",
+    "beneficiaires": "Toute personne ne possédant pas la nationalité djiboutienne et souhaitant travailler dans le pays.",
+    "conditions": "Justifier d'un contrat de travail signé avant le dépôt de la demande.",
+    "pieces_justificatives": [
+      "Formulaire de demande d'autorisation de travail",
+      "Déclaration d'embauche",
+      "4 exemplaires du contrat de travail (formulaire disponible à l'Imprimerie nationale)",
+      "Courrier adressé au Directeur général de l'ANEFIP",
+      "2 photos d'identité",
+      "Copie du passeport ou du visa de séjour",
+      "Patente commerciale de l'entreprise employeuse"
+    ],
+    "etapes": [
+      "Signer le contrat de travail avec l'employeur",
+      "Rassembler les pièces justificatives",
+      "Déposer le dossier auprès de l'ANEFIP"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Agence nationale de l'emploi, de la formation et de l'insertion professionnelle (ANEFIP)",
+      "adresse": "Djibouti",
+      "contact": "http://www.anefip.dj",
+      "horaires": null
+    },
+    "resultat": "Obtention d'une autorisation de travail officielle permettant d'exercer une activité professionnelle à Djibouti."
+  },
+  {
+    "id": 161,
+    "category_id": 12,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/161/12/1",
+    "title": "Renouvellement d'autorisation de travail",
+    "category": "Étrangers",
+    "type": "démarche",
+    "description": "Procédure de renouvellement de l'autorisation de travail pour les travailleurs étrangers dont le titre arrive à expiration. La demande doit être déposée auprès de l'ANEFIP dans les deux mois précédant l'expiration.",
+    "beneficiaires": "Travailleurs étrangers dont l'autorisation de travail approche de sa date d'expiration.",
+    "conditions": "La demande doit être soumise dans les deux mois précédant la date d'expiration de l'autorisation de travail en cours.",
+    "pieces_justificatives": [
+      "Formulaire de demande de renouvellement d'autorisation de travail",
+      "Original de la carte d'autorisation de travail à renouveler",
+      "Copie de la carte d'autorisation de travail à renouveler"
+    ],
+    "etapes": [
+      "Préparer les documents requis",
+      "Déposer la demande auprès de l'ANEFIP au moins deux mois avant la date d'expiration",
+      "Attendre l'instruction du dossier par l'ANEFIP"
+    ],
+    "delai": "Déposer au moins 2 mois avant la date d'expiration.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Agence nationale de l'emploi, de la formation et de l'insertion professionnelle (ANEFIP)",
+      "adresse": "Djibouti",
+      "contact": "http://www.anefip.dj",
+      "horaires": null
+    },
+    "resultat": "Renouvellement de l'autorisation de travail."
+  },
+  {
+    "id": 162,
+    "category_id": 12,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/162/12/1",
+    "title": "e-Visa",
+    "category": "Étrangers",
+    "type": "démarche",
+    "description": "L'e-Visa est un document électronique qui certifie que le titulaire est autorisé à entrer et à séjourner en République de Djibouti pour une période déterminée. Il est limité aux objectifs de tourisme, de commerce ou de transit. Les demandes à des fins de travail ou d'études nécessitent un visa traditionnel. L'e-Visa ne garantit pas l'entrée sur le territoire ; les autorités frontalières conservent le droit de refuser l'accès.",
+    "beneficiaires": "Ressortissants étrangers souhaitant voyager à Djibouti pour le tourisme, les affaires ou le transit.",
+    "conditions": "Objectif du voyage limité au tourisme, au commerce ou au transit. Formulaire numérique dûment rempli avec informations personnelles et paiement électronique.",
+    "pieces_justificatives": [
+      "Formulaire de demande en ligne complété",
+      "Paiement électronique des frais de visa"
+    ],
+    "etapes": [
+      "Remplir le formulaire de demande en ligne avec les informations requises",
+      "Effectuer le paiement électronique",
+      "Recevoir l'e-Visa par courrier électronique",
+      "Imprimer l'e-Visa et le conserver avec le passeport"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Agence nationale des systèmes d'information de l'État (ANSIE)",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": "Document électronique envoyé par e-mail, à imprimer et à présenter avec le passeport aux points d'entrée."
+  },
+  {
+    "id": 180,
+    "category_id": 12,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/180/12/1",
+    "title": "Demande d'accréditation presse",
+    "category": "Étrangers",
+    "type": "démarche",
+    "description": "Procédure de demande d'accréditation presse auprès du Ministère de la communication chargé des postes et des télécommunications.",
+    "beneficiaires": "Journalistes et professionnels des médias souhaitant exercer à Djibouti.",
+    "conditions": "Non détaillées.",
+    "pieces_justificatives": [],
+    "etapes": [
+      "Accéder au portail du ministère via https://communication.gouv.dj/Demande",
+      "Soumettre la demande d'accréditation en ligne"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Ministère de la communication chargé des postes et des télécommunications",
+      "adresse": "Djibouti",
+      "contact": "https://communication.gouv.dj/Demande",
+      "horaires": null
+    },
+    "resultat": "Obtention d'une accréditation presse officielle."
+  },
+  {
+    "id": 178,
+    "category_id": 13,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/178/13/1",
+    "title": "Sites touristiques",
+    "category": "Loisirs et Cultures",
+    "type": "information",
+    "description": "Présentation des principales attractions touristiques de Djibouti. Sites de plongée sous-marine : Îles Moucha et Maskali (à 30 minutes en bateau de Djibouti-ville), Archipel des Sept Frères (à 300 km au nord de Djibouti-ville), Plage des Sables Blancs à Tadjourah (à 173 km de Djibouti-ville), Arta Plage (plongée avec requins baleines de novembre à mars, à 41 km de Djibouti-ville). Campements touristiques : Lac Assal et Ardoukoba (à 107 km), Goubet Al-Kharab, Balho (site préhistorique, à 80 km du Lac Assal), Lac Abbé (à 195 km de Djibouti-ville), Massif des Mablas (région d'Obock, à 235 km), Grand Bara (à 76,8 km de Djibouti).",
+    "beneficiaires": "Touristes nationaux et internationaux.",
+    "conditions": null,
+    "pieces_justificatives": [],
+    "etapes": [],
+    "delai": null,
+    "cout": null,
+    "organisme": {
+      "nom": "Office national du tourisme de Djibouti",
+      "adresse": "Djibouti",
+      "contact": "https://guide.visitdjibouti.dj/",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": null
+  },
+  {
+    "id": 174,
+    "category_id": 16,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/174/16/1",
+    "title": "Demande de raccordement d'électricité",
+    "category": "Énergie - Eau",
+    "type": "démarche",
+    "description": "Connexion d'un logement au réseau électrique incluant l'installation d'un compteur électrique neuf.",
+    "beneficiaires": "Propriétaires ou occupants de logements nécessitant une connexion au réseau électrique.",
+    "conditions": "Logement à raccorder au réseau de distribution. Installation d'un nouveau compteur électrique requise.",
+    "pieces_justificatives": [],
+    "etapes": [
+      "Déposer la demande de raccordement auprès d'Électricité de Djibouti (EDD) ou via le portail https://www.edd.dj/e-services/"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Électricité de Djibouti (EDD)",
+      "adresse": "Djibouti",
+      "contact": "https://www.edd.dj/e-services/",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Raccordement de l'habitation au réseau électrique avec installation du compteur."
+  },
+  {
+    "id": 175,
+    "category_id": 16,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/175/16/1",
+    "title": "Branchement neuf ONEAD",
+    "category": "Énergie - Eau",
+    "type": "démarche",
+    "description": "Raccordement d'une habitation, d'un commerce ou d'un établissement au réseau de distribution d'eau ou d'assainissement collectif.",
+    "beneficiaires": "Propriétaires de résidences, commerces et établissements nécessitant un accès aux services d'eau et d'assainissement.",
+    "conditions": "Pour les habitations en dur : possession d'un titre foncier. Pour les habitations en bois : certificat de propriété. Disponibilité du réseau à l'adresse demandée.",
+    "pieces_justificatives": [
+      {
+        "cas": "Habitations en dur",
+        "documents": [
+          "Demande de branchement",
+          "Photocopie de la carte d'identité",
+          "Titre foncier",
+          "Plan de masse",
+          "Plan de situation",
+          "Permis de construction"
+        ]
+      },
+      {
+        "cas": "Habitations en bois",
+        "documents": [
+          "Demande de branchement",
+          "Photocopie de la carte d'identité",
+          "Certificat de propriété"
+        ]
+      }
+    ],
+    "etapes": [
+      "Déposer le dossier à l'ONEAD",
+      "Étude du dossier par l'ONEAD",
+      "Présentation du devis",
+      "Paiement du devis et de l'avance",
+      "Exécution du branchement et pose du compteur"
+    ],
+    "delai": "15 jours après dépôt.",
+    "cout": "Frais de dossier : 6 600 FDJ. Devis et avance : 8 400 FDJ.",
+    "organisme": {
+      "nom": "Office national de l'eau et de l'assainissement de Djibouti (ONEAD)",
+      "adresse": "Antennes commerciales : Ambouli et Balbala",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Installation fonctionnelle du branchement d'eau avec pose du compteur au domicile ou à l'établissement."
+  },
+  {
+    "id": 176,
+    "category_id": 16,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/176/16/1",
+    "title": "Abonnement ONEAD",
+    "category": "Énergie - Eau",
+    "type": "démarche",
+    "description": "Demande de fourniture d'eau pour un point de livraison disposant déjà d'un branchement existant.",
+    "beneficiaires": "Résidents djiboutiens, résidents étrangers, entreprises et ONG.",
+    "conditions": "La présence des deux parties (propriétaire et locataire) est obligatoire lors de la souscription de l'abonnement.",
+    "pieces_justificatives": [
+      "Pièce d'identité du propriétaire et du locataire",
+      "Contrat de bail (pour les quartiers résidentiels)",
+      "Patente commerciale (pour les entreprises)",
+      "Protocole d'accord (pour les ONG)"
+    ],
+    "etapes": [
+      "Se présenter à l'accueil de l'ONEAD avec les documents requis (propriétaire et locataire)",
+      "Établissement d'une caution solidaire",
+      "Signature du contrat d'abonnement",
+      "Pose du compteur"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Djiboutiens : 11 490 FDJ. Étrangers : 48 990 FDJ. Fontainiers : 60 000 FDJ. Frais de pose du compteur inclus (tarifs variables selon le calibre).",
+    "organisme": {
+      "nom": "Office national de l'eau et de l'assainissement de Djibouti (ONEAD)",
+      "adresse": "Direction générale, antenne commerciale de Balbala, antenne commerciale d'Ambouli, agences régionales",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Accès à la fourniture d'eau avec facturation périodique (bimestrielle pour les consommateurs domestiques, mensuelle pour les gros consommateurs)."
+  },
+  {
+    "id": 177,
+    "category_id": 16,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/177/16/1",
+    "title": "Résiliation ONEAD",
+    "category": "Énergie - Eau",
+    "type": "démarche",
+    "description": "Rupture du contrat d'abonnement eau entre l'ONEAD et le client, incluant la suspension du service et l'établissement d'une facture finale de régularisation.",
+    "beneficiaires": "Abonnés de l'ONEAD souhaitant mettre fin à leur contrat d'abonnement.",
+    "conditions": "Le client doit régler toutes les factures impayées avant d'effectuer la demande de résiliation.",
+    "pieces_justificatives": [],
+    "etapes": [
+      "Se présenter au guichet de l'ONEAD",
+      "Payer les éventuelles factures en retard",
+      "Intervention de coupure dans les 48 heures",
+      "Relevé de l'index du compteur",
+      "Établissement de la facture de résiliation",
+      "Paiement de la facture finale"
+    ],
+    "delai": "La coupure d'eau intervient dans les 48 heures suivant la demande.",
+    "cout": "Frais de résiliation et de dépose du compteur : 3 000 FDJ. Pénalités pour défaut d'abonnement : de 20 000 à 100 000 FDJ selon les cas. Facture de régularisation basée sur la différence de consommation.",
+    "organisme": {
+      "nom": "Office national de l'eau et de l'assainissement de Djibouti (ONEAD)",
+      "adresse": "Djibouti",
+      "contact": "",
+      "horaires": "8h à 17h du dimanche au jeudi"
+    },
+    "resultat": "Suspension complète du service d'eau et clôture du contrat d'abonnement."
+  },
+  {
+    "id": 179,
+    "category_id": 18,
+    "url": "https://www.egouv.dj/sousmenu/sousmenu_selected_article/179/18/1",
+    "title": "Délivrance de certificats numériques (PKI)",
+    "category": "Sécurité",
+    "type": "démarche",
+    "description": "Le service vise à mettre en place une infrastructure nationale à clé publique (PKI) pour sécuriser les communications et les transactions électroniques. Il assure l'authentification, l'intégrité, la non-répudiation et la confidentialité des communications et transactions électroniques.",
+    "beneficiaires": "Citoyens, entreprises et organisations opérant dans un environnement électronique.",
+    "conditions": "Non spécifiées.",
+    "pieces_justificatives": [
+      "Carte nationale d'identité (CNI)",
+      "Nom et date de naissance",
+      "Adresse e-mail"
+    ],
+    "etapes": [
+      "Remplir le formulaire en ligne avec le numéro de CNI, le nom, la date de naissance et l'adresse e-mail",
+      "Soumettre la demande",
+      "Recevoir le certificat numérique"
+    ],
+    "delai": "Non spécifié.",
+    "cout": "Non spécifié.",
+    "organisme": {
+      "nom": "Agence nationale des systèmes d'information de l'État (ANSIE)",
+      "adresse": "Présidence de la République, BP 2000, Djibouti",
+      "contact": "servicenumerique@ansie.dj",
+      "horaires": null
+    },
+    "resultat": "Certificat numérique permettant l'authentification, l'assurance de l'intégrité et la confidentialité des transactions électroniques."
+  }
+]
