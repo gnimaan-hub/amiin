@@ -290,6 +290,7 @@ class ChatRequest(BaseModel):
     tool_results: Optional[List[Dict[str, Any]]] = None
     lat: Optional[float] = None
     lon: Optional[float] = None
+    user_preferences: Optional[Dict[str, Any]] = None
 
 class ToolCall(BaseModel):
     id: str
@@ -559,12 +560,58 @@ def _fetch_weather_context(lat: float, lon: float) -> str:
         return ""
 
 
-def _build_system(context: str, system_override: str = None) -> list:
+def _build_preferences_fragment(prefs: dict) -> str:
+    """Traduit les préférences utilisateur (app mobile) en instructions Claude."""
+    if not prefs:
+        return ""
+
+    lines = []
+
+    tone_map = {
+        "formal":  "Adopte un registre formel et professionnel.",
+        "neutral": "Adopte un registre neutre et naturel.",
+        "casual":  "Adopte un registre décontracté et amical.",
+    }
+    line = tone_map.get(prefs.get("tone", ""), "")
+    if line:
+        lines.append(line)
+
+    length_map = {
+        "concise":  "Sois très concis : 1 à 2 phrases maximum par réponse, va droit au but.",
+        "balanced": "Équilibre concision et clarté : ne dépasse pas 4 phrases sauf si absolument nécessaire.",
+        "detailed": "Sois exhaustif : développe chaque point avec explications et exemples concrets.",
+    }
+    line = length_map.get(prefs.get("response_length", ""), "")
+    if line:
+        lines.append(line)
+
+    expertise_map = {
+        "simplified": "Simplifie au maximum : vulgarise tout terme technique, évite le jargon, utilise des analogies du quotidien.",
+        "standard":   "Niveau standard : explique les termes importants sans sur-simplifier.",
+        "expert":     "Niveau expert : utilise la terminologie technique et juridique précise, sans vulgarisation excessive.",
+    }
+    line = expertise_map.get(prefs.get("expertise_level", ""), "")
+    if line:
+        lines.append(line)
+
+    if not lines:
+        return ""
+
+    return (
+        "## Préférences de style de l'utilisateur (prioritaires sur les règles par défaut) :\n"
+        + "\n".join(f"- {l}" for l in lines)
+    )
+
+
+def _build_system(context: str, system_override: str = None, preferences_text: str = None) -> list:
     dynamic_parts = []
     if context:
         dynamic_parts.append(f"CONTEXTE (base de connaissances) :\n{context}")
     if system_override:
         dynamic_parts.append(f"## Contexte temps réel de l'utilisateur :\n{system_override}")
+    # Les préférences viennent en dernier pour prendre le dessus sur SYSTEM_PROMPT_BASE
+    if preferences_text:
+        dynamic_parts.append(preferences_text)
 
     blocks = [
         {
@@ -607,7 +654,8 @@ def _build_messages(query: str, history, pending_tool_uses=None, tool_results=No
 
 def run_pipeline(query: str, history=None, expand: bool = True, system: str = None,
                  lat: float = None, lon: float = None,
-                 pending_tool_uses=None, tool_results=None) -> dict:
+                 pending_tool_uses=None, tool_results=None,
+                 user_preferences: dict = None) -> dict:
     t0 = time.time()
     chunks = []
 
@@ -645,11 +693,12 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
 
         context = build_context(chunks)
 
+    prefs_text = _build_preferences_fragment(user_preferences or {})
     response = claude_client.messages.create(
         model=MODEL_CLAUDE,
         max_tokens=MAX_TOKENS,
         temperature=TEMPERATURE,
-        system=_build_system(context, system),
+        system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
         extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
@@ -677,7 +726,8 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
 
 async def _stream_pipeline(query: str, history=None, expand: bool = True, system: str = None,
                            lat: float = None, lon: float = None,
-                           pending_tool_uses=None, tool_results=None):
+                           pending_tool_uses=None, tool_results=None,
+                           user_preferences: dict = None):
     t0 = time.time()
     loop = asyncio.get_event_loop()
     chunks = []
@@ -723,13 +773,14 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
         context = build_context(chunks)
         yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
 
+    prefs_text = _build_preferences_fragment(user_preferences or {})
     tool_calls = []
     final_usage = None
     async with async_claude.messages.stream(
         model=MODEL_CLAUDE,
         max_tokens=MAX_TOKENS,
         temperature=TEMPERATURE,
-        system=_build_system(context, system),
+        system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
         extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
@@ -900,7 +951,8 @@ async def chat(request: ChatRequest):
                               system=request.system,
                               lat=request.lat, lon=request.lon,
                               pending_tool_uses=request.pending_tool_uses,
-                              tool_results=request.tool_results),
+                              tool_results=request.tool_results,
+                              user_preferences=request.user_preferences),
         )
         return ChatResponse(
             reply=result["reply"],
@@ -928,6 +980,7 @@ async def chat_stream(request: ChatRequest):
                 lat=request.lat, lon=request.lon,
                 pending_tool_uses=request.pending_tool_uses,
                 tool_results=request.tool_results,
+                user_preferences=request.user_preferences,
             ):
                 yield chunk
         except Exception as e:
