@@ -68,8 +68,8 @@ JINA_EMBED_DIM = 1024                   # dimension du modèle jina-embeddings-v
 QDRANT_COLLECTION = 'djibouti_knowledge'
 MODEL_CLAUDE   = 'claude-haiku-4-5-20251001'
 EXPAND_MODEL   = 'claude-haiku-4-5-20251001'
-TOP_K          = 10
-TOP_K_FINAL    = 12
+TOP_K          = 8
+TOP_K_FINAL    = 8
 MAX_TOKENS     = 2048
 TEMPERATURE    = 0.3
 
@@ -82,6 +82,17 @@ _FOLLOWUP_PREFIXES = (
     "parfait", "d'accord", "bien sûr", "ça ", "c'est ", "donc ",
     "pourquoi ", "comment ", "combien", "quand ", "où ", "qui ",
     "dis-moi", "explique", "donne",
+)
+
+# Messages purement conversationnels → skip RAG complet (zéro Jina + zéro sources)
+_CONVERSATIONAL_STARTERS = (
+    "bonjour", "bonsoir", "salut", "hello", "coucou", "bonne nuit",
+    "merci", "super merci", "ok merci", "très bien merci", "bien reçu",
+    "excellent", "parfait", "super !", "super.", "génial", "bravo", "wow",
+    "incroyable", "c'est parfait", "c'est super", "c'est génial",
+    "tu es vraiment", "vous êtes vraiment", "tu es bien", "tu es le meilleur",
+    "comment ça va", "ça va", "comment allez-vous", "comment vas-tu",
+    "bonne journée", "bonne soirée", "à bientôt", "au revoir", "bonne continuation",
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -271,7 +282,8 @@ TOOLS = [
                 }
             },
             "required": ["query"]
-        }
+        },
+        "cache_control": {"type": "ephemeral"},
     },
 ]
 
@@ -417,6 +429,13 @@ def _should_expand(query: str) -> bool:
     if any(q.startswith(p) for p in _FOLLOWUP_PREFIXES):
         return False
     return True
+
+def _is_conversational(query: str) -> bool:
+    """Retourne True si la requête est purement conversationnelle — pas de RAG nécessaire."""
+    q = query.strip().lower()
+    if len(q) > 130:
+        return False
+    return any(q.startswith(p) or q == p for p in _CONVERSATIONAL_STARTERS)
 
 # ── C : cache LRU sur les embeddings ─────────────────────────────────────────
 
@@ -669,6 +688,9 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
     if tool_results:
         # 2e passe : pas de RAG, on répond avec les résultats d'outils
         context = ""
+    elif _is_conversational(query):
+        # Message purement conversationnel : skip RAG complet
+        context = ""
     else:
         should_exp = expand and _should_expand(query)
         direct_embedding = list(_cached_embed(query))
@@ -743,6 +765,10 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
 
     if tool_results:
         # 2e passe : pas de RAG, réponse directe avec les résultats d'outils
+        context = ""
+        yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
+    elif _is_conversational(query):
+        # Message purement conversationnel : skip RAG complet
         context = ""
         yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
     else:
