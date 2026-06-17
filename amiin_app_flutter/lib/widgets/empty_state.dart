@@ -1,4 +1,4 @@
-// ─── EmptyState ──────────────────────────────────────────────────────────────
+﻿// â”€â”€â”€ EmptyState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import 'package:flutter/material.dart';
 import '../theme/colors.dart';
@@ -35,7 +35,7 @@ class EmptyState extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontFamily: FontFamily.serif,
+                fontFamily: FontFamily.geo,
                 fontSize: 18,
                 color: ColorsAmiin.ink,
               ),

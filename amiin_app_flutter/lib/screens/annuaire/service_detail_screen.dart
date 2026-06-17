@@ -1,4 +1,4 @@
-// ─── ServiceDetailScreen ─────────────────────────────────────────────────────
+﻿// â”€â”€â”€ ServiceDetailScreen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -61,14 +61,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       if (!mounted) return;
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible d’ouvrir le lien')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible dâ€™ouvrir le lien')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.terra)));
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
     }
     if (_service == null) return const SizedBox();
 
@@ -88,7 +88,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   width: 22,
                   height: 22,
                   colorFilter: ColorFilter.mode(
-                    _isFavorite ? ColorsAmiin.terra : ColorsAmiin.terra.withValues(alpha: 0.4),
+                    _isFavorite ? ColorsAmiin.ocre : ColorsAmiin.ocre.withValues(alpha: 0.4),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -102,7 +102,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.name, style: TextStyle(
-                      fontFamily: FontFamily.serif,
+                      fontFamily: FontFamily.geo,
                       fontSize: 24,
                       color: ColorsAmiin.ink,
                     )),
@@ -112,9 +112,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       runSpacing: 4,
                       children: [
                         if (s.sousCategorie.isNotEmpty)
-                          _tagChip(s.sousCategorie, ColorsAmiin.terra),
+                          _tagChip(s.sousCategorie, ColorsAmiin.ocre),
                         if (s.quartier.isNotEmpty)
-                          _tagChip(s.quartier, ColorsAmiin.indigo),
+                          _tagChip(s.quartier, ColorsAmiin.ocre),
                         if (s.ministry != null)
                           _tagChip(s.ministry!, ColorsAmiin.muted),
                       ],
@@ -125,22 +125,22 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Contact', style: TextStyle(
-                            fontFamily: FontFamily.sansBold,
+                            fontFamily: FontFamily.geoBold,
                             fontSize: 10,
                             letterSpacing: 1.2,
                             color: ColorsAmiin.muted,
                           )),
                           const SizedBox(height: 8),
                           if (s.phone != null) ...[
-                            _contactRow('📞', s.phone!, () => _launchUrl('tel:${s.phone}')),
+                            _contactRow('ðŸ“ž', s.phone!, () => _launchUrl('tel:${s.phone}')),
                             const SizedBox(height: Spacing.sm),
                           ],
                           if (s.email != null) ...[
-                            _contactRow('✉️', s.email!, () => _launchUrl('mailto:${s.email}')),
+                            _contactRow('âœ‰ï¸', s.email!, () => _launchUrl('mailto:${s.email}')),
                             const SizedBox(height: Spacing.sm),
                           ],
                           if (s.website != null) ...[
-                            _contactRow('🌐', s.website!, () => _launchUrl(s.website!)),
+                            _contactRow('ðŸŒ', s.website!, () => _launchUrl(s.website!)),
                           ],
                         ],
                       ),
@@ -151,7 +151,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Adresse', style: TextStyle(
-                            fontFamily: FontFamily.sansBold,
+                            fontFamily: FontFamily.geoBold,
                             fontSize: 10,
                             letterSpacing: 1.2,
                             color: ColorsAmiin.muted,
@@ -186,7 +186,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Horaires', style: TextStyle(
-                              fontFamily: FontFamily.sansBold,
+                              fontFamily: FontFamily.geoBold,
                               fontSize: 10,
                               letterSpacing: 1.2,
                               color: ColorsAmiin.muted,
@@ -207,8 +207,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('À propos', style: TextStyle(
-                              fontFamily: FontFamily.sansBold,
+                            Text('Ã€ propos', style: TextStyle(
+                              fontFamily: FontFamily.geoBold,
                               fontSize: 10,
                               letterSpacing: 1.2,
                               color: ColorsAmiin.muted,
@@ -244,7 +244,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           Expanded(child: Text(text, style: TextStyle(
             fontFamily: FontFamily.sans,
             fontSize: 14,
-            color: ColorsAmiin.indigo,
+            color: ColorsAmiin.ocre,
           ))),
         ],
       ),
@@ -259,7 +259,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Text(label, style: TextStyle(
-          fontFamily: FontFamily.sansMedium,
+          fontFamily: FontFamily.geoMedium,
           fontSize: 11,
           color: color,
         )),

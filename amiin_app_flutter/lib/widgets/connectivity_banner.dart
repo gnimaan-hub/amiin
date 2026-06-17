@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/connectivity_service.dart';
 import '../theme/colors.dart';
@@ -19,14 +19,14 @@ class ConnectivityBanner extends StatelessWidget {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: svc.isOnline ? 0 : 32,
-                color: ColorsAmiin.terra,
+                color: ColorsAmiin.corail,
                 child: svc.isOnline
                     ? const SizedBox()
                     : Center(
                         child: Text(
                           'Pas de connexion internet',
                           style: TextStyle(
-                            fontFamily: FontFamily.sansMedium,
+                            fontFamily: FontFamily.geoMedium,
                             fontSize: 12,
                             color: ColorsAmiin.white,
                           ),
@@ -41,3 +41,5 @@ class ConnectivityBanner extends StatelessWidget {
     );
   }
 }
+
+

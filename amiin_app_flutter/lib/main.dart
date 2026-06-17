@@ -13,6 +13,7 @@ import 'services/notes_service.dart';
 import 'services/demarches_service.dart';
 import 'services/notification_service.dart';
 import 'services/connectivity_service.dart';
+import 'services/settings_service.dart';
 import 'app.dart';
 
 void main() async {
@@ -24,6 +25,7 @@ void main() async {
   await initHiveCipher();
 
   // Boxes nécessaires dès le premier écran
+  await settingsService.init();
   await agendaService.init();
   await notesService.init();
   await demarchesService.init();

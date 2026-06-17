@@ -70,14 +70,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await agendaService.deleteEvent(widget.eventId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement supprimé'), backgroundColor: ColorsAmiin.olive),
+            const SnackBar(content: Text('Événement supprimé'), backgroundColor: ColorsAmiin.success),
           );
           Navigator.pop(context); // retour à l'agenda
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de la suppression : $e'), backgroundColor: ColorsAmiin.terra),
+            SnackBar(content: Text('Erreur lors de la suppression : $e'), backgroundColor: ColorsAmiin.turquoise),
           );
         }
       }
@@ -120,7 +120,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.terra)));
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.turquoise)));
     }
     if (_event == null) return const SizedBox();
 
@@ -141,12 +141,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, color: ColorsAmiin.terra),
+                      icon: const Icon(Icons.edit_outlined, color: ColorsAmiin.turquoise),
                       onPressed: _editEvent,
                       tooltip: 'Modifier',
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: ColorsAmiin.terra),
+                      icon: const Icon(Icons.delete_outline, color: ColorsAmiin.turquoise),
                       onPressed: _deleteEvent,
                       tooltip: 'Supprimer',
                     ),
@@ -167,7 +167,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: Text(
                             _event!.title,
                             style: TextStyle(
-                              fontFamily: FontFamily.serif,
+                              fontFamily: FontFamily.geo,
                               fontSize: 24,
                               color: ColorsAmiin.ink,
                               height: 1.2,
@@ -175,7 +175,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           ),
                         ),
                         if (_event!.createdByAgent == true)
-                          const AmiinTag(label: 'Créé par Amiin', variant: TagVariant.terra),
+                          const AmiinTag(label: 'Créé par Amiin', variant: TagVariant.turquoise),
                       ],
                     ),
                     const SizedBox(height: Spacing.md),
@@ -205,7 +205,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             Text(
                               'Description',
                               style: TextStyle(
-                                fontFamily: FontFamily.sansBold,
+                                fontFamily: FontFamily.geoBold,
                                 fontSize: 10,
                                 letterSpacing: 1.2,
                                 color: ColorsAmiin.muted,
@@ -235,10 +235,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             Text(
                               'Contexte Amiin',
                               style: TextStyle(
-                                fontFamily: FontFamily.sansBold,
+                                fontFamily: FontFamily.geoBold,
                                 fontSize: 10,
                                 letterSpacing: 1.2,
-                                color: ColorsAmiin.terraDk,
+                                color: ColorsAmiin.turquoiseDk,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -247,7 +247,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 13,
-                                color: ColorsAmiin.terraDk,
+                                color: ColorsAmiin.turquoiseDk,
                                 height: 1.5,
                               ),
                             ),
@@ -284,3 +284,4 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 }
+

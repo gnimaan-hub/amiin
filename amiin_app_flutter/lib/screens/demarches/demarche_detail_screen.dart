@@ -10,6 +10,7 @@ import '../../widgets/header.dart';
 import '../../widgets/card.dart';
 import '../../widgets/button.dart';
 import '../../services/demarches_service.dart';
+import '../../services/annuaire_service.dart';
 
 class DemarcheDetailScreen extends StatefulWidget {
   final String demarcheId;
@@ -66,7 +67,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.terra)));
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
     }
     if (_demarche == null) return const SizedBox();
 
@@ -97,15 +98,15 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: isInfo ? ColorsAmiin.indigoLt : ColorsAmiin.oliveLt,
+                            color: isInfo ? ColorsAmiin.ocreLt : ColorsAmiin.successLt,
                             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                           ),
                           child: Text(
                             isInfo ? 'Fiche d\'information' : 'Démarche administrative',
                             style: TextStyle(
-                              fontFamily: FontFamily.sansBold,
+                              fontFamily: FontFamily.geoBold,
                               fontSize: 10,
-                              color: isInfo ? ColorsAmiin.indigo : ColorsAmiin.olive,
+                              color: isInfo ? ColorsAmiin.ocre : ColorsAmiin.success,
                             ),
                           ),
                         ),
@@ -119,7 +120,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                     const SizedBox(height: Spacing.sm),
                     // Titre
                     Text(d.title, style: TextStyle(
-                      fontFamily: FontFamily.serif,
+                      fontFamily: FontFamily.geo,
                       fontSize: 22,
                       color: ColorsAmiin.ink,
                       height: 1.3,
@@ -190,7 +191,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                                   ),
                                   child: Text('Cas : $cas', style: TextStyle(
-                                    fontFamily: FontFamily.sansBold, fontSize: 11, color: ColorsAmiin.mid,
+                                    fontFamily: FontFamily.geoBold, fontSize: 11, color: ColorsAmiin.mid,
                                   )),
                                 ),
                                 const SizedBox(height: 6),
@@ -228,31 +229,11 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                       ),
 
                     // Organisme
-                    if (d.organisme != null)
+                    if (d.lieux.isNotEmpty)
                       _section(
                         icon: Icons.business_outlined,
-                        title: 'Organisme compétent',
-                        child: _organismeCard(d.organisme!),
-                      ),
-
-                    // Source
-                    if (d.sourceUrl != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: Spacing.md),
-                        child: GestureDetector(
-                          onTap: () => launchUrl(Uri.parse(d.sourceUrl!), mode: LaunchMode.externalApplication),
-                          child: Row(
-                            children: [
-                              Icon(Icons.open_in_new, size: 14, color: ColorsAmiin.indigo),
-                              const SizedBox(width: 4),
-                              Text('Voir sur eGouv.dj', style: TextStyle(
-                                fontFamily: FontFamily.sans, fontSize: 12,
-                                color: ColorsAmiin.indigo,
-                                decoration: TextDecoration.underline,
-                              )),
-                            ],
-                          ),
-                        ),
+                        title: d.lieux.length == 1 ? 'Organisme compétent' : 'Où faire la démarche ?',
+                        child: _organismeBody(d),
                       ),
 
                     const SizedBox(height: Spacing.md),
@@ -276,6 +257,73 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     );
   }
 
+  Future<void> _openInAnnuaire(DemarcheOrganisme org) async {
+    final results = await annuaireService.searchSimilar(org.nom);
+    if (!mounted) return;
+    if (results.isNotEmpty) {
+      context.go('/annuaire/${results.first.id}');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
+      );
+      context.go('/annuaire');
+    }
+  }
+
+  Widget _organismeBody(Demarche d) {
+    final lieux = d.lieux;
+    if (lieux.length == 1) return _organismeCard(lieux.first);
+
+    final org = d.organisme!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (org.adresse != null && org.adresse!.isNotEmpty) ...[
+          Row(children: [
+            Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+            const SizedBox(width: 4),
+            Expanded(child: Text(org.adresse!, style: TextStyle(
+              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+            ))),
+          ]),
+          const SizedBox(height: 4),
+        ],
+        if (org.horaires != null && org.horaires!.isNotEmpty) ...[
+          Row(children: [
+            Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+            const SizedBox(width: 4),
+            Expanded(child: Text(org.horaires!, style: TextStyle(
+              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+            ))),
+          ]),
+          const SizedBox(height: Spacing.sm),
+        ],
+        for (int i = 0; i < lieux.length; i++) ...[
+          if (i > 0) const Padding(
+            padding: EdgeInsets.only(top: 4, bottom: 8),
+            child: Divider(height: 1, color: ColorsAmiin.border),
+          ),
+          Row(children: [
+            Expanded(child: Text(lieux[i].nom, style: TextStyle(
+              fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.ink,
+            ))),
+            TextButton(
+              onPressed: () => _openInAnnuaire(lieux[i]),
+              style: TextButton.styleFrom(
+                foregroundColor: ColorsAmiin.ocre,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+                minimumSize: Size.zero,
+              ),
+              child: const Text('Annuaire'),
+            ),
+          ]),
+        ],
+      ],
+    );
+  }
+
   Widget _section({required IconData icon, required String title, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: Spacing.md),
@@ -288,7 +336,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                 Icon(icon, size: 14, color: ColorsAmiin.muted),
                 const SizedBox(width: 6),
                 Text(title.toUpperCase(), style: TextStyle(
-                  fontFamily: FontFamily.sansBold,
+                  fontFamily: FontFamily.geoBold,
                   fontSize: 10,
                   letterSpacing: 1.2,
                   color: ColorsAmiin.muted,
@@ -332,7 +380,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
         Container(
           width: 6, height: 6,
           margin: const EdgeInsets.only(top: 6, right: 8),
-          decoration: const BoxDecoration(color: ColorsAmiin.terra, shape: BoxShape.circle),
+          decoration: const BoxDecoration(color: ColorsAmiin.ocre, shape: BoxShape.circle),
         ),
         Expanded(child: Text(name, style: TextStyle(
           fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.ink, height: 1.4,
@@ -351,9 +399,9 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             children: [
               Container(
                 width: 28, height: 28,
-                decoration: const BoxDecoration(color: ColorsAmiin.terra, shape: BoxShape.circle),
+                decoration: const BoxDecoration(color: ColorsAmiin.ocre, shape: BoxShape.circle),
                 child: Center(child: Text('${step.order}', style: TextStyle(
-                  fontFamily: FontFamily.sansBold, fontSize: 12, color: ColorsAmiin.white,
+                  fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.white,
                 ))),
               ),
               if (!isLast) Container(width: 2, height: 36, color: ColorsAmiin.border),
@@ -368,7 +416,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(step.title, style: TextStyle(
-                  fontFamily: FontFamily.sansBold, fontSize: 13, color: ColorsAmiin.ink,
+                  fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink,
                 )),
                 if (step.title != step.description) ...[
                   const SizedBox(height: 3),
@@ -388,7 +436,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(org.nom, style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 13, color: ColorsAmiin.ink)),
+        Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink)),
         if (org.adresse != null && org.adresse!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Row(children: [
@@ -421,15 +469,28 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               }
             },
             child: Row(children: [
-              Icon(Icons.contact_mail_outlined, size: 13, color: ColorsAmiin.indigo),
+              Icon(Icons.contact_mail_outlined, size: 13, color: ColorsAmiin.ocre),
               const SizedBox(width: 4),
               Expanded(child: Text(org.contact!, style: TextStyle(
-                fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.indigo,
+                fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.ocre,
               ))),
             ]),
           ),
         ],
+        const SizedBox(height: Spacing.sm),
+        TextButton.icon(
+          icon: const Icon(Icons.map_outlined, size: 14),
+          label: const Text('Voir dans l\'annuaire'),
+          style: TextButton.styleFrom(
+            foregroundColor: ColorsAmiin.ocre,
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+          ),
+          onPressed: () => _openInAnnuaire(org),
+        ),
       ],
     );
   }
 }
+

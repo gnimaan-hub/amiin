@@ -268,7 +268,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
           onPressed: () => _scroll.animateTo(0,
               duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
           backgroundColor: ColorsAmiin.white,
-          foregroundColor: ColorsAmiin.terra,
+          foregroundColor: ColorsAmiin.ocre,
           elevation: 2,
           child: const Icon(Icons.keyboard_arrow_up),
         ),
@@ -346,7 +346,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
           _FilterChip(
             label: 'Partout',
             selected: _selectedQuartier == null,
-            color: ColorsAmiin.indigo,
+            color: ColorsAmiin.ocre,
             onTap: () => _selectQuartier(null),
           ),
           ...qs.map((q) => Padding(
@@ -354,7 +354,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                 child: _FilterChip(
                   label: q,
                   selected: _selectedQuartier == q,
-                  color: ColorsAmiin.indigo,
+                  color: ColorsAmiin.ocre,
                   onTap: () =>
                       _selectQuartier(_selectedQuartier == q ? null : q),
                 ),
@@ -397,34 +397,39 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
   Widget _buildCategoryGrid() {
     final cats = _localData?.categories ?? [];
     if (cats.isEmpty) return const SkeletonList();
-    return GridView.builder(
-      controller: _scroll,
-      padding: const EdgeInsets.all(Spacing.lg),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: Spacing.sm,
-        crossAxisSpacing: Spacing.sm,
-        childAspectRatio: 1.55,
+    // Pré-calcule tous les counts en une seule passe O(n) au lieu de O(n*m)
+    final counts = <String, int>{};
+    for (final e in _localData!.entries) {
+      counts[e.category] = (counts[e.category] ?? 0) + 1;
+    }
+    return RepaintBoundary(
+      child: GridView.builder(
+        controller: _scroll,
+        padding: const EdgeInsets.all(Spacing.lg),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: Spacing.sm,
+          crossAxisSpacing: Spacing.sm,
+          childAspectRatio: 1.55,
+        ),
+        itemCount: cats.length,
+        itemBuilder: (_, i) {
+          final cat = cats[i];
+          return _CategoryTile(
+            label: cat,
+            count: counts[cat] ?? 0,
+            emoji: _catEmoji[cat] ?? '📍',
+            color: _catColors[cat] ?? ColorsAmiin.ocre,
+            onTap: () => _selectCat(cat),
+          );
+        },
       ),
-      itemCount: cats.length,
-      itemBuilder: (_, i) {
-        final cat = cats[i];
-        final count = _localData!.entries
-            .where((e) => e.category == cat)
-            .length;
-        return _CategoryTile(
-          label: cat,
-          count: count,
-          emoji: _catEmoji[cat] ?? '📍',
-          color: _catColors[cat] ?? ColorsAmiin.terra,
-          onTap: () => _selectCat(cat),
-        );
-      },
     );
   }
 
   Widget _buildServiceList(List<AmiinService> services) {
-    return ListView.separated(
+    return RepaintBoundary(
+     child: ListView.separated(
       controller: _scroll,
       padding: const EdgeInsets.all(Spacing.lg),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -444,7 +449,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _catColors[s.category] ?? ColorsAmiin.terra,
+                        color: _catColors[s.category] ?? ColorsAmiin.ocre,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -457,7 +462,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontFamily: FontFamily.sansBold,
+                                  fontFamily: FontFamily.geoBold,
                                   fontSize: 14,
                                   color: ColorsAmiin.ink)),
                           if (s.sousCategorie.isNotEmpty)
@@ -472,9 +477,9 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                     if (s.distanceKm != null)
                       Text('${s.distanceKm!.toStringAsFixed(1)} km',
                           style: TextStyle(
-                              fontFamily: FontFamily.sansBold,
+                              fontFamily: FontFamily.geoBold,
                               fontSize: 11,
-                              color: ColorsAmiin.terra)),
+                              color: ColorsAmiin.ocre)),
                   ],
                 ),
                 if (s.address.street.isNotEmpty ||
@@ -510,13 +515,14 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                       style: TextStyle(
                           fontFamily: FontFamily.sans,
                           fontSize: 12,
-                          color: ColorsAmiin.indigo)),
+                          color: ColorsAmiin.ocre)),
                 ],
               ],
             ),
           ),
         );
       },
+     ),
     );
   }
 
@@ -567,7 +573,7 @@ class _CategoryTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        fontFamily: FontFamily.sansBold,
+                        fontFamily: FontFamily.geoBold,
                         fontSize: 12,
                         color: color,
                         height: 1.2)),
@@ -599,7 +605,7 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? ColorsAmiin.terra;
+    final c = color ?? ColorsAmiin.ocre;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -612,7 +618,7 @@ class _FilterChip extends StatelessWidget {
         ),
         child: Text(label,
             style: TextStyle(
-                fontFamily: FontFamily.sansMedium,
+                fontFamily: FontFamily.geoMedium,
                 fontSize: 11,
                 color: selected ? ColorsAmiin.white : ColorsAmiin.mid)),
       ),
@@ -634,7 +640,7 @@ class _NearbyButton extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
         decoration: BoxDecoration(
-          color: active ? ColorsAmiin.terraLt : ColorsAmiin.white,
+          color: active ? ColorsAmiin.ocreLt : ColorsAmiin.white,
           borderRadius: BorderRadius.circular(RadiusAmiin.full),
           border: Border.all(color: ColorsAmiin.border),
         ),
@@ -642,16 +648,17 @@ class _NearbyButton extends StatelessWidget {
           children: [
             Icon(Icons.near_me,
                 size: 15,
-                color: active ? ColorsAmiin.terraDk : ColorsAmiin.muted),
+                color: active ? ColorsAmiin.ocreDk : ColorsAmiin.muted),
             const SizedBox(width: 4),
             Text('Proche',
                 style: TextStyle(
-                    fontFamily: FontFamily.sansMedium,
+                    fontFamily: FontFamily.geoMedium,
                     fontSize: 12,
-                    color: active ? ColorsAmiin.terraDk : ColorsAmiin.muted)),
+                    color: active ? ColorsAmiin.ocreDk : ColorsAmiin.muted)),
           ],
         ),
       ),
     );
   }
 }
+

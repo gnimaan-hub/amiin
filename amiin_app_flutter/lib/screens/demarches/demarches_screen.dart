@@ -100,8 +100,8 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
   Color _statusColor(DemarcheStatus status) {
     switch (status) {
       case DemarcheStatus.aFaire:   return ColorsAmiin.mid;
-      case DemarcheStatus.enCours:  return ColorsAmiin.indigo;
-      case DemarcheStatus.terminee: return ColorsAmiin.olive;
+      case DemarcheStatus.enCours:  return ColorsAmiin.ocre;
+      case DemarcheStatus.terminee: return ColorsAmiin.success;
       case DemarcheStatus.expiree:  return ColorsAmiin.muted;
     }
   }
@@ -109,8 +109,8 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
   Color _statusBgColor(DemarcheStatus status) {
     switch (status) {
       case DemarcheStatus.aFaire:   return ColorsAmiin.sand;
-      case DemarcheStatus.enCours:  return ColorsAmiin.indigoLt;
-      case DemarcheStatus.terminee: return ColorsAmiin.oliveLt;
+      case DemarcheStatus.enCours:  return ColorsAmiin.ocreLt;
+      case DemarcheStatus.terminee: return ColorsAmiin.successLt;
       case DemarcheStatus.expiree:  return ColorsAmiin.ecru;
     }
   }
@@ -158,9 +158,9 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
                         decoration: BoxDecoration(
-                          color: selected ? ColorsAmiin.terra : ColorsAmiin.white,
+                          color: selected ? ColorsAmiin.ocre : ColorsAmiin.white,
                           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                          border: Border.all(color: selected ? ColorsAmiin.terra : ColorsAmiin.border),
+                          border: Border.all(color: selected ? ColorsAmiin.ocre : ColorsAmiin.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                             Text(cat.icon, style: const TextStyle(fontSize: 12)),
                             const SizedBox(width: 4),
                             Text(cat.label, style: TextStyle(
-                              fontFamily: FontFamily.sansMedium,
+                              fontFamily: FontFamily.geoMedium,
                               fontSize: 12,
                               color: selected ? ColorsAmiin.white : ColorsAmiin.mid,
                             )),
@@ -186,7 +186,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                   ? const SkeletonList()
                   : RefreshIndicator(
                       onRefresh: _loadData,
-                      color: ColorsAmiin.terra,
+                      color: ColorsAmiin.ocre,
                       child: _tabIndex == 0
                           ? _buildCatalogList()
                           : _buildUserDemarchesList(),
@@ -207,7 +207,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(
-              color: isActive ? ColorsAmiin.terra : Colors.transparent,
+              color: isActive ? ColorsAmiin.ocre : Colors.transparent,
               width: 2,
             )),
           ),
@@ -215,9 +215,9 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: FontFamily.sansMedium,
+              fontFamily: FontFamily.geoMedium,
               fontSize: 13,
-              color: isActive ? ColorsAmiin.terra : ColorsAmiin.muted,
+              color: isActive ? ColorsAmiin.ocre : ColorsAmiin.muted,
             ),
           ),
         ),
@@ -270,7 +270,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             Text(cat.icon, style: const TextStyle(fontSize: 16)),
             const SizedBox(width: Spacing.sm),
             Text(cat.label, style: TextStyle(
-              fontFamily: FontFamily.sansBold,
+              fontFamily: FontFamily.geoBold,
               fontSize: 13,
               color: ColorsAmiin.ink,
             )),
@@ -282,7 +282,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
               child: Text('${items.length}', style: TextStyle(
-                fontFamily: FontFamily.sansBold, fontSize: 10, color: ColorsAmiin.mid,
+                fontFamily: FontFamily.geoBold, fontSize: 10, color: ColorsAmiin.mid,
               )),
             ),
           ],
@@ -324,7 +324,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontFamily: FontFamily.sansBold,
+                          fontFamily: FontFamily.geoBold,
                           fontSize: 14,
                           color: ColorsAmiin.ink,
                           height: 1.3,
@@ -350,15 +350,15 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isInfo ? ColorsAmiin.indigoLt : ColorsAmiin.oliveLt,
+                    color: isInfo ? ColorsAmiin.ocreLt : ColorsAmiin.successLt,
                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                   ),
                   child: Text(
                     isInfo ? 'Info' : 'Démarche',
                     style: TextStyle(
-                      fontFamily: FontFamily.sansBold,
+                      fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: isInfo ? ColorsAmiin.indigo : ColorsAmiin.olive,
+                      color: isInfo ? ColorsAmiin.ocre : ColorsAmiin.success,
                     ),
                   ),
                 ),
@@ -429,7 +429,40 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
       itemBuilder: (_, i) {
         final ud = _userDemarches[i];
-        return GestureDetector(
+        return Dismissible(
+          key: Key(ud.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: Spacing.lg),
+            decoration: BoxDecoration(
+              color: Colors.red.shade600,
+              borderRadius: BorderRadius.circular(RadiusAmiin.md),
+            ),
+            child: const Icon(Icons.delete_outline, color: Colors.white, size: 22),
+          ),
+          confirmDismiss: (_) => showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Supprimer la démarche ?'),
+              content: const Text('Votre suivi sera supprimé. Le catalogue n\'est pas affecté.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Annuler'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          ),
+          onDismissed: (_) async {
+            await demarchesService.deleteDemarche(ud.id);
+            _loadData();
+          },
+          child: GestureDetector(
           onTap: () async {
             await context.push('/demarches/user/${ud.id}');
             _loadData();
@@ -442,7 +475,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                   children: [
                     Expanded(
                       child: Text(ud.demarche.title, style: TextStyle(
-                        fontFamily: FontFamily.sansBold, fontSize: 14, color: ColorsAmiin.ink,
+                        fontFamily: FontFamily.geoBold, fontSize: 14, color: ColorsAmiin.ink,
                       )),
                     ),
                     Container(
@@ -452,7 +485,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                       ),
                       child: Text(_statusLabel(ud.status), style: TextStyle(
-                        fontFamily: FontFamily.sansBold, fontSize: 11, color: _statusColor(ud.status),
+                        fontFamily: FontFamily.geoBold, fontSize: 11, color: _statusColor(ud.status),
                       )),
                     ),
                   ],
@@ -472,8 +505,8 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                             value: ud.progress,
                             backgroundColor: ColorsAmiin.border,
                             color: ud.status == DemarcheStatus.terminee
-                                ? ColorsAmiin.olive
-                                : ColorsAmiin.terra,
+                                ? ColorsAmiin.success
+                                : ColorsAmiin.ocre,
                             minHeight: 4,
                           ),
                         ),
@@ -481,7 +514,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       const SizedBox(width: Spacing.sm),
                       Text(
                         '${ud.completedSteps}/${ud.totalSteps}',
-                        style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 11, color: ColorsAmiin.mid),
+                        style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 11, color: ColorsAmiin.mid),
                       ),
                     ],
                   ),
@@ -496,8 +529,10 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
               ],
             ),
           ),
-        );
+        ),
+      );
       },
     );
   }
 }
+

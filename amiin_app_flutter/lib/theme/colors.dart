@@ -1,46 +1,65 @@
-// ─── Amiin Design Tokens ── Colors ──────────────────────────────────────────
+// ─── Amiin Design Tokens ── Colors ───────────────────────────────────────────
+// Palette ancrée dans le paysage de Djibouti
 
 import 'package:flutter/material.dart';
 
-
 class ColorsAmiin {
-  // Brand
-  static const Color terra = Color(0xFFB85530);
-  static const Color terraDk = Color(0xFF8C3D20);
-  static const Color terraLt = Color(0xFFF2E0D6);
-  static const Color terraMid = Color(0xFFD4784A);
+  // ── Palette Djibouti ────────────────────────────────────────────────────────
 
-  static const Color indigo = Color(0xFF2D3D7A);
-  static const Color indigoLt = Color(0xFFD4D9EE);
+  // Encre de Nuit — fond sombre, ciel nocturne sur le golfe de Tadjourah
+  static const Color encreNuit     = Color(0xFF14213D);
+  static const Color darkMid       = Color(0xFF1C2E52);
 
-  static const Color olive = Color(0xFF4A6741);
-  static const Color oliveLt = Color(0xFFD5E3D2);
+  // Sel d'Assal — fond clair minéral, salines du lac Assal
+  static const Color selAssal      = Color(0xFFF2EFE9);
 
-  // Neutrals
-  static const Color ink = Color(0xFF1A1208);
-  static const Color darkMid = Color(0xFF2C2114);
-  static const Color mid = Color(0xFF6B5E4E);
-  static const Color muted = Color(0xFF9C8E80);
-  static const Color border = Color(0xFFDDD5C5);
-  static const Color borderMid = Color(0xFFC8BCAA);
-  static const Color sand = Color(0xFFEDE5D5);
-  static const Color ecru = Color(0xFFF4EFE6);
-  static const Color white = Color(0xFFFFFFFF);
+  // Turquoise Tadjourah — accent secrétariat (agenda, notes, chat, actions)
+  static const Color turquoise     = Color(0xFF1E8A8A);
+  static const Color turquoiseDk   = Color(0xFF135E5E);
+  static const Color turquoiseLt   = Color(0xFFCCEBEB);
+  static const Color turquoiseMid  = Color(0xFF2AADAD);
 
-  // Semantic
-  static const Color success = Color(0xFF4A6741);
-  static const Color successLt = Color(0xFFD5E3D2);
-  static const Color warning = Color(0xFFB85530);
-  static const Color warningLt = Color(0xFFF2E0D6);
-  static const Color info = Color(0xFF2D3D7A);
-  static const Color infoLt = Color(0xFFD4D9EE);
+  // Ocre des Dunes — accent information (démarches, annuaire, contenu éditorial)
+  static const Color ocre          = Color(0xFFC8902F);
+  static const Color ocreDk        = Color(0xFF8F6520);
+  static const Color ocreLt        = Color(0xFFF5E8CC);
+  static const Color ocreMid       = Color(0xFFDEA844);
 
-  // Text on dark
-  static const Color onDark = Color(0xFFF4EFE6);
-  static const Color onTerra = Color(0xFFFFFFFF);
+  // Corail — alertes et échéances urgentes uniquement (usage parcimonieux)
+  static const Color corail        = Color(0xFFC75145);
+  static const Color corailLt      = Color(0xFFF5D0CC);
 
-  // Shadows (opacités converties en double)
-  static const Color shadow = Color(0x14B85530);   // rgba(26,18,8,0.08) ~ #1A120814
-  static const Color shadowMd = Color(0x241A1208); // 0.14 -> 0x24
-  static const Color shadowLg = Color(0x381A1208); // 0.22 -> 0x38
+  // Succès / complété
+  static const Color success       = Color(0xFF2A7A5A);
+  static const Color successLt     = Color(0xFFCCE8DD);
+
+  // ── Neutrals ─────────────────────────────────────────────────────────────
+  static const Color ink           = Color(0xFF14213D);
+  static const Color mid           = Color(0xFF4A5A7A);
+  static const Color muted         = Color(0xFF7A8BA8);
+  static const Color border        = Color(0xFFD0D5E2);
+  static const Color borderMid     = Color(0xFFB8C0D2);
+  static const Color sand          = Color(0xFFE4E8F0);
+  static const Color ecru          = Color(0xFFF2EFE9);
+  static const Color white         = Color(0xFFFFFFFF);
+
+  // ── Texte sur fond sombre ─────────────────────────────────────────────────
+  static const Color onDark        = Color(0xFFF2EFE9);
+  static const Color onTurquoise   = Color(0xFFFFFFFF);
+  static const Color onOcre        = Color(0xFFFFFFFF);
+
+  // ── Ombres ───────────────────────────────────────────────────────────────
+  static const Color shadow        = Color(0x1414213D);
+  static const Color shadowMd      = Color(0x2414213D);
+  static const Color shadowLg      = Color(0x3814213D);
+
+  // ── Aliases pour rétrocompatibilité (seront supprimés progressivement) ───
+  @Deprecated('Use turquoise') static const Color terra       = turquoise;
+  @Deprecated('Use turquoiseDk') static const Color terraDk  = turquoiseDk;
+  @Deprecated('Use turquoiseLt') static const Color terraLt  = turquoiseLt;
+  @Deprecated('Use turquoiseMid') static const Color terraMid = turquoiseMid;
+  @Deprecated('Use ocre') static const Color indigo           = ocre;
+  @Deprecated('Use ocreLt') static const Color indigoLt       = ocreLt;
+  @Deprecated('Use success') static const Color olive         = success;
+  @Deprecated('Use successLt') static const Color oliveLt     = successLt;
 }

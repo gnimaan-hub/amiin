@@ -6,12 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
+import '../../theme/themes.dart';
 import '../../theme/typography.dart';
 import '../../services/agenda_service.dart';
 import '../../services/chat_controller.dart';
 import '../../services/notes_service.dart';
 import '../../widgets/amiin_logo.dart';
 import '../../widgets/card.dart';
+import '../../widgets/horizon_line.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,19 +26,18 @@ class _HomeScreenState extends State<HomeScreen> {
   List<AmiinEvent> _events = [];
   List<AmiinNote> _notes = [];
 
-  final _quickTiles = [
-    {'label': 'Agenda', 'tab': 'agenda', 'bg': ColorsAmiin.indigoLt, 'text': ColorsAmiin.indigo},
-    {'label': 'Notes', 'tab': 'notes', 'bg': ColorsAmiin.terraLt, 'text': ColorsAmiin.terraDk},
-    {'label': 'Annuaire', 'tab': 'annuaire', 'bg': ColorsAmiin.oliveLt, 'text': ColorsAmiin.olive},
-    {'label': 'Démarches', 'tab': 'demarches', 'bg': ColorsAmiin.sand, 'text': ColorsAmiin.mid},
+  // Tuiles d'accès rapide — turquoise pour secretariat, ocre pour info
+  static const _quickTiles = [
+    _QuickTile(label: 'Agenda',     tab: 'agenda',    bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, isInfo: false),
+    _QuickTile(label: 'Notes',      tab: 'notes',     bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, isInfo: false),
+    _QuickTile(label: 'Annuaire',   tab: 'annuaire',  bg: ColorsAmiin.ocreLt,      text: ColorsAmiin.ocreDk,      isInfo: true),
+    _QuickTile(label: 'Démarches',  tab: 'demarches', bg: ColorsAmiin.ocreLt,      text: ColorsAmiin.ocreDk,      isInfo: true),
   ];
 
   @override
   void initState() {
     super.initState();
     _loadData();
-    // Hive est réactif : toute création/modification (manuelle ou par Amiin
-    // depuis le chat) rafraîchit automatiquement l'accueil.
     agendaService.listenable.addListener(_loadData);
     notesService.listenable.addListener(_loadData);
   }
@@ -53,354 +54,307 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final now = DateTime.now();
       final end = now.add(const Duration(days: 7));
-      final eventsFuture = agendaService.getEvents(
-        now.toIso8601String(),
-        end.toIso8601String(),
-      );
-      final notesFuture = notesService.getNotes();
-      final results = await Future.wait([eventsFuture, notesFuture]);
+      final results = await Future.wait([
+        agendaService.getEvents(now.toIso8601String(), end.toIso8601String()),
+        notesService.getNotes(),
+      ]);
       if (!mounted) return;
       setState(() {
         _events = (results[0] as List<AmiinEvent>).take(3).toList();
         _notes = (results[1] as List<AmiinNote>).take(2).toList();
       });
-    } catch (e) {
-      // ignore
-    }
+    } catch (_) {}
   }
 
- 
-  Future<void> _onRefresh() async {
-    await _loadData();
-  }
+  Future<void> _onRefresh() => _loadData();
 
   String _formatEventDate(String iso) {
     final date = DateTime.parse(iso);
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today    = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final eventDay = DateTime(date.year, date.month, date.day);
-    if (eventDay == today) {
-      return "Aujourd'hui · ${DateFormat('HH:mm').format(date)}";
-    } else if (eventDay == tomorrow) {
-      return "Demain · ${DateFormat('HH:mm').format(date)}";
-    } else {
-      return DateFormat("EEE d MMM · HH:mm", 'fr').format(date);
-    }
+    if (eventDay == today) return "Aujourd'hui · ${DateFormat('HH:mm').format(date)}";
+    if (eventDay == tomorrow) return "Demain · ${DateFormat('HH:mm').format(date)}";
+    return DateFormat("EEE d MMM · HH:mm", 'fr').format(date);
   }
 
   Color _categoryColor(String category) {
     switch (category) {
-      case 'admin': return ColorsAmiin.terra;
-      case 'personal': return ColorsAmiin.olive;
-      case 'health': return ColorsAmiin.indigo;
-      case 'education': return const Color(0xFF8C6D3F);
-      default: return ColorsAmiin.muted;
+      case 'admin':     return ColorsAmiin.ocre;
+      case 'personal':  return ColorsAmiin.turquoise;
+      case 'health':    return ColorsAmiin.success;
+      case 'education': return ColorsAmiin.ocreMid;
+      default:          return ColorsAmiin.muted;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final ac = context.ac;
     final insets = MediaQuery.of(context).padding;
+
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: ac.background,
       body: RefreshIndicator(
-        color: ColorsAmiin.terra,
+        color: ac.secretariatAccent,
+        backgroundColor: ac.surface,
         onRefresh: _onRefresh,
         child: CustomScrollView(
           slivers: [
-            // Hero header with gradient
+            // ── Hero header ───────────────────────────────────────────────────
             SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [ColorsAmiin.ink, ColorsAmiin.darkMid],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                  gradient: LinearGradient(
+                    colors: [ac.headerGradientStart, ac.headerGradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
-                padding: EdgeInsets.only(top: insets.top + 12, bottom: 32),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    SizedBox(height: insets.top + 12),
                     // Top bar
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
                       child: Row(
                         children: [
-                          const AmiinLogo(size: 36, variant: AmiinLogoVariant.dark),
-                          SizedBox(width: Spacing.sm),
+                          const AmiinLogo(size: 32, variant: AmiinLogoVariant.turquoise),
+                          const SizedBox(width: Spacing.sm),
                           Expanded(
                             child: Text(
                               'Amiin',
                               style: TextStyle(
-                                fontFamily: FontFamily.serif,
-                                fontSize: 20,
-                                letterSpacing: 0.4,
-                                color: ColorsAmiin.onDark,
+                                fontFamily: FontFamily.geoBold,
+                                fontSize: 18,
+                                letterSpacing: 0.5,
+                                color: ac.onHeader,
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => context.push('/profile'),
-                            child: Container(
-                              width: 32, height: 32,
-                              decoration: const BoxDecoration(
-                                color: ColorsAmiin.terra,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text('M', style: TextStyle(
-                                  fontFamily: FontFamily.serifBold,
-                                  fontSize: 14,
-                                  color: ColorsAmiin.white,
-                                )),
-                              ),
-                            ),
+                          _HeaderIconButton(
+                            icon: Icons.settings_outlined,
+                            color: ac.onHeader,
+                            onTap: () => context.push('/settings'),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: Spacing.xxl),
-                    // Greeting + CTA
-                    Column(
-                      children: [
-                        Text(
-                          'Bonjour — que puis-je\nfaire pour vous ?',
-                          style: TextStyle(
-                            fontFamily: FontFamily.sansLight,
-                            fontSize: 15,
-                            color: ColorsAmiin.onDark.withValues(alpha: 0.6),
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
+                    const SizedBox(height: Spacing.xxxl),
+                    // Greeting
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                      child: Text(
+                        'Bonjour — que puis-je\nfaire pour vous ?',
+                        style: TextStyle(
+                          fontFamily: FontFamily.sansLight,
+                          fontSize: 15,
+                          color: ac.onHeader.withValues(alpha: 0.55),
+                          height: 1.6,
                         ),
-                        SizedBox(height: Spacing.xl),
-                        Semantics(
-                          button: true,
-                          label: 'Parler à Amiin (dictée vocale)',
-                          child: GestureDetector(
-                            onTap: () {
-                              // Demander au chat de démarrer l'écoute :
-                              // le bouton tient enfin sa promesse "Parler".
-                              chatListenRequest.value++;
-                              context.go('/chat');
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 64, height: 64,
-                                  decoration: BoxDecoration(
-                                    color: ColorsAmiin.terra,
-                                    shape: BoxShape.circle,
-                                    boxShadow: ShadowAmiin.lg,
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.string(_micSvg, width: 22, height: 26),
-                                  ),
-                                ),
-                                SizedBox(height: Spacing.sm),
-                                Text(
-                                  'Parler à Amiin',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.sans,
-                                    fontSize: 11,
-                                    letterSpacing: 0.8,
-                                    color: ColorsAmiin.onDark.withValues(alpha: 0.5),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: Spacing.xl),
-                        GestureDetector(
-                          onTap: () => context.go('/chat'),
-                          child: Container(
-                            width: double.infinity,
-                            height: 44,
-                            margin: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.07),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-                              borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Écrivez votre question…',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.sans,
-                                  fontSize: 13,
-                                  color: ColorsAmiin.onDark.withValues(alpha: 0.35),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            // Sheet content
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  SizedBox(height: 16), // negative margin offset
-                  // Quick tiles section
-                  _buildSectionHeader('Accès rapide', null),
-                  SizedBox(height: Spacing.sm),
-                  Wrap(
-                    spacing: Spacing.sm,
-                    runSpacing: Spacing.sm,
-                    children: _quickTiles.map((tile) {
-                      return Material(
-                        color: tile['bg'] as Color,
-                        borderRadius: BorderRadius.circular(RadiusAmiin.md),
-                        child: InkWell(
+                    const SizedBox(height: Spacing.xl),
+                    // Bouton micro
+                    Center(
+                      child: Semantics(
+                        button: true,
+                        label: 'Parler à Amiin',
+                        child: GestureDetector(
                           onTap: () {
-                            final tab = tile['tab'] as String;
-                            context.go('/$tab');
+                            chatListenRequest.value++;
+                            context.go('/chat');
                           },
-                          borderRadius: BorderRadius.circular(RadiusAmiin.md),
-                          child: Container(
-                            width: (MediaQuery.of(context).size.width - 3 * Spacing.xl - Spacing.sm) / 2,
-                            padding: const EdgeInsets.all(Spacing.md),
-                            child: Text(
-                              tile['label'] as String,
-                              style: TextStyle(
-                                fontFamily: FontFamily.sansBold,
-                                fontSize: 13,
-                                color: tile['text'] as Color,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(height: Spacing.xxl),
-                  // Upcoming events
-                  if (_events.isNotEmpty) ...[
-                    _buildSectionHeader('Prochains événements', () => context.push('/agenda')),
-                    SizedBox(height: Spacing.sm),
-                    ..._events.map((ev) => GestureDetector(
-                      onTap: () => context.push('/agenda/event/${ev.id}'),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: Spacing.sm),
-                        child: AmiinCard(
-                          variant: CardVariant.default_,
-                          child: Row(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                width: 8, height: 8,
+                                width: 60, height: 60,
                                 decoration: BoxDecoration(
-                                  color: _categoryColor(ev.category.name),
+                                  color: ac.secretariatAccent,
                                   shape: BoxShape.circle,
-                                ),
-                              ),
-                              SizedBox(width: Spacing.md),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(ev.title, style: TextStyle(
-                                      fontFamily: FontFamily.sansMedium,
-                                      fontSize: 14,
-                                      color: ColorsAmiin.ink,
-                                    )),
-                                    SizedBox(height: 2),
-                                    Text(_formatEventDate(ev.startDate), style: TextStyle(
-                                      fontFamily: FontFamily.sans,
-                                      fontSize: 12,
-                                      color: ColorsAmiin.muted,
-                                    )),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: ac.secretariatAccent.withValues(alpha: 0.35),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 6),
+                                    )
                                   ],
                                 ),
-                              ),
-                              if (ev.createdByAgent == true)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: ColorsAmiin.terraLt,
-                                    borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                                  ),
-                                  child: Text('Amiin', style: TextStyle(
-                                    fontFamily: FontFamily.sansBold,
-                                    fontSize: 10,
-                                    color: ColorsAmiin.terraDk,
-                                  )),
+                                child: Center(
+                                  child: SvgPicture.string(_micSvg, width: 22, height: 26),
                                 ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Parler à Amiin',
+                                style: TextStyle(
+                                  fontFamily: FontFamily.geo,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                  letterSpacing: 0.5,
+                                  color: ac.onHeader.withValues(alpha: 0.45),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                    )),
-                  ],
-                  if (_notes.isNotEmpty) ...[
-                    SizedBox(height: Spacing.xxl),
-                    _buildSectionHeader('Notes récentes', () => context.go('/notes')),
-                    SizedBox(height: Spacing.sm),
-                    ..._notes.map((note) => Padding(
-                      padding: const EdgeInsets.only(bottom: Spacing.sm),
-                      child: AmiinCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(note.title, style: TextStyle(
-                              fontFamily: FontFamily.sansBold,
-                              fontSize: 14,
-                              color: ColorsAmiin.ink,
-                            )),
-                            SizedBox(height: 4),
-                            Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(
+                    ),
+                    const SizedBox(height: Spacing.xl),
+                    // Barre de saisie rapide
+                    GestureDetector(
+                      onTap: () => context.go('/chat'),
+                      child: Container(
+                        height: 44,
+                        margin: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.06),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                          borderRadius: BorderRadius.circular(RadiusAmiin.full),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Écrivez votre question…',
+                            style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
-                              height: 1.5,
-                            )),
+                              color: ac.onHeader.withValues(alpha: 0.30),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.xxxl),
+                    // Ligne d'horizon — au bas du header
+                    const HorizonLine(color: ColorsAmiin.turquoise, height: 1.5),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Contenu ────────────────────────────────────────────────────────
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  const SizedBox(height: Spacing.xxl),
+
+                  // Accès rapide
+                  _SectionLabel(
+                    label: 'Accès rapide',
+                    modeColor: ac.secretariatAccent,
+                  ),
+                  const SizedBox(height: Spacing.sm),
+                  _QuickTilesGrid(tiles: _quickTiles),
+
+                  // Événements
+                  if (_events.isNotEmpty) ...[
+                    const SizedBox(height: Spacing.xxxl),
+                    _SectionLabel(
+                      label: 'Cette semaine',
+                      modeColor: ac.secretariatAccent,
+                      action: _SectionAction(
+                        label: 'Agenda',
+                        onTap: () => context.push('/agenda'),
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.sm),
+                    ..._events.map((ev) => Padding(
+                      padding: const EdgeInsets.only(bottom: Spacing.sm),
+                      child: AmiinCard(
+                        variant: CardVariant.secretariat,
+                        onTap: () => context.push('/agenda/event/${ev.id}'),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 6, height: 6,
+                              decoration: BoxDecoration(
+                                color: _categoryColor(ev.category.name),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: Spacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(ev.title, style: TextStyle(
+                                    fontFamily: FontFamily.geoMedium,
+                                    fontSize: 14,
+                                    color: ac.ink,
+                                  )),
+                                  const SizedBox(height: 2),
+                                  Text(_formatEventDate(ev.startDate), style: TextStyle(
+                                    fontFamily: FontFamily.sans,
+                                    fontSize: 12,
+                                    color: ac.muted,
+                                  )),
+                                ],
+                              ),
+                            ),
+                            if (ev.createdByAgent == true)
+                              _AgentBadge(color: ac.secretariatAccent),
                           ],
                         ),
                       ),
                     )),
                   ],
-                  SizedBox(height: 24),
+
+                  // Notes récentes
+                  if (_notes.isNotEmpty) ...[
+                    const SizedBox(height: Spacing.xxxl),
+                    _SectionLabel(
+                      label: 'Notes récentes',
+                      modeColor: ac.secretariatAccent,
+                      action: _SectionAction(
+                        label: 'Voir tout',
+                        onTap: () => context.go('/notes'),
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.sm),
+                    ..._notes.map((note) => Padding(
+                      padding: const EdgeInsets.only(bottom: Spacing.sm),
+                      child: AmiinCard(
+                        onTap: () => context.push('/notes/${note.id}'),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(note.title, style: TextStyle(
+                              fontFamily: FontFamily.geoBold,
+                              fontSize: 14,
+                              color: ac.ink,
+                            )),
+                            const SizedBox(height: 4),
+                            Text(
+                              note.content,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: FontFamily.sans,
+                                fontSize: 13,
+                                color: ac.muted,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                  ],
+
+                  const SizedBox(height: Spacing.huge),
                 ]),
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title, VoidCallback? onSeeAll) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: TextStyle(
-          fontFamily: FontFamily.sansBold,
-          fontSize: 10,
-          letterSpacing: 1.2,
-          color: ColorsAmiin.muted,
-        )),
-        if (onSeeAll != null)
-          InkWell(
-            onTap: onSeeAll,
-            borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              child: Text('Voir tout', style: TextStyle(
-                fontFamily: FontFamily.sansMedium,
-                fontSize: 12,
-                color: ColorsAmiin.terra,
-              )),
-            ),
-          ),
-      ],
     );
   }
 
@@ -411,4 +365,161 @@ class _HomeScreenState extends State<HomeScreen> {
       <path d="M13 25v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
   ''';
+}
+
+// ── Sub-widgets ───────────────────────────────────────────────────────────────
+
+class _HeaderIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _HeaderIconButton({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 34, height: 34,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        ),
+        child: Center(child: Icon(icon, size: 17, color: color)),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  final Color modeColor;
+  final _SectionAction? action;
+
+  const _SectionLabel({required this.label, required this.modeColor, this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(width: 3, height: 12,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(color: modeColor, borderRadius: BorderRadius.circular(2))),
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontFamily: FontFamily.geo,
+            fontWeight: FontWeight.w600,
+            fontSize: 10,
+            letterSpacing: 1.2,
+            color: context.ac.muted,
+          ),
+        ),
+        const Spacer(),
+        if (action != null)
+          InkWell(
+            onTap: action!.onTap,
+            borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(
+                action!.label,
+                style: TextStyle(
+                  fontFamily: FontFamily.geoMedium,
+                  fontSize: 12,
+                  color: modeColor,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _SectionAction {
+  final String label;
+  final VoidCallback onTap;
+  const _SectionAction({required this.label, required this.onTap});
+}
+
+class _QuickTile {
+  final String label;
+  final String tab;
+  final Color bg;
+  final Color text;
+  final bool isInfo;
+  const _QuickTile({required this.label, required this.tab, required this.bg, required this.text, required this.isInfo});
+}
+
+class _QuickTilesGrid extends StatelessWidget {
+  final List<_QuickTile> tiles;
+  const _QuickTilesGrid({required this.tiles});
+
+  @override
+  Widget build(BuildContext context) {
+    final w = (MediaQuery.of(context).size.width - 2 * Spacing.xl - Spacing.sm) / 2;
+    return Wrap(
+      spacing: Spacing.sm,
+      runSpacing: Spacing.sm,
+      children: tiles.map((tile) {
+        return Material(
+          color: tile.bg,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            onTap: () => context.go('/${tile.tab}'),
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox(
+              width: w,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.md),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 4, height: 4,
+                      decoration: BoxDecoration(color: tile.text, shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      tile.label,
+                      style: TextStyle(
+                        fontFamily: FontFamily.geoBold,
+                        fontSize: 13,
+                        color: tile.text,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _AgentBadge extends StatelessWidget {
+  final Color color;
+  const _AgentBadge({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Text('Amiin', style: TextStyle(
+        fontFamily: FontFamily.geoBold,
+        fontSize: 9,
+        letterSpacing: 0.5,
+        color: color,
+      )),
+    );
+  }
 }

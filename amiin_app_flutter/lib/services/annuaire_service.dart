@@ -186,6 +186,53 @@ class AnnuaireService {
     }).toList();
   }
 
+  /// Recherche tolérante pour les noms d'organismes provenant de sources externes.
+  /// 3 passes : sous-chaîne directe → bidirectionnelle → overlap de mots-clés (≥ 50 %).
+  Future<List<AmiinService>> searchSimilar(String query) async {
+    if (query.isEmpty) return [];
+
+    // 1. Sous-chaîne normale : "mairie" trouvé dans "Mairie de Djibouti"
+    final direct = await searchLocal(query);
+    if (direct.isNotEmpty) return direct;
+
+    final data = await loadLocal();
+    final q = query.toLowerCase();
+
+    // 2. Bidirectionnel : la requête contient le nom de l'entrée
+    //    "mairie de la ville de djibouti".contains("mairie de djibouti") = false
+    //    mais on gère aussi les noms courts contenus dans une longue requête
+    final bidir = data.entries.where((e) {
+      final name = e.name.toLowerCase();
+      return name.length > 4 && q.contains(name);
+    }).toList();
+    if (bidir.isNotEmpty) return bidir;
+
+    // 3. Overlap de mots significatifs : ignorer les mots-outils courts
+    const stop = {'de', 'la', 'le', 'les', 'du', 'des', 'et', 'en', 'un',
+      'une', 'd', 'l', 'au', 'aux', 'dans', 'pour', 'par', 'sur', 'avec'};
+    Set<String> sig(String text) => text
+        .toLowerCase()
+        .split(RegExp(r'\W+'))
+        .where((w) => w.length > 2 && !stop.contains(w))
+        .toSet();
+
+    final qWords = sig(query);
+    if (qWords.isEmpty) return [];
+
+    final scored = <({AmiinService service, int score})>[];
+    for (final e in data.entries) {
+      final eWords = sig(e.name);
+      if (eWords.isEmpty) continue;
+      final overlap = qWords.intersection(eWords).length;
+      // Au moins 50 % des mots de l'entrée doivent être présents dans la requête
+      if (overlap / eWords.length >= 0.5) {
+        scored.add((service: e, score: overlap));
+      }
+    }
+    scored.sort((a, b) => b.score.compareTo(a.score));
+    return scored.map((s) => s.service).toList();
+  }
+
   // ── API backend (recherche sémantique) ───────────────────────────────────
 
   /// Recherche sémantique via Qdrant (gère les fautes, troncatures, synonymes).

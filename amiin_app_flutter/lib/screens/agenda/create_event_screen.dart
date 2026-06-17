@@ -30,9 +30,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   bool _loading = false;
 
   final List<({EventCategory category, String label, Color color})> _categories = [
-    (category: EventCategory.admin, label: 'Administratif', color: ColorsAmiin.terra),
-    (category: EventCategory.personal, label: 'Personnel', color: ColorsAmiin.olive),
-    (category: EventCategory.health, label: 'Santé', color: ColorsAmiin.indigo),
+    (category: EventCategory.admin, label: 'Administratif', color: ColorsAmiin.turquoise),
+    (category: EventCategory.personal, label: 'Personnel', color: ColorsAmiin.success),
+    (category: EventCategory.health, label: 'Santé', color: ColorsAmiin.turquoise),
     (category: EventCategory.education, label: 'Éducation', color: const Color(0xFF8C6D3F)),
     (category: EventCategory.other, label: 'Autre', color: ColorsAmiin.muted),
   ];
@@ -110,7 +110,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.terra),
+        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.turquoise),
       );
       return;
     }
@@ -118,7 +118,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('La date de fin doit être après la date de début.'),
-          backgroundColor: ColorsAmiin.terra,
+          backgroundColor: ColorsAmiin.turquoise,
         ),
       );
       return;
@@ -138,7 +138,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement modifié'), backgroundColor: ColorsAmiin.olive),
+            const SnackBar(content: Text('Événement modifié'), backgroundColor: ColorsAmiin.success),
           );
         }
       } else {
@@ -154,7 +154,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ));
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement créé'), backgroundColor: ColorsAmiin.olive),
+            const SnackBar(content: Text('Événement créé'), backgroundColor: ColorsAmiin.success),
           );
         }
       }
@@ -162,7 +162,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur : ${e.toString()}'), backgroundColor: ColorsAmiin.terra),
+          SnackBar(content: Text('Erreur : ${e.toString()}'), backgroundColor: ColorsAmiin.turquoise),
         );
       }
     } finally {
@@ -237,7 +237,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         checkmarkColor: Colors.white,
                         labelStyle: TextStyle(
                           color: _category == cat.category ? Colors.white : ColorsAmiin.mid,
-                          fontFamily: FontFamily.sansMedium,
+                          fontFamily: FontFamily.geoMedium,
                         ),
                       )).toList(),
                     )),
@@ -250,10 +250,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         selected: _reminder == rem.value,
                         onSelected: (_) => setState(() => _reminder = rem.value),
                         backgroundColor: Colors.white,
-                        selectedColor: ColorsAmiin.terra,
+                        selectedColor: ColorsAmiin.turquoise,
                         labelStyle: TextStyle(
                           color: _reminder == rem.value ? Colors.white : ColorsAmiin.mid,
-                          fontFamily: FontFamily.sansMedium,
+                          fontFamily: FontFamily.geoMedium,
                         ),
                       )).toList(),
                     )),
@@ -282,7 +282,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         Text(
           label,
           style: TextStyle(
-            fontFamily: FontFamily.sansBold,
+            fontFamily: FontFamily.geoBold,
             fontSize: 10,
             letterSpacing: 1.2,
             color: ColorsAmiin.muted,

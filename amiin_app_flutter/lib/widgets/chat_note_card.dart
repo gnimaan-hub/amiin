@@ -31,9 +31,9 @@ class ChatNoteCard extends StatelessWidget {
         margin: const EdgeInsets.only(top: Spacing.sm),
         padding: const EdgeInsets.all(Spacing.sm + 2),
         decoration: BoxDecoration(
-          color: ColorsAmiin.terraLt,
+          color: ColorsAmiin.turquoiseLt,
           borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: ColorsAmiin.terra.withValues(alpha: 0.35)),
+          border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,12 +42,12 @@ class ChatNoteCard extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: ColorsAmiin.terra.withValues(alpha: 0.12),
+                color: ColorsAmiin.turquoise.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_note_outlined : Icons.note_outlined,
-                color: ColorsAmiin.terraDk,
+                color: ColorsAmiin.turquoiseDk,
                 size: 18,
               ),
             ),
@@ -59,9 +59,9 @@ class ChatNoteCard extends StatelessWidget {
                   Text(
                     isUpdate ? 'Note mise à jour' : 'Note créée',
                     style: TextStyle(
-                      fontFamily: FontFamily.sansBold,
+                      fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: ColorsAmiin.terraDk,
+                      color: ColorsAmiin.turquoiseDk,
                       letterSpacing: 0.4,
                     ),
                   ),
@@ -71,7 +71,7 @@ class ChatNoteCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: FontFamily.sansMedium,
+                      fontFamily: FontFamily.geoMedium,
                       fontSize: 13,
                       color: ColorsAmiin.ink,
                     ),
@@ -97,7 +97,7 @@ class ChatNoteCard extends StatelessWidget {
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 11,
-              color: ColorsAmiin.terraDk,
+              color: ColorsAmiin.turquoiseDk,
             ),
           ],
         ),
@@ -139,9 +139,9 @@ class ChatEventCard extends StatelessWidget {
         margin: const EdgeInsets.only(top: Spacing.sm),
         padding: const EdgeInsets.all(Spacing.sm + 2),
         decoration: BoxDecoration(
-          color: ColorsAmiin.indigoLt,
+          color: ColorsAmiin.turquoiseLt,
           borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: ColorsAmiin.indigo.withValues(alpha: 0.35)),
+          border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -150,12 +150,12 @@ class ChatEventCard extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: ColorsAmiin.indigo.withValues(alpha: 0.12),
+                color: ColorsAmiin.turquoise.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_calendar_outlined : Icons.event_outlined,
-                color: ColorsAmiin.indigo,
+                color: ColorsAmiin.turquoise,
                 size: 18,
               ),
             ),
@@ -167,9 +167,9 @@ class ChatEventCard extends StatelessWidget {
                   Text(
                     isUpdate ? 'Événement mis à jour' : 'Événement créé',
                     style: TextStyle(
-                      fontFamily: FontFamily.sansBold,
+                      fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: ColorsAmiin.indigo,
+                      color: ColorsAmiin.turquoise,
                       letterSpacing: 0.4,
                     ),
                   ),
@@ -179,7 +179,7 @@ class ChatEventCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: FontFamily.sansMedium,
+                      fontFamily: FontFamily.geoMedium,
                       fontSize: 13,
                       color: ColorsAmiin.ink,
                     ),
@@ -200,7 +200,7 @@ class ChatEventCard extends StatelessWidget {
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 11,
-              color: ColorsAmiin.indigo,
+              color: ColorsAmiin.turquoise,
             ),
           ],
         ),
@@ -293,7 +293,7 @@ class ChatNoteSuggestion extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorsAmiin.white,
         borderRadius: BorderRadius.circular(RadiusAmiin.md),
-        border: Border.all(color: ColorsAmiin.terra.withValues(alpha: 0.45)),
+        border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.45)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class ChatNoteSuggestion extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.note_add_outlined, size: 15, color: ColorsAmiin.terraDk),
+              const Icon(Icons.note_add_outlined, size: 15, color: ColorsAmiin.turquoiseDk),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -344,10 +344,10 @@ class _SuggestionBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: primary ? ColorsAmiin.terra : Colors.transparent,
+      color: primary ? ColorsAmiin.turquoise : Colors.transparent,
       shape: StadiumBorder(
         side: BorderSide(
-          color: primary ? ColorsAmiin.terra : ColorsAmiin.border,
+          color: primary ? ColorsAmiin.turquoise : ColorsAmiin.border,
         ),
       ),
       child: InkWell(
@@ -358,7 +358,7 @@ class _SuggestionBtn extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontFamily: FontFamily.sansMedium,
+              fontFamily: FontFamily.geoMedium,
               fontSize: 12,
               color: primary ? ColorsAmiin.white : ColorsAmiin.muted,
             ),
@@ -368,3 +368,4 @@ class _SuggestionBtn extends StatelessWidget {
     );
   }
 }
+

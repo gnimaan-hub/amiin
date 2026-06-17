@@ -19,6 +19,7 @@ import '../../widgets/card.dart';
 import '../../widgets/button.dart';
 import '../../services/demarches_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/annuaire_service.dart';
 
 class UserDemarcheTrackingScreen extends StatefulWidget {
   final String userDemarcheId;
@@ -42,7 +43,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
 
   @override
   void dispose() {
-    for (final c in _noteControllers.values) c.dispose();
+    for (final c in _noteControllers.values) { c.dispose(); }
     super.dispose();
   }
 
@@ -107,9 +108,11 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       body: 'Étape ${step.order} — ${step.title}',
       scheduledAt: picked,
     );
-    if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}')),
+      );
+    }
   }
 
   Future<void> _deleteDemarche() async {
@@ -149,7 +152,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.terra)));
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
     }
     if (_ud == null) return const SizedBox();
 
@@ -159,7 +162,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
 
     // Grouper les docs par cas
     final Map<String?, List<DemarcheDocument>> docsByCas = {};
-    for (final doc in d.documents) docsByCas.putIfAbsent(doc.cas, () => []).add(doc);
+    for (final doc in d.documents) { docsByCas.putIfAbsent(doc.cas, () => []).add(doc); }
 
     return Scaffold(
       backgroundColor: ColorsAmiin.ecru,
@@ -173,7 +176,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _load,
-                color: ColorsAmiin.terra,
+                color: ColorsAmiin.ocre,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(Spacing.lg),
@@ -202,7 +205,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                       if (d.documents.isNotEmpty)
                         _sectionCard(
                           icon: Icons.folder_outlined,
-                          title: 'Pièces à préparer',
+                          title: 'Pièces à préparer (${ud.checkedDocuments.length}/${d.documents.length})',
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -212,11 +215,11 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                     decoration: BoxDecoration(color: ColorsAmiin.sand, borderRadius: BorderRadius.circular(4)),
-                                    child: Text(cas, style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 10, color: ColorsAmiin.mid)),
+                                    child: Text(cas, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 10, color: ColorsAmiin.mid)),
                                   ),
                                   const SizedBox(height: 4),
                                 ],
-                                for (final doc in docsByCas[cas]!) _docCheckRow(doc.name),
+                                for (final doc in docsByCas[cas]!) _docCheckRow(doc, ud),
                               ],
                             ],
                           ),
@@ -229,12 +232,12 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         _stepCard(d.steps[i], ud, isLast: i == d.steps.length - 1),
 
                       // ── Organisme ────────────────────────────────────────
-                      if (d.organisme != null) ...[
+                      if (d.lieux.isNotEmpty) ...[
                         const SizedBox(height: Spacing.md),
                         _sectionCard(
                           icon: Icons.business_outlined,
-                          title: 'Où faire la démarche ?',
-                          child: _organismeCard(d.organisme!),
+                          title: d.lieux.length == 1 ? 'Où faire la démarche ?' : 'Où faire la démarche ? (${d.lieux.length} lieux)',
+                          child: _organismeBody(d),
                         ),
                       ],
 
@@ -260,16 +263,16 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                           width: double.infinity,
                           padding: const EdgeInsets.all(Spacing.lg),
                           decoration: BoxDecoration(
-                            color: ColorsAmiin.oliveLt,
+                            color: ColorsAmiin.successLt,
                             borderRadius: BorderRadius.circular(RadiusAmiin.md),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('✓', style: TextStyle(fontSize: 18, color: ColorsAmiin.olive)),
+                              const Text('✓', style: TextStyle(fontSize: 18, color: ColorsAmiin.success)),
                               const SizedBox(width: Spacing.sm),
                               Text('Démarche terminée', style: TextStyle(
-                                fontFamily: FontFamily.sansBold, fontSize: 15, color: ColorsAmiin.olive,
+                                fontFamily: FontFamily.geoBold, fontSize: 15, color: ColorsAmiin.success,
                               )),
                             ],
                           ),
@@ -309,9 +312,9 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                 ud.status == DemarcheStatus.terminee
                     ? 'Démarche terminée ✓'
                     : 'En cours — ${ud.completedSteps} sur ${ud.totalSteps} étapes',
-                style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 13, color: ColorsAmiin.ink),
+                style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink),
               )),
-              Text('$pct %', style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 14, color: ColorsAmiin.terra)),
+              Text('$pct %', style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 14, color: ColorsAmiin.ocre)),
             ],
           ),
           const SizedBox(height: 8),
@@ -320,7 +323,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             child: LinearProgressIndicator(
               value: ud.progress,
               backgroundColor: ColorsAmiin.border,
-              color: ud.status == DemarcheStatus.terminee ? ColorsAmiin.olive : ColorsAmiin.terra,
+              color: ud.status == DemarcheStatus.terminee ? ColorsAmiin.success : ColorsAmiin.ocre,
               minHeight: 8,
             ),
           ),
@@ -358,71 +361,78 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           ),
           child: Column(
           children: [
-            // Header de l'étape
-            InkWell(
-              onTap: () => setState(() => _expandedStep = isExpanded ? null : step.order),
-              borderRadius: BorderRadius.circular(RadiusAmiin.md),
-              child: Padding(
-                padding: const EdgeInsets.all(Spacing.md),
-                child: Row(
-                  children: [
-                    // Checkbox validation
-                    GestureDetector(
-                      onTap: () => _toggleStep(step.order),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 32, height: 32,
-                        decoration: BoxDecoration(
-                          color: isDone ? ColorsAmiin.terra : ColorsAmiin.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isDone ? ColorsAmiin.terra : ColorsAmiin.border,
-                            width: 2,
-                          ),
-                        ),
-                        child: Center(child: isDone
-                          ? const Icon(Icons.check, color: Colors.white, size: 18)
-                          : Text('${step.order}', style: TextStyle(
-                              fontFamily: FontFamily.sansBold, fontSize: 13,
-                              color: ColorsAmiin.mid,
-                            )),
+            // Header de l'étape — cercle hors InkWell pour éviter le conflit de gestes
+            Padding(
+              padding: const EdgeInsets.all(Spacing.md),
+              child: Row(
+                children: [
+                  // Cercle de validation — tap target indépendant
+                  GestureDetector(
+                    onTap: () => _toggleStep(step.order),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        color: isDone ? ColorsAmiin.ocre : ColorsAmiin.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDone ? ColorsAmiin.ocre : ColorsAmiin.border,
+                          width: 2,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: Spacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(step.title, style: TextStyle(
-                            fontFamily: isDone ? FontFamily.sans : FontFamily.sansBold,
-                            fontSize: 14,
-                            color: isDone ? ColorsAmiin.muted : ColorsAmiin.ink,
-                            decoration: isDone ? TextDecoration.lineThrough : null,
+                      child: Center(child: isDone
+                        ? const Icon(Icons.check, color: Colors.white, size: 18)
+                        : Text('${step.order}', style: TextStyle(
+                            fontFamily: FontFamily.geoBold, fontSize: 13,
+                            color: ColorsAmiin.mid,
                           )),
-                          if (isDone && st.completedAt != null) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              'Validé le ${_formatDate(st.completedAt!)}',
-                              style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.md),
+                  // Titre + flèche — zone expand/collapse
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => setState(() => _expandedStep = isExpanded ? null : step.order),
+                      borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(step.title, style: TextStyle(
+                                  fontFamily: isDone ? FontFamily.sans : FontFamily.geoBold,
+                                  fontSize: 14,
+                                  color: isDone ? ColorsAmiin.muted : ColorsAmiin.ink,
+                                  decoration: isDone ? TextDecoration.lineThrough : null,
+                                )),
+                                if (isDone && st.completedAt != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Validé le ${_formatDate(st.completedAt!)}',
+                                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                                  ),
+                                ] else if (st.agendaEventId != null) ...[
+                                  const SizedBox(height: 2),
+                                  Row(children: [
+                                    Icon(Icons.event, size: 12, color: ColorsAmiin.ocre),
+                                    const SizedBox(width: 3),
+                                    Text('RDV programmé', style: TextStyle(fontSize: 11, color: ColorsAmiin.ocre)),
+                                  ]),
+                                ],
+                              ],
                             ),
-                          ] else if (st.agendaEventId != null) ...[
-                            const SizedBox(height: 2),
-                            Row(children: [
-                              Icon(Icons.event, size: 12, color: ColorsAmiin.indigo),
-                              const SizedBox(width: 3),
-                              Text('RDV programmé', style: TextStyle(fontSize: 11, color: ColorsAmiin.indigo)),
-                            ]),
-                          ],
+                          ),
+                          Icon(
+                            isExpanded ? Icons.expand_less : Icons.expand_more,
+                            color: ColorsAmiin.muted, size: 20,
+                          ),
                         ],
                       ),
                     ),
-                    Icon(
-                      isExpanded ? Icons.expand_less : Icons.expand_more,
-                      color: ColorsAmiin.muted, size: 20,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             // Corps expandé
@@ -451,7 +461,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
 
                     // Note pour cette étape
                     Text('Ma note', style: TextStyle(
-                      fontFamily: FontFamily.sansBold, fontSize: 11,
+                      fontFamily: FontFamily.geoBold, fontSize: 11,
                       letterSpacing: 0.8, color: ColorsAmiin.muted,
                     )),
                     const SizedBox(height: 6),
@@ -481,7 +491,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.save_outlined, size: 15),
                           label: const Text('Enregistrer'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.mid, textStyle: TextStyle(fontFamily: FontFamily.sansMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.mid, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _saveStepNote(step.order),
                         ),
                         const Spacer(),
@@ -489,7 +499,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.notifications_outlined, size: 15),
                           label: const Text('Rappel'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.indigo, textStyle: TextStyle(fontFamily: FontFamily.sansMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.ocre, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _setStepReminder(step.order),
                         ),
                         const SizedBox(width: 4),
@@ -497,7 +507,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.calendar_today_outlined, size: 15),
                           label: const Text('RDV'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.terra, textStyle: TextStyle(fontFamily: FontFamily.sansMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.ocre, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _scheduleStepEvent(step.order),
                         ),
                       ],
@@ -524,7 +534,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
               Icon(icon, size: 14, color: ColorsAmiin.muted),
               const SizedBox(width: 6),
               Text(title.toUpperCase(), style: TextStyle(
-                fontFamily: FontFamily.sansBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
+                fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
               )),
             ]),
             const SizedBox(height: 10),
@@ -536,19 +546,126 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   }
 
   Widget _sectionHeader(String title) => Text(title, style: TextStyle(
-    fontFamily: FontFamily.sansBold, fontSize: 13, color: ColorsAmiin.ink,
+    fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink,
   ));
 
-  Widget _docCheckRow(String name) => Padding(
-    padding: const EdgeInsets.only(bottom: 4),
-    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 6, right: 8),
-        decoration: const BoxDecoration(color: ColorsAmiin.terra, shape: BoxShape.circle)),
-      Expanded(child: Text(name, style: TextStyle(
-        fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.ink, height: 1.4,
-      ))),
-    ]),
-  );
+  Future<void> _toggleDocCheck(String docName) async {
+    if (_ud == null) return;
+    final updated = await demarchesService.toggleDocumentCheck(widget.userDemarcheId, docName);
+    if (!mounted) return;
+    setState(() => _ud = updated);
+    final allDocs = updated.demarche.documents;
+    if (allDocs.isNotEmpty && allDocs.every((d) => updated.checkedDocuments.contains(d.name))) {
+      _autoCompleteDocsStep(updated);
+    }
+  }
+
+  void _autoCompleteDocsStep(UserDemarche ud) {
+    const keywords = ['rassembl', 'prépari', 'réunir', 'constitu', 'pièce', 'document', 'dossier'];
+    final docsStep = ud.demarche.steps.where((s) {
+      final t = s.title.toLowerCase();
+      return keywords.any((k) => t.contains(k));
+    }).firstOrNull;
+    if (docsStep != null && !ud.statusForStep(docsStep.order).isDone) {
+      _toggleStep(docsStep.order);
+    }
+  }
+
+  Widget _docCheckRow(DemarcheDocument doc, UserDemarche ud) {
+    final isChecked = ud.checkedDocuments.contains(doc.name);
+    return GestureDetector(
+      onTap: () => _toggleDocCheck(doc.name),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(
+              isChecked ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 18,
+              color: isChecked ? ColorsAmiin.success : ColorsAmiin.muted,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(doc.name, style: TextStyle(
+                fontFamily: FontFamily.sans,
+                fontSize: 13,
+                color: isChecked ? ColorsAmiin.muted : ColorsAmiin.ink,
+                decoration: isChecked ? TextDecoration.lineThrough : null,
+                height: 1.4,
+              )),
+              if (doc.description != null && doc.description!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  _firstSentence(doc.description!),
+                  style: const TextStyle(fontSize: 11, color: ColorsAmiin.muted, fontStyle: FontStyle.italic),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          )),
+        ]),
+      ),
+    );
+  }
+
+  String _firstSentence(String text) {
+    final s = text.split('.').first.trim();
+    return s.length > 80 ? '${s.substring(0, 77)}…' : s;
+  }
+
+  Widget _organismeBody(Demarche d) {
+    final lieux = d.lieux;
+    if (lieux.length == 1) return _organismeCard(lieux.first);
+    final org = d.organisme!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (org.adresse != null && org.adresse!.isNotEmpty) ...[
+          Row(children: [
+            Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+            const SizedBox(width: 4),
+            Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+          ]),
+          const SizedBox(height: 4),
+        ],
+        if (org.horaires != null && org.horaires!.isNotEmpty) ...[
+          Row(children: [
+            Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+            const SizedBox(width: 4),
+            Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+          ]),
+          const SizedBox(height: Spacing.sm),
+        ],
+        for (int i = 0; i < lieux.length; i++) ...[
+          if (i > 0) const Padding(
+            padding: EdgeInsets.only(top: 4, bottom: 8),
+            child: Divider(height: 1, color: ColorsAmiin.border),
+          ),
+          Row(children: [
+            Expanded(child: Text(lieux[i].nom, style: TextStyle(
+              fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.ink,
+            ))),
+            TextButton(
+              onPressed: () => _openInAnnuaire(lieux[i]),
+              style: TextButton.styleFrom(
+                foregroundColor: ColorsAmiin.ocre,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+                minimumSize: Size.zero,
+              ),
+              child: const Text('Annuaire'),
+            ),
+          ]),
+        ],
+      ],
+    );
+  }
 
   Widget _infoChip(IconData icon, String label) {
     final truncated = label.length > 45 ? '${label.substring(0, 42)}…' : label;
@@ -570,7 +687,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   Widget _organismeCard(DemarcheOrganisme org) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(org.nom, style: TextStyle(fontFamily: FontFamily.sansBold, fontSize: 13, color: ColorsAmiin.ink)),
+      Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink)),
       if (org.adresse != null && org.adresse!.isNotEmpty) ...[
         const SizedBox(height: 5),
         Row(children: [
@@ -593,12 +710,12 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         icon: const Icon(Icons.map_outlined, size: 15),
         label: const Text('Voir dans l\'annuaire'),
         style: TextButton.styleFrom(
-          foregroundColor: ColorsAmiin.terra,
-          textStyle: TextStyle(fontFamily: FontFamily.sansMedium, fontSize: 13),
+          foregroundColor: ColorsAmiin.ocre,
+          textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 13),
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        onPressed: () => context.push('/annuaire?q=${Uri.encodeComponent(org.nom)}'),
+        onPressed: () => _openInAnnuaire(org),
       ),
     ],
   );
@@ -612,7 +729,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             Icon(Icons.sticky_note_2_outlined, size: 14, color: ColorsAmiin.muted),
             const SizedBox(width: 6),
             Text('NOTES GÉNÉRALES', style: TextStyle(
-              fontFamily: FontFamily.sansBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
+              fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
             )),
           ]),
           const SizedBox(height: 10),
@@ -654,6 +771,19 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     if (result != null && mounted) {
       await demarchesService.updateGlobalNotes(widget.userDemarcheId, result);
       await _load();
+    }
+  }
+
+  Future<void> _openInAnnuaire(DemarcheOrganisme org) async {
+    final results = await annuaireService.searchSimilar(org.nom);
+    if (!mounted) return;
+    if (results.isNotEmpty) {
+      context.go('/annuaire/${results.first.id}');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
+      );
+      context.go('/annuaire');
     }
   }
 
@@ -718,3 +848,4 @@ Future<DateTime?> showDateTimePicker(BuildContext context) async {
   if (time == null) return null;
   return DateTime(date.year, date.month, date.day, time.hour, time.minute);
 }
+

@@ -211,6 +211,25 @@ class Demarche {
     'updatedAt': updatedAt,
   };
 
+  /// Sépare le nom de l'organisme par " / " pour obtenir les lieux individuels.
+  List<DemarcheOrganisme> get lieux {
+    if (organisme == null) return [];
+    final parts = organisme!.nom
+        .split(' / ')
+        .map((n) => n.trim())
+        .where((n) => n.isNotEmpty)
+        .toList();
+    if (parts.length <= 1) return [organisme!];
+    return parts
+        .map((nom) => DemarcheOrganisme(
+              nom: nom,
+              adresse: organisme!.adresse,
+              contact: organisme!.contact,
+              horaires: organisme!.horaires,
+            ))
+        .toList();
+  }
+
   factory Demarche.fromJson(Map json) {
     DemarcheCategory cat;
     try {
@@ -308,6 +327,7 @@ class UserDemarche {
   final int currentStep;
   final List<UserDemarcheStepStatus> stepStatuses;
   final String? notes;
+  final List<String> checkedDocuments;
   final String startedAt;
   final String updatedAt;
 
@@ -319,6 +339,7 @@ class UserDemarche {
     required this.currentStep,
     required this.stepStatuses,
     this.notes,
+    this.checkedDocuments = const [],
     required this.startedAt,
     required this.updatedAt,
   });
@@ -342,6 +363,7 @@ class UserDemarche {
     'currentStep': currentStep,
     'stepStatuses': stepStatuses.map((s) => s.toJson()).toList(),
     'notes': notes,
+    'checkedDocuments': checkedDocuments,
     'startedAt': startedAt,
     'updatedAt': updatedAt,
   };
@@ -364,6 +386,7 @@ class UserDemarche {
           .map((s) => UserDemarcheStepStatus.fromJson(s as Map))
           .toList(),
       notes: json['notes'] as String?,
+      checkedDocuments: ((json['checkedDocuments'] as List?) ?? []).cast<String>(),
       startedAt: (json['startedAt'] as String?) ?? DateTime.now().toIso8601String(),
       updatedAt: (json['updatedAt'] as String?) ?? DateTime.now().toIso8601String(),
     );
@@ -634,6 +657,7 @@ class DemarchesService {
       currentStep: nextIncomplete ?? (ud.demarche.steps.length + 1),
       stepStatuses: updatedStatuses,
       notes: ud.notes,
+      checkedDocuments: ud.checkedDocuments,
       startedAt: ud.startedAt,
       updatedAt: DateTime.now().toIso8601String(),
     );
@@ -664,6 +688,7 @@ class DemarchesService {
       currentStep: firstIncomplete,
       stepStatuses: updatedStatuses,
       notes: ud.notes,
+      checkedDocuments: ud.checkedDocuments,
       startedAt: ud.startedAt,
       updatedAt: DateTime.now().toIso8601String(),
     );
@@ -688,6 +713,7 @@ class DemarchesService {
       id: ud.id, demarcheId: ud.demarcheId, demarche: ud.demarche,
       status: ud.status, currentStep: ud.currentStep,
       stepStatuses: updatedStatuses, notes: ud.notes,
+      checkedDocuments: ud.checkedDocuments,
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
@@ -711,6 +737,7 @@ class DemarchesService {
       id: ud.id, demarcheId: ud.demarcheId, demarche: ud.demarche,
       status: ud.status, currentStep: ud.currentStep,
       stepStatuses: updatedStatuses, notes: ud.notes,
+      checkedDocuments: ud.checkedDocuments,
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
@@ -725,6 +752,28 @@ class DemarchesService {
       id: ud.id, demarcheId: ud.demarcheId, demarche: ud.demarche,
       status: ud.status, currentStep: ud.currentStep,
       stepStatuses: ud.stepStatuses, notes: notes,
+      checkedDocuments: ud.checkedDocuments,
+      startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
+    );
+    await _userBox.put(ud.id, updated);
+    return updated;
+  }
+
+  Future<UserDemarche> toggleDocumentCheck(String userDemarcheId, String docName) async {
+    await _init();
+    final ud = _userBox.get(userDemarcheId);
+    if (ud == null) throw Exception('Démarche introuvable');
+    final checked = List<String>.from(ud.checkedDocuments);
+    if (checked.contains(docName)) {
+      checked.remove(docName);
+    } else {
+      checked.add(docName);
+    }
+    final updated = UserDemarche(
+      id: ud.id, demarcheId: ud.demarcheId, demarche: ud.demarche,
+      status: ud.status, currentStep: ud.currentStep,
+      stepStatuses: ud.stepStatuses, notes: ud.notes,
+      checkedDocuments: checked,
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
@@ -748,6 +797,7 @@ class DemarchesService {
       id: ud.id, demarcheId: ud.demarcheId, demarche: ud.demarche,
       status: status, currentStep: ud.currentStep,
       stepStatuses: ud.stepStatuses, notes: ud.notes,
+      checkedDocuments: ud.checkedDocuments,
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
@@ -787,7 +837,7 @@ class DemarchesService {
       final buf = StringBuffer()
         ..writeln('# ${d.title}')
         ..writeln('Catégorie : ${d.category.label}')
-        ..writeln('Type : ${d.type == DemarcheType.procedure ? "Démarche (procédure)" : "Fiche d\'information"}');
+        ..writeln("Type : ${d.type == DemarcheType.procedure ? 'Démarche (procédure)' : "Fiche d'information"}");
       if (d.beneficiaires != null) buf.writeln('Bénéficiaires : ${d.beneficiaires}');
       buf.writeln('\n## Description\n${d.summary}');
       if (d.conditions != null) buf.writeln('\n## Conditions\n${d.conditions}');
@@ -800,7 +850,7 @@ class DemarchesService {
       }
       if (d.steps.isNotEmpty) {
         buf.writeln('\n## Étapes');
-        for (final s in d.steps) buf.writeln('${s.order}. ${s.description}');
+        for (final s in d.steps) { buf.writeln('${s.order}. ${s.description}'); }
       }
       if (d.duration != null) buf.writeln('\n## Délai\n${d.duration}');
       if (d.cost != null) buf.writeln('\n## Coût\n${d.cost}');

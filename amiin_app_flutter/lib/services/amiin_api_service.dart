@@ -157,6 +157,7 @@ class AmiinApiService {
     List<Map<String, dynamic>>? toolResults,
     double? lat,
     double? lon,
+    Map<String, dynamic>? userPreferences,
   }) async* {
     final cancelToken = CancelToken();
     _activeCancelToken = cancelToken;
@@ -169,6 +170,7 @@ class AmiinApiService {
         'expand': expand,
         if (lat != null) 'lat': lat,
         if (lon != null) 'lon': lon,
+        if (userPreferences != null) 'user_preferences': userPreferences,
       };
       if (pendingToolUses != null) body['pending_tool_uses'] = pendingToolUses;
       if (toolResults != null) body['tool_results'] = toolResults;

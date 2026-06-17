@@ -41,13 +41,13 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   Future<void> _save() async {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.terra),
+        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.turquoise),
       );
       return;
     }
     if (_contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: ColorsAmiin.terra),
+        const SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: ColorsAmiin.turquoise),
       );
       return;
     }
@@ -88,11 +88,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                   children: [
                     TextField(
                       controller: _titleController,
-                      style: TextStyle(fontFamily: FontFamily.serif, fontSize: 22, color: ColorsAmiin.ink),
+                      style: TextStyle(fontFamily: FontFamily.geo, fontSize: 22, color: ColorsAmiin.ink),
                       decoration: const InputDecoration(
                         hintText: 'Titre',
                         border: UnderlineInputBorder(borderSide: BorderSide(color: ColorsAmiin.border)),
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: ColorsAmiin.terra)),
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: ColorsAmiin.turquoise)),
                       ),
                     ),
                     const SizedBox(height: Spacing.lg),
@@ -107,7 +107,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                     ),
                     const SizedBox(height: Spacing.lg),
                     Text('Tags', style: TextStyle(
-                      fontFamily: FontFamily.sansBold,
+                      fontFamily: FontFamily.geoBold,
                       fontSize: 10,
                       letterSpacing: 1.2,
                       color: ColorsAmiin.muted,
@@ -118,7 +118,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                       runSpacing: Spacing.sm,
                       children: _tags.map((t) => GestureDetector(
                         onTap: () => _removeTag(t),
-                        child: AmiinTag(label: '$t ×', variant: TagVariant.terra),
+                        child: AmiinTag(label: '$t ×', variant: TagVariant.turquoise),
                       )).toList(),
                     ),
                     const SizedBox(height: 8),
@@ -140,7 +140,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                           onTap: _addTag,
                           child: Container(
                             width: 40, height: 40,
-                            decoration: const BoxDecoration(color: ColorsAmiin.terra, borderRadius: BorderRadius.all(Radius.circular(RadiusAmiin.sm))),
+                            decoration: const BoxDecoration(color: ColorsAmiin.turquoise, borderRadius: BorderRadius.all(Radius.circular(RadiusAmiin.sm))),
                             child: const Center(child: Text('+', style: TextStyle(fontSize: 22, color: ColorsAmiin.white))),
                           ),
                         ),
@@ -218,13 +218,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (_note == null) return;
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.terra),
+        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.turquoise),
       );
       return;
     }
     if (_contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: ColorsAmiin.terra),
+        const SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: ColorsAmiin.turquoise),
       );
       return;
     }
@@ -267,7 +267,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.terra)));
+      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.turquoise)));
     }
     if (_note == null) return const SizedBox();
 
@@ -298,7 +298,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       ? [
                           TextField(
                             controller: _titleController,
-                            style: TextStyle(fontFamily: FontFamily.serif, fontSize: 22, color: ColorsAmiin.ink),
+                            style: TextStyle(fontFamily: FontFamily.geo, fontSize: 22, color: ColorsAmiin.ink),
                             decoration: const InputDecoration(border: InputBorder.none),
                           ),
                           const SizedBox(height: Spacing.md),
@@ -311,7 +311,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         ]
                       : [
                           Text(_note!.title, style: TextStyle(
-                            fontFamily: FontFamily.serif,
+                            fontFamily: FontFamily.geo,
                             fontSize: 24,
                             color: ColorsAmiin.ink,
                             height: 1.2,
@@ -340,23 +340,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             Container(
                               padding: const EdgeInsets.all(Spacing.md),
                               decoration: BoxDecoration(
-                                color: ColorsAmiin.terraLt,
+                                color: ColorsAmiin.turquoiseLt,
                                 borderRadius: BorderRadius.circular(RadiusAmiin.md),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Contexte Amiin', style: TextStyle(
-                                    fontFamily: FontFamily.sansBold,
+                                    fontFamily: FontFamily.geoBold,
                                     fontSize: 10,
                                     letterSpacing: 1.2,
-                                    color: ColorsAmiin.terraDk,
+                                    color: ColorsAmiin.turquoiseDk,
                                   )),
                                   const SizedBox(height: 6),
                                   Text(_note!.agentContext!, style: TextStyle(
                                     fontFamily: FontFamily.sans,
                                     fontSize: 13,
-                                    color: ColorsAmiin.terraDk,
+                                    color: ColorsAmiin.turquoiseDk,
                                     height: 1.4,
                                   )),
                                 ],
@@ -391,3 +391,4 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     </svg>
   ''';
 }
+

@@ -150,7 +150,7 @@ class _NotesScreenState extends State<NotesScreen> {
                             child: AmiinTag(
                               label: tag,
                               variant: _activeTag == tag
-                                  ? TagVariant.terra
+                                  ? TagVariant.turquoise
                                   : TagVariant.default_,
                             ),
                           ))
@@ -167,7 +167,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               'Appuyez sur + pour créer votre première note.')
                       : RefreshIndicator(
                           onRefresh: _loadData,
-                          color: ColorsAmiin.terra,
+                          color: ColorsAmiin.turquoise,
                           child: ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(Spacing.lg),
@@ -237,7 +237,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                     TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                   fontFamily:
-                                                      FontFamily.sansBold,
+                                                      FontFamily.geoBold,
                                                   fontSize: 15,
                                                   color: ColorsAmiin.ink,
                                                 ),
@@ -260,7 +260,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                         horizontal: 6,
                                                         vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: ColorsAmiin.terraLt,
+                                                  color: ColorsAmiin.turquoiseLt,
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           RadiusAmiin.sm),
@@ -269,10 +269,10 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   'Amiin',
                                                   style: TextStyle(
                                                     fontFamily:
-                                                        FontFamily.sansBold,
+                                                        FontFamily.geoBold,
                                                     fontSize: 10,
                                                     color:
-                                                        ColorsAmiin.terraDk,
+                                                        ColorsAmiin.turquoiseDk,
                                                   ),
                                                 ),
                                               ),
@@ -341,7 +341,7 @@ class _NotesScreenState extends State<NotesScreen> {
               heroTag: 'notesScrollTop',
               onPressed: _scrollToTop,
               backgroundColor: ColorsAmiin.white,
-              foregroundColor: ColorsAmiin.terra,
+              foregroundColor: ColorsAmiin.turquoise,
               elevation: 2,
               child: const Icon(Icons.keyboard_arrow_up),
             ),
@@ -351,7 +351,7 @@ class _NotesScreenState extends State<NotesScreen> {
             heroTag: 'notesCreate',
             onPressed: () =>
                 context.push('/notes/create').then((_) => _loadData()),
-            backgroundColor: ColorsAmiin.terra,
+            backgroundColor: ColorsAmiin.turquoise,
             child: const Icon(Icons.add, color: ColorsAmiin.white),
           ),
         ],
@@ -365,3 +365,5 @@ class _NotesScreenState extends State<NotesScreen> {
     </svg>
   ''';
 }
+
+

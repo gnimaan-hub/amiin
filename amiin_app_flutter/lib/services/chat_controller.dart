@@ -28,6 +28,7 @@ import 'demarches_service.dart';
 import 'location_service.dart';
 import 'memory_service.dart';
 import 'notes_service.dart';
+import 'settings_service.dart';
 
 /// Signal global : l'accueil demande au chat de démarrer l'écoute vocale.
 /// Incrémenté avant la navigation vers /chat ; le ChatScreen y réagit.
@@ -245,6 +246,7 @@ class ChatController extends ChangeNotifier {
           toolResults: toolResults,
           lat: _lat,
           lon: _lon,
+          userPreferences: settingsService.userPreferencesPayload,
         )) {
           if (_cancelled) break;
 
@@ -812,6 +814,12 @@ class ChatController extends ChangeNotifier {
         'Pour obtenir le détail complet d\'une démarche (étapes, pièces, organisme, coût), '
         'utilise l\'outil get_demarche_detail avec son ID (ex: "egouv_102").',
       );
+    }
+
+    // Profil utilisateur (injecté depuis les paramètres)
+    final profileFragment = settingsService.profileSystemPromptFragment;
+    if (profileFragment.isNotEmpty) {
+      buffer.writeln('\n$profileFragment');
     }
 
     // Mémoire : actions récentes de l'utilisateur

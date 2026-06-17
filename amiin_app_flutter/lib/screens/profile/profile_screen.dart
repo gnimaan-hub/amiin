@@ -73,11 +73,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Avatar
                     CircleAvatar(
                       radius: 36,
-                      backgroundColor: ColorsAmiin.terra,
-                      child: Text('MA', style: TextStyle(fontSize: 26, fontFamily: FontFamily.serifBold, color: ColorsAmiin.white)),
+                      backgroundColor: ColorsAmiin.turquoise,
+                      child: Text('MA', style: TextStyle(fontSize: 26, fontFamily: FontFamily.geoBold, color: ColorsAmiin.white)),
                     ),
                     const SizedBox(height: Spacing.sm),
-                    Text('Mohamed A.', style: TextStyle(fontFamily: FontFamily.serif, fontSize: 20, color: ColorsAmiin.ink)),
+                    Text('Mohamed A.', style: TextStyle(fontFamily: FontFamily.geo, fontSize: 20, color: ColorsAmiin.ink)),
                     const SizedBox(height: 4),
                     Text('m.ahmed@example.dj', style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.muted)),
                     const SizedBox(height: Spacing.xl),
@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: _settingRow('🚪', 'Se déconnecter', destructive: true, onTap: _onLogout),
                     ),
                     const SizedBox(height: Spacing.xxxl),
-                    Text('Amiin', style: TextStyle(fontFamily: FontFamily.serif, fontSize: 22, color: ColorsAmiin.terra, letterSpacing: 2)),
+                    Text('Amiin', style: TextStyle(fontFamily: FontFamily.geo, fontSize: 22, color: ColorsAmiin.turquoise, letterSpacing: 2)),
                     const SizedBox(height: 4),
                     Text('App Assistance Djibouti · v1.0', style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted)),
                     const SizedBox(height: 4),
@@ -146,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 4, top: 8),
         child: Text(title, style: TextStyle(
-          fontFamily: FontFamily.sansBold,
+          fontFamily: FontFamily.geoBold,
           fontSize: 10,
           letterSpacing: 1.2,
           color: ColorsAmiin.muted,
@@ -180,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Switch(
                 value: toggleValue,
                 onChanged: onToggle,
-                activeColor: ColorsAmiin.terra,
+                activeColor: ColorsAmiin.turquoise,
               ),
             if (!toggle && onTap != null)
               const Icon(Icons.chevron_right, color: ColorsAmiin.muted, size: 18),

@@ -3,7 +3,7 @@ import '../theme/colors.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
-enum ButtonVariant { primary, secondary, ghost, danger }
+enum ButtonVariant { primary, secondary, ghost, danger, info }
 enum ButtonSize { sm, md, lg }
 
 class AmiinButton extends StatelessWidget {
@@ -14,6 +14,7 @@ class AmiinButton extends StatelessWidget {
   final bool loading;
   final bool disabled;
   final bool fullWidth;
+  final Widget? icon;
 
   const AmiinButton({
     super.key,
@@ -24,6 +25,7 @@ class AmiinButton extends StatelessWidget {
     this.loading = false,
     this.disabled = false,
     this.fullWidth = false,
+    this.icon,
   });
 
   @override
@@ -36,23 +38,33 @@ class AmiinButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: config.bg,
         foregroundColor: config.text,
-        disabledBackgroundColor: config.bg.withValues(alpha: 0.45),
-        disabledForegroundColor: config.text.withValues(alpha: 0.45),
+        disabledBackgroundColor: config.bg.withValues(alpha: 0.4),
+        disabledForegroundColor: config.text.withValues(alpha: 0.4),
         side: BorderSide(color: config.border),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusAmiin.md)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: sizeConfig.px),
         minimumSize: fullWidth ? Size(double.infinity, sizeConfig.height) : Size(0, sizeConfig.height),
       ),
       child: loading
-          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-          : Text(
-              label,
-              style: TextStyle(
-                fontFamily: FontFamily.sansBold,
-                fontSize: sizeConfig.font,
-                letterSpacing: 0.2,
-              ),
+          ? SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: config.text),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null) ...[icon!, const SizedBox(width: 6)],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: FontFamily.geoBold,
+                    fontSize: sizeConfig.font,
+                    letterSpacing: 0.1,
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -60,24 +72,31 @@ class AmiinButton extends StatelessWidget {
   _ButtonVariantConfig _getVariantConfig(ButtonVariant v) {
     switch (v) {
       case ButtonVariant.primary:
-        return _ButtonVariantConfig(bg: ColorsAmiin.terra, text: ColorsAmiin.white, border: ColorsAmiin.terra);
+        return _ButtonVariantConfig(
+            bg: ColorsAmiin.turquoise, text: ColorsAmiin.white, border: ColorsAmiin.turquoise);
       case ButtonVariant.secondary:
-        return _ButtonVariantConfig(bg: ColorsAmiin.terraLt, text: ColorsAmiin.terraDk, border: ColorsAmiin.terraLt);
+        return _ButtonVariantConfig(
+            bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, border: ColorsAmiin.turquoiseLt);
       case ButtonVariant.ghost:
-        return _ButtonVariantConfig(bg: Colors.transparent, text: ColorsAmiin.terra, border: ColorsAmiin.border);
+        return _ButtonVariantConfig(
+            bg: Colors.transparent, text: ColorsAmiin.turquoise, border: ColorsAmiin.border);
+      case ButtonVariant.info:
+        return _ButtonVariantConfig(
+            bg: ColorsAmiin.ocre, text: ColorsAmiin.white, border: ColorsAmiin.ocre);
       case ButtonVariant.danger:
-        return _ButtonVariantConfig(bg: const Color(0xFFC0392B), text: ColorsAmiin.white, border: const Color(0xFFC0392B));
+        return _ButtonVariantConfig(
+            bg: ColorsAmiin.corail, text: ColorsAmiin.white, border: ColorsAmiin.corail);
     }
   }
 
   _ButtonSizeConfig _getSizeConfig(ButtonSize s) {
     switch (s) {
       case ButtonSize.sm:
-        return _ButtonSizeConfig(height: 36, px: Spacing.md, font: 13.0);
+        return _ButtonSizeConfig(height: 34, px: Spacing.md, font: 13.0);
       case ButtonSize.md:
-        return _ButtonSizeConfig(height: 48, px: Spacing.xl, font: 15.0);
+        return _ButtonSizeConfig(height: 46, px: Spacing.xl, font: 15.0);
       case ButtonSize.lg:
-        return _ButtonSizeConfig(height: 56, px: Spacing.xxl, font: 16.0);
+        return _ButtonSizeConfig(height: 54, px: Spacing.xxl, font: 16.0);
     }
   }
 }
