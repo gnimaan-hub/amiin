@@ -27,5 +27,6 @@ python-dateutil==2.9.0.post0
 # ── BASE DE DONNÉES (nouveau) ─────────────────────────────────────
 psycopg2-binary==2.9.10        # driver PostgreSQL
 SQLAlchemy==2.0.41             # ORM
-passlib[bcrypt]==1.7.4         # hash des mots de passe
+passlib==1.7.4                  # hash des mots de passe
+bcrypt==3.2.2                  # pin <4.0 — passlib 1.7.4 incompatible avec bcrypt 4.x
 python-jose[cryptography]==3.3.0  # JWT tokens
