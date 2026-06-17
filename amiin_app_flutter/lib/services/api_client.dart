@@ -11,6 +11,7 @@
 // Passer --dart-define=AMIIN_API_URL=http://... pour développer en local.
 
 import 'package:dio/dio.dart';
+import 'auth_service.dart';
 
 class ApiClient {
   static const String baseUrl = String.fromEnvironment(
@@ -40,20 +41,31 @@ class ApiClient {
   Dio get dio => _dio;
 
   static void init() {
-    // Request interceptor: inject auth token (TODO)
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // TODO: récupérer token JWT stocké localement
-        // final token = await storage.read(key: 'auth_token');
-        // if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        final token = await authService.getAccessToken();
+        if (token != null) options.headers['Authorization'] = 'Bearer $token';
         return handler.next(options);
       },
-      onError: (DioException error, handler) {
-        // Normaliser les erreurs — `data` peut être une Map JSON, une String
-        // (page d'erreur HTML d'un proxy) ou null : ne jamais indexer à l'aveugle.
+      onError: (DioException error, handler) async {
+        // Tentative de refresh sur 401 (token expiré)
+        if (error.response?.statusCode == 401) {
+          final newToken = await authService.refreshAccessToken();
+          if (newToken != null) {
+            try {
+              final opts = error.requestOptions;
+              opts.headers['Authorization'] = 'Bearer $newToken';
+              final resp = await _dio.fetch(opts);
+              return handler.resolve(resp);
+            } catch (_) {}
+          }
+        }
+        // Normaliser les erreurs — data peut être Map, String ou null
         String message;
         final data = error.response?.data;
-        if (data is Map && data['message'] is String) {
+        if (data is Map && data['detail'] is String) {
+          message = data['detail'] as String;
+        } else if (data is Map && data['message'] is String) {
           message = data['message'] as String;
         } else if (error.response != null) {
           message = 'Erreur serveur (${error.response?.statusCode})';
@@ -62,7 +74,7 @@ class ApiClient {
         }
         return handler.reject(DioException(
           requestOptions: error.requestOptions,
-          type: error.type, // préserver le type (cancel, timeout…)
+          type: error.type,
           error: message,
         ));
       },
