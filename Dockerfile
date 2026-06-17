@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code source
-COPY amiin_api.py .
+COPY amiin_api.py auth.py ./
 
 # Render injecte $PORT — uvicorn le lit via la variable d'environnement
 CMD ["sh", "-c", "uvicorn amiin_api:app --host 0.0.0.0 --port ${PORT:-8000}"]
