@@ -902,7 +902,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
+app.include_router(auth_router, prefix="/v1")
 
 # ─── Health ───────────────────────────────────────────────────────────────────
 
