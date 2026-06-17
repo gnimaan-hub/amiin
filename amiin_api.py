@@ -23,6 +23,8 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from auth import router as auth_router
+
 import requests as _requests
 from dotenv import load_dotenv
 load_dotenv()   # charge .env en local ; no-op sur Render (env vars injectées)
@@ -899,6 +901,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
 
 # ─── Health ───────────────────────────────────────────────────────────────────
 

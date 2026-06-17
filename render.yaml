@@ -18,6 +18,10 @@ services:
         sync: false
       - key: OWM_API_KEY
         sync: false
+      - key: DATABASE_URL          # ← NOUVEAU
+        sync: false
+      - key: JWT_SECRET_KEY        # ← NOUVEAU (chaîne aléatoire longue)
+        sync: false
 
     # Health check — Render surveille cet endpoint pour savoir si le service est vivant
     healthCheckPath: /v1/chat/health

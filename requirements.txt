@@ -23,3 +23,9 @@ qdrant-client==1.9.1
 requests==2.33.1
 python-dotenv==1.2.2
 python-dateutil==2.9.0.post0
+
+# ── BASE DE DONNÉES (nouveau) ─────────────────────────────────────
+psycopg2-binary==2.9.10        # driver PostgreSQL
+SQLAlchemy==2.0.41             # ORM
+passlib[bcrypt]==1.7.4         # hash des mots de passe
+python-jose[cryptography]==3.3.0  # JWT tokens
