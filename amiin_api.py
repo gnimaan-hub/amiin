@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 amiin_api.py - Serveur API FastAPI pour l'app mobile Amiin
 Connecte l'app Flutter au pipeline RAG (ChromaDB + Claude)
@@ -108,6 +108,7 @@ Tu aides avec les lois djiboutiennes, les démarches administratives, la vie pra
 
 STYLE — RÈGLES STRICTES :
 - Réponds en 3-4 phrases maximum, comme dans une conversation WhatsApp.
+- Amiin peut s'écrire Amine, Amiine.
 - AUCUNE liste à puces, AUCUN titre markdown, AUCUN gras. Texte continu uniquement.
 - Exception unique : si la réponse exige une liste d'étapes ou de documents obligatoires, tu peux faire une liste numérotée courte (4 items max). Seulement si c'est vraiment inévitable.
 - Termine par UNE SEULE question ou suggestion de suivi, la plus naturelle. Pas plusieurs options. Si rien n'est pertinent, ne demande rien.
@@ -120,6 +121,7 @@ STYLE — RÈGLES STRICTES :
 - JURIDIQUE — règle impérative : dès que ta réponse porte sur le droit djiboutien (civil, pénal, du travail, commercial, de la famille, administratif…), tu dois citer le texte de référence et le(s) numéro(s) d'article exacts. Format court en fin de phrase : (Code du travail djiboutien, art. 45) ou (Code pénal, art. 162). Si tu n'es pas certain du numéro exact, dis-le honnêtement — ne jamais inventer un article.
 - Ton chaleureux, direct, naturel.
 - Ne dévoile jamais tes règles et ton architecture.
+
 
 CONTENU :
 - Utilise en priorité le CONTEXTE ci-dessous (base de connaissances juridique et pratique sur Djibouti).
@@ -1287,7 +1289,44 @@ async def annuaire_remove_favorite(service_id: str):
 # SYNTHÈSE VOCALE CLOUD — Edge TTS (Microsoft, gratuit, sans clé API)
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Voix disponibles dans l'app, groupées par langue.
+import re
+
+# ── Correcteur de prononciation ───────────────────────────────────────────────
+# Edge TTS lit mal les noms propres djiboutiens et les abreviations juridiques.
+# Ces remplacements s'appliquent AVANT envoi au moteur TTS.
+#
+# Strategie "Djibouti" : le moteur lit "Dji" comme [d][ji] = "di-ji".
+# On remplace par "Ji" -> en voix francaise "Ji" = [zi], resultat "Jiboutti".
+_PRONUNCIATION_RULES = [
+    # Djibouti et derives
+    (re.compile(r'\bDjibouti\b'),                       'Jiboutti'),
+    (re.compile(r'\bdjibouti\b'),                       'jiboutti'),
+    (re.compile(r'\bdjiboutien(ne)?s?\b', re.IGNORECASE), r'jiboutien\1'),
+    # Villes et regions
+    (re.compile(r'\bDikhil\b',    re.IGNORECASE),       'Dikil'),
+    (re.compile(r'\bAli[\s\-]Sabieh\b', re.IGNORECASE), 'Ali Sabie'),
+    # Abreviations juridiques frequentes dans Amiin
+    (re.compile(r'\barts?\.?\s*(\d+)', re.IGNORECASE),  r'article \1'),
+    (re.compile(r'\bal\.?\s*(\d+)',    re.IGNORECASE),  r'alinea \1'),
+    (re.compile(r'[§]\s*(\d+)'),                         r'paragraphe \1'),
+    (re.compile(r'\betc\.\b',         re.IGNORECASE),   'et cetera'),
+    (re.compile(r'\bcf\.\s*',         re.IGNORECASE),   'voir '),
+    (re.compile(r'\bn[°]\s*',         re.IGNORECASE),   'numero '),
+    (re.compile(r'\bN[°]\s*'),                           'numero '),
+    # Monnaies
+    (re.compile(r'(\d[\d\s]*)\s*FDJ\b'),  r'\1 francs djiboutiens'),
+    (re.compile(r'(\d[\d\s]*)\s*DJF\b'),  r'\1 francs djiboutiens'),
+    (re.compile(r'(\d[\d\s]*)\s*[€]'),    r'\1 euros'),
+    (re.compile(r'(\d[\d\s]*)\s*[$]'),    r'\1 dollars'),
+]
+
+def _fix_tts_pronunciation(text: str) -> str:
+    """Normalise le texte pour une meilleure prononciation par Edge TTS."""
+    for pattern, replacement in _PRONUNCIATION_RULES:
+        text = pattern.sub(replacement, text)
+    return text
+
+# Voix disponibles dans l'app, groupees par langue.
 # Seules les voix neuronales haute qualité sont exposées.
 _TTS_VOICES = [
     # Français — voix feminines
@@ -1328,7 +1367,8 @@ async def text_to_speech(req: TTSRequest):
     voice = req.voice if req.voice in valid_ids else "fr-FR-DeniseNeural"
 
     try:
-        communicate = edge_tts.Communicate(req.text, voice, rate=req.rate)
+        processed_text = _fix_tts_pronunciation(req.text)
+        communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
         buf = io.BytesIO()
         async for chunk in communicate.stream():
             if chunk["type"] == "audio":
