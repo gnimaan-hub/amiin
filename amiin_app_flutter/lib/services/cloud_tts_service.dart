@@ -1,7 +1,8 @@
 // ─── CloudTtsService ──────────────────────────────────────────────────────────
 // Synthèse vocale via Edge TTS (Microsoft, gratuit).
-// Le backend streame le MP3 dès les premiers frames — just_audio joue en temps
-// réel sans attendre le téléchargement complet ni écrire de fichier temporaire.
+// ResponseType.bytes : compatible avec l'intercepteur Dio (refresh 401).
+// Lecture depuis la mémoire sans écriture disque (_BytesAudioSource).
+// CancelToken : stop() interrompt aussi le téléchargement en cours.
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -10,28 +11,22 @@ import 'package:just_audio/just_audio.dart';
 import 'api_client.dart' show api;
 import 'settings_service.dart';
 
-// ── Source audio streaming ────────────────────────────────────────────────────
-// just_audio appelle request() puis lit les bytes au fur et à mesure.
-// Chaque appel à request() déclenche une nouvelle requête POST /tts,
-// ce qui permet à just_audio de réessayer automatiquement si besoin.
-class _TtsStreamSource extends StreamAudioSource {
-  final Map<String, dynamic> _body;
+// ── Source audio en mémoire ───────────────────────────────────────────────────
+class _BytesAudioSource extends StreamAudioSource {
+  final Uint8List _bytes;
 
-  _TtsStreamSource(this._body);
+  _BytesAudioSource(this._bytes);
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
-    final response = await api.post<ResponseBody>(
-      '/tts',
-      data: _body,
-      options: Options(responseType: ResponseType.stream),
-    );
+    final s = start ?? 0;
+    final e = end ?? _bytes.length;
     return StreamAudioResponse(
-      sourceLength: null,
-      contentLength: null,
-      offset: 0,
+      sourceLength: _bytes.length,
+      contentLength: e - s,
+      offset: s,
       contentType: 'audio/mpeg',
-      stream: response.data!.stream,
+      stream: Stream.value(_bytes.sublist(s, e)),
     );
   }
 }
@@ -42,51 +37,60 @@ class CloudTtsService {
   final _player = AudioPlayer();
   bool _isPlaying = false;
   String? _playingMsgId;
+  CancelToken? _cancelToken;
 
   bool get isPlaying => _isPlaying;
   String? get playingMsgId => _playingMsgId;
 
-  /// Génère et joue [text] en streaming.
-  /// La lecture démarre dès les premiers frames audio reçus du serveur.
   Future<void> speak(String text, {String? msgId}) async {
     if (_isPlaying) await stop();
     if (text.trim().isEmpty) return;
 
     _isPlaying = true;
     _playingMsgId = msgId;
+    _cancelToken = CancelToken();
 
     try {
       final speed = settingsService.ttsSpeed;
       final pct = ((speed - 1.0) * 100).round();
       final rate = pct >= 0 ? '+$pct%' : '$pct%';
 
-      final source = _TtsStreamSource({
-        'text': text,
-        'voice': settingsService.ttsVoice,
-        'rate': rate,
-      });
+      final response = await api.post<List<int>>(
+        '/tts',
+        data: {'text': text, 'voice': settingsService.ttsVoice, 'rate': rate},
+        options: Options(responseType: ResponseType.bytes),
+        cancelToken: _cancelToken,
+      );
 
-      await _player.setAudioSource(source);
-      await _player.play(); // démarre dès les premiers frames
+      final bytes = Uint8List.fromList(response.data ?? []);
+      if (bytes.isEmpty) throw Exception('[CloudTts] réponse vide');
+
+      await _player.setAudioSource(_BytesAudioSource(bytes));
+      await _player.play();
+    } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) return;
+      debugPrint('[CloudTts] erreur Dio : $e');
+      rethrow;
     } catch (e) {
       debugPrint('[CloudTts] erreur : $e');
       rethrow;
     } finally {
       _isPlaying = false;
       _playingMsgId = null;
+      _cancelToken = null;
       try { await _player.stop(); } catch (_) {}
     }
   }
 
   Future<void> stop() async {
+    _cancelToken?.cancel('stopped');
+    _cancelToken = null;
     try { await _player.stop(); } catch (_) {}
     _isPlaying = false;
     _playingMsgId = null;
   }
 
-  void dispose() {
-    _player.dispose();
-  }
+  void dispose() => _player.dispose();
 }
 
 final cloudTtsService = CloudTtsService();
