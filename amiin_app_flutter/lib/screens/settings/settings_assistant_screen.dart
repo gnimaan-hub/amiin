@@ -13,15 +13,14 @@ import 'settings_widgets.dart';
 
 // Miroir de la liste backend — permet l'affichage hors-ligne et l'aperçu.
 const _kCloudVoices = [
-  {'id': 'fr-FR-DeniseNeural',  'name': 'Denise',  'lang': 'Français', 'gender': 'F'},
-  {'id': 'fr-FR-HenriNeural',   'name': 'Henri',   'lang': 'Français', 'gender': 'M'},
-  {'id': 'fr-FR-EloiseNeural',  'name': 'Éloïse',  'lang': 'Français', 'gender': 'F'},
-  {'id': 'ar-SA-ZariyahNeural', 'name': 'Zariyah', 'lang': 'Arabe',    'gender': 'F'},
-  {'id': 'ar-SA-HamedNeural',   'name': 'Hamed',   'lang': 'Arabe',    'gender': 'M'},
-  {'id': 'ar-DZ-AminaNeural',   'name': 'Amina',   'lang': 'Arabe',    'gender': 'F'},
-  {'id': 'en-US-JennyNeural',   'name': 'Jenny',   'lang': 'Anglais',  'gender': 'F'},
-  {'id': 'en-US-GuyNeural',     'name': 'Guy',     'lang': 'Anglais',  'gender': 'M'},
-  {'id': 'en-GB-SoniaNeural',   'name': 'Sonia',   'lang': 'Anglais',  'gender': 'F'},
+  {'id': 'fr-FR-DeniseNeural',           'name': 'Denise',  'lang': 'Français', 'gender': 'F', 'note': ''},
+  {'id': 'fr-FR-HenriNeural',            'name': 'Henri',   'lang': 'Français', 'gender': 'M', 'note': ''},
+  {'id': 'fr-FR-RemyMultilingualNeural', 'name': 'Rémy',    'lang': 'Français', 'gender': 'M', 'note': 'grave'},
+  {'id': 'fr-BE-GerardNeural',           'name': 'Gérard',  'lang': 'Français', 'gender': 'M', 'note': 'grave'},
+  {'id': 'fr-CA-JeanNeural',             'name': 'Jean',    'lang': 'Français', 'gender': 'M', 'note': 'grave'},
+  {'id': 'en-US-JennyNeural',            'name': 'Jenny',   'lang': 'Anglais',  'gender': 'F', 'note': ''},
+  {'id': 'en-US-GuyNeural',              'name': 'Guy',     'lang': 'Anglais',  'gender': 'M', 'note': ''},
+  {'id': 'en-GB-SoniaNeural',            'name': 'Sonia',   'lang': 'Anglais',  'gender': 'F', 'note': ''},
 ];
 
 class SettingsAssistantScreen extends StatelessWidget {
@@ -210,6 +209,8 @@ class SettingsAssistantScreen extends StatelessWidget {
                             current: settings.defaultVoiceMode,
                             onSelect: (v) => settingsService.defaultVoiceMode = v,
                           ),
+                          const SizedBox(height: Spacing.md),
+                          _VoiceModeDescription(mode: settings.defaultVoiceMode),
                         ],
                       ),
                     ),
@@ -455,6 +456,58 @@ class _TopicsPicker extends StatelessWidget {
   }
 }
 
+// ─── Description du mode vocal ───────────────────────────────────────────────
+
+class _VoiceModeDescription extends StatelessWidget {
+  const _VoiceModeDescription({required this.mode});
+  final String mode;
+
+  static const _descriptions = {
+    'none': 'Amiin ne parle jamais. Tu lis les réponses à l\'écran, aucun son ne se déclenche.',
+    'tts':  'Chaque réponse d\'Amiin est lue à voix haute automatiquement, que tu aies tapé ou parlé.',
+    'voice': 'Amiin répond à voix haute uniquement quand tu lui parles au micro. Si tu tapes, il reste silencieux.',
+  };
+
+  static const _icons = {
+    'none':  Icons.volume_off_outlined,
+    'tts':   Icons.volume_up_outlined,
+    'voice': Icons.mic_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final desc = _descriptions[mode] ?? '';
+    final icon = _icons[mode] ?? Icons.volume_off_outlined;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: Container(
+        key: ValueKey(mode),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: primary.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 16, color: primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(desc, style: TextStyle(
+                fontFamily: FontFamily.sans,
+                fontSize: 12,
+                color: ColorsAmiin.ink,
+                height: 1.5,
+              )),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ─── Tuile de voix cloud ──────────────────────────────────────────────────────
 // Affiche une voix sélectionnable + bouton d'aperçu.
 class _VoiceTile extends StatefulWidget {
@@ -513,14 +566,34 @@ class _VoiceTileState extends State<_VoiceTile> {
             ),
             const SizedBox(width: Spacing.sm),
             Expanded(
-              child: Text(
-                '${widget.voice['name']}  $gender',
-                style: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 14,
-                  color: widget.selected ? ColorsAmiin.ink : ColorsAmiin.mid,
-                  fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    '${widget.voice['name']}  $gender',
+                    style: TextStyle(
+                      fontFamily: FontFamily.sans,
+                      fontSize: 14,
+                      color: widget.selected ? ColorsAmiin.ink : ColorsAmiin.mid,
+                      fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                  if (widget.voice['note'] == 'grave') ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: widget.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text('grave', style: TextStyle(
+                        fontFamily: FontFamily.sans,
+                        fontSize: 10,
+                        color: widget.primary,
+                        fontWeight: FontWeight.w600,
+                      )),
+                    ),
+                  ],
+                ],
               ),
             ),
             IconButton(

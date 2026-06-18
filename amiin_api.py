@@ -1289,18 +1289,17 @@ async def annuaire_remove_favorite(service_id: str):
 # Voix disponibles dans l'app, groupées par langue.
 # Seules les voix neuronales haute qualité sont exposées.
 _TTS_VOICES = [
-    # Français
-    {"id": "fr-FR-DeniseNeural",   "name": "Denise",   "lang": "fr-FR", "gender": "F"},
-    {"id": "fr-FR-HenriNeural",    "name": "Henri",    "lang": "fr-FR", "gender": "M"},
-    {"id": "fr-FR-EloiseNeural",   "name": "Éloïse",   "lang": "fr-FR", "gender": "F"},
-    # Arabe
-    {"id": "ar-SA-ZariyahNeural",  "name": "Zariyah",  "lang": "ar-SA", "gender": "F"},
-    {"id": "ar-SA-HamedNeural",    "name": "Hamed",    "lang": "ar-SA", "gender": "M"},
-    {"id": "ar-DZ-AminaNeural",    "name": "Amina",    "lang": "ar-DZ", "gender": "F"},
+    # Français — voix feminines
+    {"id": "fr-FR-DeniseNeural",            "name": "Denise",   "lang": "fr-FR", "gender": "F"},
+    # Français — voix masculines (du plus standard au plus grave)
+    {"id": "fr-FR-HenriNeural",             "name": "Henri",    "lang": "fr-FR", "gender": "M"},
+    {"id": "fr-FR-RemyMultilingualNeural",  "name": "Rémy",     "lang": "fr-FR", "gender": "M"},
+    {"id": "fr-BE-GerardNeural",            "name": "Gérard",   "lang": "fr-BE", "gender": "M"},
+    {"id": "fr-CA-JeanNeural",              "name": "Jean",     "lang": "fr-CA", "gender": "M"},
     # Anglais
-    {"id": "en-US-JennyNeural",    "name": "Jenny",    "lang": "en-US", "gender": "F"},
-    {"id": "en-US-GuyNeural",      "name": "Guy",      "lang": "en-US", "gender": "M"},
-    {"id": "en-GB-SoniaNeural",    "name": "Sonia",    "lang": "en-GB", "gender": "F"},
+    {"id": "en-US-JennyNeural",             "name": "Jenny",    "lang": "en-US", "gender": "F"},
+    {"id": "en-US-GuyNeural",               "name": "Guy",      "lang": "en-US", "gender": "M"},
+    {"id": "en-GB-SoniaNeural",             "name": "Sonia",    "lang": "en-GB", "gender": "F"},
 ]
 
 class TTSRequest(BaseModel):
