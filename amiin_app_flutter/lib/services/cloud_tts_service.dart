@@ -1,17 +1,42 @@
 // ─── CloudTtsService ──────────────────────────────────────────────────────────
 // Synthèse vocale via Edge TTS (Microsoft, gratuit).
-// Appelle POST /v1/tts sur le backend → reçoit des bytes MP3 → joue via just_audio.
-// Garde le même contrat d'état que flutter_tts pour une intégration transparente.
-
-import 'dart:io';
+// Le backend streame le MP3 dès les premiers frames — just_audio joue en temps
+// réel sans attendre le téléchargement complet ni écrire de fichier temporaire.
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'api_client.dart' show api;
 import 'settings_service.dart';
+
+// ── Source audio streaming ────────────────────────────────────────────────────
+// just_audio appelle request() puis lit les bytes au fur et à mesure.
+// Chaque appel à request() déclenche une nouvelle requête POST /tts,
+// ce qui permet à just_audio de réessayer automatiquement si besoin.
+class _TtsStreamSource extends StreamAudioSource {
+  final Map<String, dynamic> _body;
+
+  _TtsStreamSource(this._body);
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    final response = await api.post<ResponseBody>(
+      '/tts',
+      data: _body,
+      options: Options(responseType: ResponseType.stream),
+    );
+    return StreamAudioResponse(
+      sourceLength: null,
+      contentLength: null,
+      offset: 0,
+      contentType: 'audio/mpeg',
+      stream: response.data!.stream,
+    );
+  }
+}
+
+// ── Service ───────────────────────────────────────────────────────────────────
 
 class CloudTtsService {
   final _player = AudioPlayer();
@@ -21,8 +46,8 @@ class CloudTtsService {
   bool get isPlaying => _isPlaying;
   String? get playingMsgId => _playingMsgId;
 
-  /// Génère et joue [text] avec la voix et la vitesse des réglages courants.
-  /// Retourne quand la lecture est terminée (ou interrompue par [stop]).
+  /// Génère et joue [text] en streaming.
+  /// La lecture démarre dès les premiers frames audio reçus du serveur.
   Future<void> speak(String text, {String? msgId}) async {
     if (_isPlaying) await stop();
     if (text.trim().isEmpty) return;
@@ -31,47 +56,30 @@ class CloudTtsService {
     _playingMsgId = msgId;
 
     try {
-      // Convertit ttsSpeed (0.5–2.0) → format edge-tts ("+50%", "-25%", "+0%")
       final speed = settingsService.ttsSpeed;
       final pct = ((speed - 1.0) * 100).round();
       final rate = pct >= 0 ? '+$pct%' : '$pct%';
 
-      final response = await api.post<List<int>>(
-        '/tts',
-        data: {
-          'text': text,
-          'voice': settingsService.ttsVoice,
-          'rate': rate,
-        },
-        options: Options(responseType: ResponseType.bytes),
-      );
+      final source = _TtsStreamSource({
+        'text': text,
+        'voice': settingsService.ttsVoice,
+        'rate': rate,
+      });
 
-      final bytes = response.data;
-      if (bytes == null || bytes.isEmpty) return;
-
-      // Sauvegarde dans un fichier temporaire — just_audio lit depuis un chemin.
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/amiin_cloud_tts.mp3');
-      await file.writeAsBytes(bytes, flush: true);
-
-      await _player.setFilePath(file.path);
-      await _player.play(); // attend la fin de la lecture
+      await _player.setAudioSource(source);
+      await _player.play(); // démarre dès les premiers frames
     } catch (e) {
       debugPrint('[CloudTts] erreur : $e');
-      rethrow; // le caller peut décider de fallback vers flutter_tts
+      rethrow;
     } finally {
       _isPlaying = false;
       _playingMsgId = null;
-      // Remet le player à zéro pour la prochaine lecture
       try { await _player.stop(); } catch (_) {}
     }
   }
 
-  /// Interrompt la lecture en cours.
   Future<void> stop() async {
-    try {
-      await _player.stop();
-    } catch (_) {}
+    try { await _player.stop(); } catch (_) {}
     _isPlaying = false;
     _playingMsgId = null;
   }
@@ -81,5 +89,4 @@ class CloudTtsService {
   }
 }
 
-/// Singleton global — partagé entre ChatScreen et les Settings.
 final cloudTtsService = CloudTtsService();

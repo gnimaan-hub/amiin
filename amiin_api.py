@@ -1394,23 +1394,20 @@ async def text_to_speech(req: TTSRequest):
     valid_ids = {v["id"] for v in _TTS_VOICES}
     voice = req.voice if req.voice in valid_ids else "fr-FR-DeniseNeural"
 
-    try:
-        processed_text = _fix_tts_pronunciation(req.text)
-        communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
-        buf = io.BytesIO()
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                buf.write(chunk["data"])
-        buf.seek(0)
-        audio_bytes = buf.read()
-    except Exception as e:
-        import traceback
-        err_detail = f"{type(e).__name__}: {e}"
-        logging.error(f"[TTS] ERREUR edge-tts — {err_detail}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=502, detail=err_detail)
+    processed_text = _fix_tts_pronunciation(req.text)
 
-    return Response(
-        content=audio_bytes,
+    async def _stream_audio():
+        try:
+            communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    yield chunk["data"]
+        except Exception as e:
+            import traceback
+            logging.error(f"[TTS] ERREUR streaming — {type(e).__name__}: {e}\n{traceback.format_exc()}")
+
+    return StreamingResponse(
+        _stream_audio(),
         media_type="audio/mpeg",
         headers={"Content-Disposition": "inline; filename=speech.mp3"},
     )
