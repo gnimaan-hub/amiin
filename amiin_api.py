@@ -1321,7 +1321,13 @@ _PRONUNCIATION_RULES = [
     # ── Djibouti et derives ──────────────────────────────────────────────────
     (re.compile(r'\bDjibouti\b'),                        'Jiboutti'),
     (re.compile(r'\bdjibouti\b'),                        'jiboutti'),
-    (re.compile(r'\bdjiboutien(ne)?s?\b', re.IGNORECASE), r'jiboutien\1'),
+    (re.compile(r'\bdjiboutien(ne)?s?\b', re.IGNORECASE), r'jiboucien\1'),  # 'c' force le son [s]
+
+    # ── Amiin (nom de l'assistant) ───────────────────────────────────────────
+    # TTS lit "Amiin" comme "a-mien" (nasal). Le "e" final empeche la nasalisation
+    # de "-in" et donne [a.mi.n] — beaucoup plus proche de la vraie prononciation.
+    (re.compile(r'\bAmiin\b'),  'Amiine'),
+    (re.compile(r'\bamiin\b'),  'amiine'),
 
     # ── Villes et regions ────────────────────────────────────────────────────
     (re.compile(r'\bDikhil\b',    re.IGNORECASE),        'Dikil'),
