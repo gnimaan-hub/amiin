@@ -15,7 +15,6 @@ import '../screens/annuaire/service_detail_screen.dart';
 import '../screens/demarches/demarche_detail_screen.dart';
 import '../screens/demarches/user_demarche_tracking_screen.dart';
 import '../screens/notes/note_detail_screen.dart';
-import '../screens/profile/profile_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/settings_profile_screen.dart';
@@ -241,11 +240,6 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
-    ),
-    GoRoute(
-      path: '/profile',
-      name: 'profile',
-      builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(
       path: '/settings',
