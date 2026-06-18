@@ -13,6 +13,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../services/cloud_tts_service.dart';
 import '../../services/settings_service.dart';
@@ -282,7 +283,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     final reply = await chat.sendMessage(text);
 
-    if (reply != null && wasVoice && mounted) {
+    // 'none'  → jamais de lecture auto
+    // 'tts'   → lecture auto sur toute réponse (texte ou voix)
+    // 'voice' → lecture seulement si le message a été dicté
+    final mode = settingsService.defaultVoiceMode;
+    if (reply != null && mounted &&
+        (mode == 'tts' || (mode == 'voice' && wasVoice))) {
       final msgs = chat.messages;
       final msgId = msgs.isNotEmpty ? msgs.last.id : null;
       await _speak(reply, msgId: msgId);
@@ -379,7 +385,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             padding: const EdgeInsets.fromLTRB(Spacing.xl, 0, Spacing.md, 12),
             child: Row(
               children: [
-                const AmiinLogo(size: 30, variant: AmiinLogoVariant.turquoise),
+                GestureDetector(
+                  onTap: () => context.go('/home'),
+                  child: const AmiinLogo(size: 30, variant: AmiinLogoVariant.turquoise),
+                ),
                 const SizedBox(width: Spacing.md),
                 Expanded(
                   child: Column(

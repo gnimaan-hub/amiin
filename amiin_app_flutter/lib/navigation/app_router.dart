@@ -91,18 +91,29 @@ final GoRouter appRouter = GoRouter(
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return Scaffold(
-          body: ConnectivityBanner(
-            child: _AnimatedShell(
-              currentIndex: navigationShell.currentIndex,
-              child: navigationShell,
+        // Retour physique (bouton ou swipe) depuis n'importe quel onglet :
+        // - accueil → ferme l'app (canPop: true)
+        // - autre onglet (à sa racine) → revient à l'accueil
+        // Les sous-routes d'un onglet sont gérées par le navigator de la branche
+        // avant que ce PopScope ne soit consulté.
+        return PopScope(
+          canPop: navigationShell.currentIndex == 0,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) navigationShell.goBranch(0);
+          },
+          child: Scaffold(
+            body: ConnectivityBanner(
+              child: _AnimatedShell(
+                currentIndex: navigationShell.currentIndex,
+                child: navigationShell,
+              ),
             ),
-          ),
-          bottomNavigationBar: _AmiinNavBar(
-            currentIndex: navigationShell.currentIndex,
-            onTap: (index) => navigationShell.goBranch(
-              index,
-              initialLocation: index == navigationShell.currentIndex,
+            bottomNavigationBar: _AmiinNavBar(
+              currentIndex: navigationShell.currentIndex,
+              onTap: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
             ),
           ),
         );

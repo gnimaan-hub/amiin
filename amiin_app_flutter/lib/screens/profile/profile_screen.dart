@@ -1,7 +1,7 @@
 // ─── ProfileScreen ───────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../../services/auth_service.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -45,9 +45,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
-            onPressed: () {
-              // TODO: clear auth token
-              context.go('/home'); // redirection temporaire
+            onPressed: () async {
+              Navigator.pop(context);
+              await authService.logout();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Déconnexion'),

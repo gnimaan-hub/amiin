@@ -284,6 +284,11 @@ class SettingsAssistantScreen extends StatelessWidget {
                                       fontSize: 12,
                                       color: ColorsAmiin.muted,
                                     )),
+                                    Text('Ajoute 2–5 s de délai avant la lecture.', style: TextStyle(
+                                      fontFamily: FontFamily.sans,
+                                      fontSize: 12,
+                                      color: ColorsAmiin.ocre,
+                                    )),
                                   ],
                                 ),
                               ),
