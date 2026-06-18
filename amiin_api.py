@@ -1297,27 +1297,49 @@ import re
 #
 # Strategie "Djibouti" : le moteur lit "Dji" comme [d][ji] = "di-ji".
 # On remplace par "Ji" -> en voix francaise "Ji" = [zi], resultat "Jiboutti".
+# Emoji regex couvrant tous les blocs Unicode courants
+_EMOJI_RE = re.compile(
+    '['
+    '\U0001F300-\U0001FAFF'   # emojis principaux (emoticons, symboles, transport...)
+    '\U00002600-\U000027BF'   # symboles divers + dingbats
+    '\U0001F1E0-\U0001F1FF'   # drapeaux (regional indicators)
+    '︀-️'           # variation selectors (modificateurs emoji)
+    ']+',
+    re.UNICODE,
+)
+
 _PRONUNCIATION_RULES = [
-    # Djibouti et derives
-    (re.compile(r'\bDjibouti\b'),                       'Jiboutti'),
-    (re.compile(r'\bdjibouti\b'),                       'jiboutti'),
+    # ── Emojis — supprimer avant tout autre traitement ───────────────────────
+    (_EMOJI_RE, ''),
+
+    # ── Nombres avec separateurs de milliers (style francais : "1 000") ──────
+    # Le TTS lit "1 000" comme "un... zero zero zero" au lieu de "mille".
+    # On colle les chiffres : "1 000" -> "1000", "50 000" -> "50000".
+    (re.compile(r'\b(\d{1,3})(?:[  ](\d{3}))+\b'),
+     lambda m: m.group(0).replace(' ', '').replace(' ', '')),
+
+    # ── Djibouti et derives ──────────────────────────────────────────────────
+    (re.compile(r'\bDjibouti\b'),                        'Jiboutti'),
+    (re.compile(r'\bdjibouti\b'),                        'jiboutti'),
     (re.compile(r'\bdjiboutien(ne)?s?\b', re.IGNORECASE), r'jiboutien\1'),
-    # Villes et regions
-    (re.compile(r'\bDikhil\b',    re.IGNORECASE),       'Dikil'),
+
+    # ── Villes et regions ────────────────────────────────────────────────────
+    (re.compile(r'\bDikhil\b',    re.IGNORECASE),        'Dikil'),
     (re.compile(r'\bAli[\s\-]Sabieh\b', re.IGNORECASE), 'Ali Sabie'),
-    # Abreviations juridiques frequentes dans Amiin
-    (re.compile(r'\barts?\.?\s*(\d+)', re.IGNORECASE),  r'article \1'),
-    (re.compile(r'\bal\.?\s*(\d+)',    re.IGNORECASE),  r'alinea \1'),
-    (re.compile(r'[§]\s*(\d+)'),                         r'paragraphe \1'),
-    (re.compile(r'\betc\.\b',         re.IGNORECASE),   'et cetera'),
-    (re.compile(r'\bcf\.\s*',         re.IGNORECASE),   'voir '),
-    (re.compile(r'\bn[°]\s*',         re.IGNORECASE),   'numero '),
-    (re.compile(r'\bN[°]\s*'),                           'numero '),
-    # Monnaies
-    (re.compile(r'(\d[\d\s]*)\s*FDJ\b'),  r'\1 francs djiboutiens'),
-    (re.compile(r'(\d[\d\s]*)\s*DJF\b'),  r'\1 francs djiboutiens'),
-    (re.compile(r'(\d[\d\s]*)\s*[€]'),    r'\1 euros'),
-    (re.compile(r'(\d[\d\s]*)\s*[$]'),    r'\1 dollars'),
+
+    # ── Abreviations juridiques ──────────────────────────────────────────────
+    (re.compile(r'\barts?\.?\s*(\d+)', re.IGNORECASE),   r'article \1'),
+    (re.compile(r'\bal\.?\s*(\d+)',    re.IGNORECASE),   r'alinea \1'),
+    (re.compile(r'§\s*(\d+)'),                            r'paragraphe \1'),
+    (re.compile(r'\betc\.\b',          re.IGNORECASE),   'et cetera'),
+    (re.compile(r'\bcf\.\s*',          re.IGNORECASE),   'voir '),
+    (re.compile(r'n°\s*',              re.IGNORECASE),   'numero '),
+
+    # ── Monnaies ─────────────────────────────────────────────────────────────
+    (re.compile(r'(\d+)\s*FDJ\b'),   r'\1 francs djiboutiens'),
+    (re.compile(r'(\d+)\s*DJF\b'),   r'\1 francs djiboutiens'),
+    (re.compile(r'(\d+)\s*€'),        r'\1 euros'),
+    (re.compile(r'(\d+)\s*\$'),       r'\1 dollars'),
 ]
 
 def _fix_tts_pronunciation(text: str) -> str:
