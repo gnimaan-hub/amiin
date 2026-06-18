@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- just_audio (StreamAudioSource) crée un serveur HTTP local sur 127.0.0.1
+     pour servir l'audio à ExoPlayer. Android 9+ bloque HTTP cleartext même
+     en localhost sans cette exception explicite. -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
