@@ -1336,7 +1336,10 @@ async def text_to_speech(req: TTSRequest):
         buf.seek(0)
         audio_bytes = buf.read()
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Edge TTS error: {e}")
+        import traceback
+        err_detail = f"{type(e).__name__}: {e}"
+        logging.error(f"[TTS] ERREUR edge-tts — {err_detail}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=502, detail=err_detail)
 
     return Response(
         content=audio_bytes,
