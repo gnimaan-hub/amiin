@@ -6,6 +6,7 @@ v2.2 : streaming SSE, skip expand auto, cache LRU embedding, parallélisation.
 """
 
 import os
+import io
 import json
 import math
 import time
@@ -18,8 +19,10 @@ from logging.handlers import RotatingFileHandler
 from typing import Optional, List, Any, Dict
 from contextlib import asynccontextmanager
 
+import edge_tts
+
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -1278,6 +1281,68 @@ async def annuaire_add_favorite(service_id: str):
 async def annuaire_remove_favorite(service_id: str):
     _favorites.discard(service_id)
     return {"ok": True}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SYNTHÈSE VOCALE CLOUD — Edge TTS (Microsoft, gratuit, sans clé API)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Voix disponibles dans l'app, groupées par langue.
+# Seules les voix neuronales haute qualité sont exposées.
+_TTS_VOICES = [
+    # Français
+    {"id": "fr-FR-DeniseNeural",   "name": "Denise",   "lang": "fr-FR", "gender": "F"},
+    {"id": "fr-FR-HenriNeural",    "name": "Henri",    "lang": "fr-FR", "gender": "M"},
+    {"id": "fr-FR-EloiseNeural",   "name": "Éloïse",   "lang": "fr-FR", "gender": "F"},
+    # Arabe
+    {"id": "ar-SA-ZariyahNeural",  "name": "Zariyah",  "lang": "ar-SA", "gender": "F"},
+    {"id": "ar-SA-HamedNeural",    "name": "Hamed",    "lang": "ar-SA", "gender": "M"},
+    {"id": "ar-DZ-AminaNeural",    "name": "Amina",    "lang": "ar-DZ", "gender": "F"},
+    # Anglais
+    {"id": "en-US-JennyNeural",    "name": "Jenny",    "lang": "en-US", "gender": "F"},
+    {"id": "en-US-GuyNeural",      "name": "Guy",      "lang": "en-US", "gender": "M"},
+    {"id": "en-GB-SoniaNeural",    "name": "Sonia",    "lang": "en-GB", "gender": "F"},
+]
+
+class TTSRequest(BaseModel):
+    text: str
+    voice: str = "fr-FR-DeniseNeural"
+    # Format edge-tts : "+10%", "-5%", "+0%" — converti depuis ttsSpeed côté Flutter
+    rate: str = "+0%"
+
+@app.get("/v1/tts/voices")
+async def tts_voices():
+    """Retourne la liste curatée des voix Edge TTS disponibles."""
+    return {"voices": _TTS_VOICES}
+
+@app.post("/v1/tts")
+async def text_to_speech(req: TTSRequest):
+    """
+    Génère un fichier MP3 à partir du texte via Edge TTS (Microsoft, gratuit).
+    Retourne directement les bytes audio avec Content-Type audio/mpeg.
+    """
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="text is empty")
+
+    # Vérifie que la voix demandée existe dans notre liste
+    valid_ids = {v["id"] for v in _TTS_VOICES}
+    voice = req.voice if req.voice in valid_ids else "fr-FR-DeniseNeural"
+
+    try:
+        communicate = edge_tts.Communicate(req.text, voice, rate=req.rate)
+        buf = io.BytesIO()
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                buf.write(chunk["data"])
+        buf.seek(0)
+        audio_bytes = buf.read()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Edge TTS error: {e}")
+
+    return Response(
+        content=audio_bytes,
+        media_type="audio/mpeg",
+        headers={"Content-Disposition": "inline; filename=speech.mp3"},
+    )
 
 # ══════════════════════════════════════════════════════════════════════════════
 

@@ -97,7 +97,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                         icon: Icons.download_outlined,
                         label: 'Exporter mes conversations',
                         subtitle: 'Fichier JSON',
-                        onTap: () => _stub(context, 'Export disponible prochainement'),
+                        onTap: () => _stub(context, 'Export disponible prochainement — nécessite une connexion'),
                       ),
                       SettingRow(
                         icon: Icons.delete_outline,
@@ -123,7 +123,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                       SettingRow(
                         icon: Icons.delete_forever_outlined,
                         label: 'Supprimer toutes mes données',
-                        subtitle: 'Suppression locale et serveur',
+                        subtitle: 'Suppression locale et sur les serveurs Amiin',
                         destructive: true,
                         onTap: () => _confirmClear(
                           context,

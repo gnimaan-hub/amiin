@@ -45,6 +45,14 @@ class SettingsService extends ChangeNotifier {
   double get ttsSpeed => (_box.get('tts_speed', defaultValue: 1.0) as num).toDouble();
   set ttsSpeed(double v) => _set('tts_speed', v);
 
+  /// Active la synthèse vocale cloud (Edge TTS via backend) au lieu des voix système.
+  bool get useCloudTts => _get('use_cloud_tts', false);
+  set useCloudTts(bool v) => _set('use_cloud_tts', v);
+
+  /// ID de la voix Edge TTS sélectionnée (ex: 'fr-FR-DeniseNeural').
+  String get ttsVoice => _get('tts_voice', 'fr-FR-DeniseNeural');
+  set ttsVoice(String v) => _set('tts_voice', v);
+
   bool get proactiveSuggestions => _get('proactive_suggestions', true);
   set proactiveSuggestions(bool v) => _set('proactive_suggestions', v);
 

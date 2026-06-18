@@ -41,6 +41,10 @@ dependencies:
   # Connectivité réseau
   connectivity_plus: ^6.1.1
 
+  # Lecture audio (voix cloud Edge TTS)
+  just_audio: ^0.9.46
+  path_provider: ^2.1.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

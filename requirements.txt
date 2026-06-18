@@ -30,3 +30,6 @@ SQLAlchemy==2.0.41             # ORM
 passlib==1.7.4                  # hash des mots de passe
 bcrypt==3.2.2                  # pin <4.0 — passlib 1.7.4 incompatible avec bcrypt 4.x
 python-jose[cryptography]==3.3.0  # JWT tokens
+
+# ── SYNTHÈSE VOCALE CLOUD (Edge TTS) ──────────────────────────────
+edge-tts==6.1.12              # TTS neuronal Microsoft Edge — gratuit, sans clé API

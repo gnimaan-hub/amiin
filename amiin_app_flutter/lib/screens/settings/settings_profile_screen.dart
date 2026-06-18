@@ -6,6 +6,7 @@ import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/header.dart';
 import '../../widgets/card.dart';
 
@@ -26,10 +27,23 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
   void initState() {
     super.initState();
     final s = settingsService;
-    _firstnameCtrl = TextEditingController(text: s.profileFirstname);
-    _lastnameCtrl = TextEditingController(text: s.profileLastname);
+
+    // Pré-remplir depuis authService si le profil local est vierge
+    String firstname = s.profileFirstname;
+    String lastname  = s.profileLastname;
+    if (firstname.isEmpty && lastname.isEmpty) {
+      final authName = authService.currentUser?.displayName ?? '';
+      if (authName.isNotEmpty) {
+        final parts = authName.trim().split(RegExp(r'\s+'));
+        firstname = parts.first;
+        lastname  = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      }
+    }
+
+    _firstnameCtrl  = TextEditingController(text: firstname);
+    _lastnameCtrl   = TextEditingController(text: lastname);
     _professionCtrl = TextEditingController(text: s.profileProfession);
-    _phoneCtrl = TextEditingController(text: s.profilePhone);
+    _phoneCtrl      = TextEditingController(text: s.profilePhone);
     _nativeLangCtrl = TextEditingController(text: s.profileNativeLanguage);
   }
 

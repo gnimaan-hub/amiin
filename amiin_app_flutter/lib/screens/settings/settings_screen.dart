@@ -7,6 +7,7 @@ import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/header.dart';
 import 'settings_widgets.dart';
 
@@ -16,8 +17,10 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsService>();
-    final name = settings.displayName;
-    final initials = settings.initials;
+    final auth = context.watch<AuthService>();
+    final authName = auth.currentUser?.displayName ?? '';
+    final displayName = authName.isNotEmpty ? authName : settings.displayName;
+    final initials = _initials(displayName);
 
     return Scaffold(
       backgroundColor: ColorsAmiin.ecru,
@@ -35,7 +38,7 @@ class SettingsScreen extends StatelessWidget {
 
                     // ── Carte utilisateur ─────────────────────────────────
                     _UserCard(
-                      name: name.isNotEmpty ? name : 'Mon profil',
+                      name: displayName.isNotEmpty ? displayName : 'Mon profil',
                       initials: initials,
                       onTap: () => context.push('/settings/profile'),
                     ),
@@ -153,6 +156,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts[0].isEmpty) return 'A';
+    final f = parts[0][0].toUpperCase();
+    final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0].toUpperCase() : '';
+    return '$f$l';
+  }
+
   String _themeLabel(String v) {
     switch (v) {
       case 'ocean':
@@ -180,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.go('/home');
+              authService.logout();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Déconnexion'),

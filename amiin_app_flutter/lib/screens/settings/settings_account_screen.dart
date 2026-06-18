@@ -1,9 +1,10 @@
 // ─── SettingsAccountScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/header.dart';
 import 'settings_widgets.dart';
 
@@ -12,6 +13,10 @@ class SettingsAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthService>();
+    final email = auth.currentUser?.email ?? '';
+    final displayName = auth.currentUser?.displayName ?? '';
+
     return Scaffold(
       backgroundColor: ColorsAmiin.ecru,
       body: SafeArea(
@@ -31,13 +36,13 @@ class SettingsAccountScreen extends StatelessWidget {
                       SettingRow(
                         icon: Icons.email_outlined,
                         label: 'Adresse e-mail',
-                        value: 'm.ahmed@example.dj',
+                        value: email,
                         onTap: () => _showComingSoon(context),
                       ),
                       SettingRow(
                         icon: Icons.badge_outlined,
                         label: 'Nom d\'utilisateur',
-                        value: 'Mohamed A.',
+                        value: displayName,
                         onTap: () => _showComingSoon(context),
                       ),
                     ]),
@@ -101,7 +106,10 @@ class SettingsAccountScreen extends StatelessWidget {
             child: const Text('Annuler'),
           ),
           TextButton(
-            onPressed: () { Navigator.pop(ctx); context.go('/home'); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              authService.logout();
+            },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Déconnexion'),
           ),

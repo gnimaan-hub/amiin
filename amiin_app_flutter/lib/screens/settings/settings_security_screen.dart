@@ -90,7 +90,7 @@ class SettingsSecurityScreen extends StatelessWidget {
                       SettingRow(
                         icon: Icons.history_outlined,
                         label: 'Dernières sessions',
-                        subtitle: 'Consultation disponible après connexion',
+                        subtitle: 'Appareils et connexions récentes',
                         onTap: () => _stub(context),
                       ),
                     ]),
@@ -109,7 +109,7 @@ class SettingsSecurityScreen extends StatelessWidget {
   void _stub(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Disponible après implémentation de l\'authentification'),
+        content: Text('Fonctionnalité à venir'),
         duration: Duration(seconds: 2),
       ),
     );

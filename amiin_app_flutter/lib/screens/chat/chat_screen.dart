@@ -14,6 +14,9 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+import '../../services/cloud_tts_service.dart';
+import '../../services/settings_service.dart';
+
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -226,15 +229,32 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _speak(String text, {String? msgId}) async {
-    if (_isSpeaking) await _flutterTts.stop();
+    if (_isSpeaking) await _stopSpeaking();
     final cleaned = _cleanTextForTts(text);
     if (cleaned.isEmpty) return;
     if (mounted) setState(() { _isSpeaking = true; _speakingMsgId = msgId; });
-    await _flutterTts.speak(cleaned);
+
+    if (settingsService.useCloudTts) {
+      // Moteur cloud Edge TTS — haute qualité, indépendant des voix système.
+      // En cas d'erreur réseau, bascule automatiquement sur flutter_tts.
+      try {
+        await cloudTtsService.speak(cleaned, msgId: msgId);
+      } catch (_) {
+        await _flutterTts.speak(cleaned);
+      }
+      if (mounted) setState(() { _isSpeaking = false; _speakingMsgId = null; });
+    } else {
+      // Moteur local flutter_tts — fin de lecture gérée par setCompletionHandler.
+      await _flutterTts.speak(cleaned);
+    }
   }
 
   Future<void> _stopSpeaking() async {
-    await _flutterTts.stop();
+    if (settingsService.useCloudTts) {
+      await cloudTtsService.stop();
+    } else {
+      await _flutterTts.stop();
+    }
     if (mounted) setState(() { _isSpeaking = false; _speakingMsgId = null; });
   }
 

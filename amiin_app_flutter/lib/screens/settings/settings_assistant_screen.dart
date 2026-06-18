@@ -6,9 +6,23 @@ import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
+import '../../services/cloud_tts_service.dart';
 import '../../widgets/header.dart';
 import '../../widgets/card.dart';
 import 'settings_widgets.dart';
+
+// Miroir de la liste backend — permet l'affichage hors-ligne et l'aperçu.
+const _kCloudVoices = [
+  {'id': 'fr-FR-DeniseNeural',  'name': 'Denise',  'lang': 'Français', 'gender': 'F'},
+  {'id': 'fr-FR-HenriNeural',   'name': 'Henri',   'lang': 'Français', 'gender': 'M'},
+  {'id': 'fr-FR-EloiseNeural',  'name': 'Éloïse',  'lang': 'Français', 'gender': 'F'},
+  {'id': 'ar-SA-ZariyahNeural', 'name': 'Zariyah', 'lang': 'Arabe',    'gender': 'F'},
+  {'id': 'ar-SA-HamedNeural',   'name': 'Hamed',   'lang': 'Arabe',    'gender': 'M'},
+  {'id': 'ar-DZ-AminaNeural',   'name': 'Amina',   'lang': 'Arabe',    'gender': 'F'},
+  {'id': 'en-US-JennyNeural',   'name': 'Jenny',   'lang': 'Anglais',  'gender': 'F'},
+  {'id': 'en-US-GuyNeural',     'name': 'Guy',     'lang': 'Anglais',  'gender': 'M'},
+  {'id': 'en-GB-SoniaNeural',   'name': 'Sonia',   'lang': 'Anglais',  'gender': 'F'},
+];
 
 class SettingsAssistantScreen extends StatelessWidget {
   const SettingsAssistantScreen({super.key});
@@ -245,6 +259,54 @@ class SettingsAssistantScreen extends StatelessWidget {
                       ),
                     ),
 
+                    // ── Voix cloud (Edge TTS) ─────────────────────────────
+                    const SettingsSection('Voix cloud (Edge TTS)'),
+                    AmiinCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.record_voice_over_outlined, size: 18, color: primary),
+                              const SizedBox(width: Spacing.sm),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Voix neuronales Microsoft', style: TextStyle(
+                                      fontFamily: FontFamily.sans,
+                                      fontSize: 15,
+                                      color: ColorsAmiin.ink,
+                                    )),
+                                    Text('Indépendantes des voix installées sur le téléphone.', style: TextStyle(
+                                      fontFamily: FontFamily.sans,
+                                      fontSize: 12,
+                                      color: ColorsAmiin.muted,
+                                    )),
+                                  ],
+                                ),
+                              ),
+                              Switch(
+                                value: settings.useCloudTts,
+                                onChanged: (v) => settingsService.useCloudTts = v,
+                                activeColor: primary,
+                              ),
+                            ],
+                          ),
+                          if (settings.useCloudTts) ...[
+                            const Divider(height: 28),
+                            Text('Choisir une voix', style: TextStyle(
+                              fontFamily: FontFamily.geoMedium,
+                              fontSize: 13,
+                              color: ColorsAmiin.muted,
+                            )),
+                            const SizedBox(height: Spacing.sm),
+                            ..._buildVoiceList(context, settings, primary),
+                          ],
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: Spacing.xxxl),
                   ],
                 ),
@@ -254,6 +316,44 @@ class SettingsAssistantScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Construit les tuiles de voix groupées par langue.
+  static List<Widget> _buildVoiceList(
+    BuildContext context,
+    SettingsService settings,
+    Color primary,
+  ) {
+    final groups = <String, List<Map<String, String>>>{};
+    for (final v in _kCloudVoices) {
+      final lang = v['lang']!;
+      groups.putIfAbsent(lang, () => []).add(v);
+    }
+
+    final widgets = <Widget>[];
+    groups.forEach((lang, voices) {
+      widgets.add(Padding(
+        padding: const EdgeInsets.only(top: Spacing.sm, bottom: 4),
+        child: Text(lang, style: TextStyle(
+          fontFamily: FontFamily.sans,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: ColorsAmiin.muted,
+          letterSpacing: 0.5,
+        )),
+      ));
+      for (final voice in voices) {
+        final id = voice['id']!;
+        final isSelected = settings.ttsVoice == id;
+        widgets.add(_VoiceTile(
+          voice: voice,
+          selected: isSelected,
+          primary: primary,
+          onSelect: () => settingsService.ttsVoice = id,
+        ));
+      }
+    });
+    return widgets;
   }
 
   static void _confirmClearMemory(BuildContext context) {
@@ -351,6 +451,97 @@ class _TopicsPicker extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+// ─── Tuile de voix cloud ──────────────────────────────────────────────────────
+// Affiche une voix sélectionnable + bouton d'aperçu.
+class _VoiceTile extends StatefulWidget {
+  const _VoiceTile({
+    required this.voice,
+    required this.selected,
+    required this.primary,
+    required this.onSelect,
+  });
+
+  final Map<String, String> voice;
+  final bool selected;
+  final Color primary;
+  final VoidCallback onSelect;
+
+  @override
+  State<_VoiceTile> createState() => _VoiceTileState();
+}
+
+class _VoiceTileState extends State<_VoiceTile> {
+  bool _previewing = false;
+
+  Future<void> _preview() async {
+    if (_previewing) {
+      await cloudTtsService.stop();
+      if (mounted) setState(() => _previewing = false);
+      return;
+    }
+    setState(() => _previewing = true);
+    // Sélectionne temporairement la voix pour l'aperçu
+    final prev = settingsService.ttsVoice;
+    settingsService.ttsVoice = widget.voice['id']!;
+    try {
+      await cloudTtsService.speak('Bonjour, je suis votre assistant Amiin.');
+    } catch (_) {
+      // ignore — l'erreur est déjà loguée dans CloudTtsService
+    }
+    settingsService.ttsVoice = prev;
+    if (mounted) setState(() => _previewing = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gender = widget.voice['gender'] == 'F' ? '♀' : '♂';
+    return InkWell(
+      onTap: widget.onSelect,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(
+              widget.selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+              size: 18,
+              color: widget.selected ? widget.primary : ColorsAmiin.muted,
+            ),
+            const SizedBox(width: Spacing.sm),
+            Expanded(
+              child: Text(
+                '${widget.voice['name']}  $gender',
+                style: TextStyle(
+                  fontFamily: FontFamily.sans,
+                  fontSize: 14,
+                  color: widget.selected ? ColorsAmiin.ink : ColorsAmiin.mid,
+                  fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: _preview,
+              icon: _previewing
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: widget.primary,
+                      ),
+                    )
+                  : Icon(Icons.play_circle_outline, size: 20, color: widget.primary),
+              tooltip: 'Aperçu',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
