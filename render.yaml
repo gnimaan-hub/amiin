@@ -20,8 +20,11 @@ services:
         sync: false
       - key: DATABASE_URL          # ← NOUVEAU
         sync: false
-      - key: JWT_SECRET_KEY        # ← NOUVEAU (chaîne aléatoire longue)
+      - key: JWT_SECRET_KEY        # OBLIGATOIRE — l'API refuse de démarrer sans (openssl rand -hex 32)
         sync: false
+      - key: LOG_SECRET            # OBLIGATOIRE pour consulter /v1/logs (sinon endpoint fermé)
+        sync: false
+      # - key: CORS_ORIGINS        # optionnel — origines web autorisées, séparées par des virgules
 
     # Health check — Render surveille cet endpoint pour savoir si le service est vivant
     healthCheckPath: /v1/chat/health

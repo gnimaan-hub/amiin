@@ -22,7 +22,12 @@ from psycopg2.extras import RealDictCursor
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
-JWT_SECRET     = os.environ.get("JWT_SECRET_KEY", "changeme-in-production")
+JWT_SECRET     = os.environ.get("JWT_SECRET_KEY", "")
+if not JWT_SECRET:
+    raise RuntimeError(
+        "JWT_SECRET_KEY manquante — définir cette variable d'environnement "
+        "(chaîne aléatoire longue, ex: `openssl rand -hex 32`) avant de démarrer l'API."
+    )
 JWT_ALGORITHM  = "HS256"
 ACCESS_TTL     = timedelta(minutes=30)
 REFRESH_TTL    = timedelta(days=30)
