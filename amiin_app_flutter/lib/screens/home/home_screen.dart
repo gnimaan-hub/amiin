@@ -9,6 +9,7 @@ import '../../theme/themes.dart';
 import '../../theme/typography.dart';
 import '../../services/agenda_service.dart';
 import '../../services/chat_controller.dart';
+import '../../services/home_brief_service.dart';
 import '../../services/notes_service.dart';
 import '../../widgets/amiin_logo.dart';
 import '../../widgets/card.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
+    homeBriefService.refresh();
     agendaService.listenable.addListener(_loadData);
     notesService.listenable.addListener(_loadData);
   }
@@ -65,7 +67,14 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {}
   }
 
-  Future<void> _onRefresh() => _loadData();
+  Future<void> _onRefresh() =>
+      Future.wait([_loadData(), homeBriefService.refresh(force: true)]);
+
+  String get _greeting {
+    final h = DateTime.now().hour;
+    final s = h < 12 ? 'Bonjour' : (h < 18 ? 'Bon après-midi' : 'Bonsoir');
+    return '$s — que puis-je\nfaire pour vous ?';
+  }
 
   String _formatEventDate(String iso) {
     final date = DateTime.parse(iso);
@@ -146,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
                       child: Text(
-                        'Bonjour — que puis-je\nfaire pour vous ?',
+                        _greeting,
                         style: TextStyle(
                           fontFamily: FontFamily.sansLight,
                           fontSize: 15,
@@ -243,6 +252,18 @@ class _HomeScreenState extends State<HomeScreen> {
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   const SizedBox(height: Spacing.xxl),
+
+                  // Brief du jour — masqué tant qu'aucune donnée n'est disponible
+                  ValueListenableBuilder<HomeBrief?>(
+                    valueListenable: homeBriefService.brief,
+                    builder: (context, brief, _) {
+                      if (brief == null || brief.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: Spacing.xxl),
+                        child: _DailyBriefStrip(brief: brief),
+                      );
+                    },
+                  ),
 
                   // Accès rapide
                   _SectionLabel(
@@ -519,6 +540,120 @@ class _AgentBadge extends StatelessWidget {
         letterSpacing: 0.5,
         color: color,
       )),
+    );
+  }
+}
+
+// ── Bande « Aujourd'hui » : météo, prochaine prière, taux FDJ ────────────────
+// Discrète par construction : une seule carte, uniquement les tuiles dont la
+// donnée existe, et rien du tout si le brief est vide ou indisponible.
+
+class _DailyBriefStrip extends StatelessWidget {
+  final HomeBrief brief;
+
+  const _DailyBriefStrip({required this.brief});
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    final tiles = <Widget>[];
+
+    final weather = brief.weather;
+    if (weather != null) {
+      tiles.add(_BriefTile(
+        icon: Icons.wb_sunny_outlined,
+        value: '${weather.temp}°',
+        label: weather.desc,
+      ));
+    }
+
+    final prayers = brief.prayers;
+    if (prayers != null) {
+      final (name, time) = prayers.next(DateTime.now());
+      tiles.add(_BriefTile(
+        icon: Icons.mosque_outlined,
+        value: time,
+        label: name,
+      ));
+    }
+
+    final fx = brief.fx;
+    if (fx != null) {
+      final eur = fx.eurFdj;
+      tiles.add(_BriefTile(
+        icon: Icons.currency_exchange_outlined,
+        value: eur != null ? '${eur.round()} FDJ' : '${fx.usdFdj.round()} FDJ',
+        label: eur != null ? '1 euro' : '1 dollar',
+      ));
+    }
+
+    if (tiles.isEmpty) return const SizedBox.shrink();
+
+    // Intercale un séparateur vertical entre les tuiles
+    final children = <Widget>[];
+    for (var i = 0; i < tiles.length; i++) {
+      if (i > 0) {
+        children.add(Container(width: 1, height: 28, color: ac.border));
+      }
+      children.add(Expanded(child: tiles[i]));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionLabel(label: "Aujourd'hui", modeColor: ac.infoAccent),
+        const SizedBox(height: Spacing.sm),
+        AmiinCard(
+          variant: CardVariant.info,
+          padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.md, vertical: Spacing.md),
+          child: Row(children: children),
+        ),
+      ],
+    );
+  }
+}
+
+class _BriefTile extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _BriefTile({required this.icon, required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 18, color: ac.infoAccent),
+        const SizedBox(width: Spacing.sm),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: FontFamily.geoBold,
+                    fontSize: 14,
+                    color: ac.ink,
+                  )),
+              Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: FontFamily.sans,
+                    fontSize: 10.5,
+                    color: ac.muted,
+                  )),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

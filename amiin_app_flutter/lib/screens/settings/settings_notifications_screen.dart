@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
+import '../../services/demarches_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/header.dart';
 import '../../widgets/card.dart';
@@ -40,7 +41,12 @@ class SettingsNotificationsScreen extends StatelessWidget {
                         subtitle: 'Contrôle général de toutes les alertes',
                         toggle: true,
                         toggleValue: enabled,
-                        onToggle: (v) => settingsService.notifMaster = v,
+                        onToggle: (v) {
+                          settingsService.notifMaster = v;
+                          v
+                              ? demarchesService.rescheduleAllFollowUps()
+                              : demarchesService.cancelAllFollowUps();
+                        },
                       ),
                     ]),
 
@@ -63,7 +69,14 @@ class SettingsNotificationsScreen extends StatelessWidget {
                           subtitle: 'Expiration de documents, étapes',
                           toggle: true,
                           toggleValue: enabled && settings.notifDemarches,
-                          onToggle: enabled ? (v) => settingsService.notifDemarches = v : null,
+                          onToggle: enabled
+                              ? (v) {
+                                  settingsService.notifDemarches = v;
+                                  v
+                                      ? demarchesService.rescheduleAllFollowUps()
+                                      : demarchesService.cancelAllFollowUps();
+                                }
+                              : null,
                         ),
                       ]),
                     ),

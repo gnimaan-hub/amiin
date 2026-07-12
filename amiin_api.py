@@ -1318,6 +1318,116 @@ async def annuaire_remove_favorite(service_id: str):
     return {"ok": True}
 
 # ══════════════════════════════════════════════════════════════════════════════
+# BRIEF DU JOUR — météo + horaires de prière + taux FDJ pour l'écran d'accueil
+# Chaque bloc est indépendant et nullable : si une source échoue, les autres
+# restent servies et l'app masque simplement la tuile correspondante.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Djibouti-ville par défaut (si l'app n'a pas la localisation)
+_DJIBOUTI_LAT, _DJIBOUTI_LON = 11.589, 43.145
+# Parité fixe depuis 1973 : 1 USD = 177.721 FDJ (Banque Centrale de Djibouti)
+_USD_FDJ_PEG = 177.721
+
+_brief_weather_cache: dict = {}   # {coords: (payload, ts)} — TTL 30 min
+_prayer_cache: dict = {}          # {(date, coords): payload} — valide la journée
+_fx_cache: dict = {}              # {"eur": (rate, ts)} — TTL 12 h
+
+def _brief_weather(lat: float, lon: float) -> Optional[dict]:
+    """Météo courante OWM condensée pour la tuile d'accueil."""
+    if not _owm_api_key:
+        return None
+    key = f"{lat:.2f},{lon:.2f}"
+    cached = _brief_weather_cache.get(key)
+    if cached and time.time() - cached[1] < 1800:
+        return cached[0]
+    try:
+        cw = _requests.get(
+            "https://api.openweathermap.org/data/2.5/weather",
+            params={"lat": lat, "lon": lon, "appid": _owm_api_key,
+                    "units": "metric", "lang": "fr"},
+            timeout=5,
+        ).json()
+        payload = {
+            "temp": round(cw["main"]["temp"]),
+            "feels_like": round(cw["main"]["feels_like"]),
+            "desc": cw["weather"][0]["description"] if cw.get("weather") else "",
+            "icon": cw["weather"][0]["icon"] if cw.get("weather") else "",
+        }
+        _brief_weather_cache[key] = (payload, time.time())
+        return payload
+    except Exception as e:
+        logging.warning(f"[brief] météo indisponible: {e}")
+        return None
+
+def _brief_prayers(lat: float, lon: float) -> Optional[dict]:
+    """Horaires de prière du jour via l'API AlAdhan (gratuite, sans clé)."""
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    today = _dt.now(_tz(_td(hours=3))).strftime("%d-%m-%Y")   # heure de Djibouti (EAT)
+    key = (today, f"{lat:.2f},{lon:.2f}")
+    if key in _prayer_cache:
+        return _prayer_cache[key]
+    try:
+        resp = _requests.get(
+            f"https://api.aladhan.com/v1/timings/{today}",
+            params={"latitude": lat, "longitude": lon, "method": 3},   # méthode MWL
+            timeout=6,
+        ).json()
+        t = resp["data"]["timings"]
+        payload = {
+            "fajr":    t["Fajr"][:5],
+            "dhuhr":   t["Dhuhr"][:5],
+            "asr":     t["Asr"][:5],
+            "maghrib": t["Maghrib"][:5],
+            "isha":    t["Isha"][:5],
+        }
+        _prayer_cache[key] = payload
+        if len(_prayer_cache) > 50:   # purge des jours passés
+            for k in list(_prayer_cache):
+                if k[0] != today:
+                    del _prayer_cache[k]
+        return payload
+    except Exception as e:
+        logging.warning(f"[brief] horaires de prière indisponibles: {e}")
+        return None
+
+def _brief_fx() -> Optional[dict]:
+    """Taux de change FDJ : USD à parité fixe, EUR via open.er-api.com (sans clé)."""
+    payload = {"usd_fdj": round(_USD_FDJ_PEG, 2), "eur_fdj": None}
+    cached = _fx_cache.get("eur")
+    if cached and time.time() - cached[1] < 12 * 3600:
+        payload["eur_fdj"] = cached[0]
+        return payload
+    try:
+        resp = _requests.get("https://open.er-api.com/v6/latest/USD", timeout=6).json()
+        usd_per_eur = resp["rates"]["EUR"]      # EUR pour 1 USD
+        eur_fdj = round(_USD_FDJ_PEG / usd_per_eur, 1)
+        _fx_cache["eur"] = (eur_fdj, time.time())
+        payload["eur_fdj"] = eur_fdj
+    except Exception as e:
+        logging.warning(f"[brief] taux EUR indisponible: {e}")
+    return payload
+
+@app.get("/v1/home/brief", dependencies=[Depends(get_current_user)])
+async def home_brief(lat: Optional[float] = None, lon: Optional[float] = None):
+    """Brief du jour pour l'écran d'accueil : météo, prières, taux de change.
+    Les trois blocs sont récupérés en parallèle ; chacun peut être null."""
+    la = lat if lat is not None else _DJIBOUTI_LAT
+    lo = lon if lon is not None else _DJIBOUTI_LON
+    loop = asyncio.get_event_loop()
+    weather, prayers, fx = await asyncio.gather(
+        loop.run_in_executor(None, _brief_weather, la, lo),
+        loop.run_in_executor(None, _brief_prayers, la, lo),
+        loop.run_in_executor(None, _brief_fx),
+    )
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    return {
+        "date": _dt.now(_tz(_td(hours=3))).strftime("%Y-%m-%d"),
+        "weather": weather,
+        "prayers": prayers,
+        "fx": fx,
+    }
+
+# ══════════════════════════════════════════════════════════════════════════════
 # SYNTHÈSE VOCALE CLOUD — Edge TTS (Microsoft, gratuit, sans clé API)
 # ══════════════════════════════════════════════════════════════════════════════
 
