@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -29,12 +30,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   int _reminder = 30;
   bool _loading = false;
 
-  final List<({EventCategory category, String label, Color color})> _categories = [
-    (category: EventCategory.admin, label: 'Administratif', color: ColorsAmiin.turquoise),
-    (category: EventCategory.personal, label: 'Personnel', color: ColorsAmiin.success),
-    (category: EventCategory.health, label: 'Santé', color: ColorsAmiin.turquoise),
-    (category: EventCategory.education, label: 'Éducation', color: const Color(0xFF8C6D3F)),
-    (category: EventCategory.other, label: 'Autre', color: ColorsAmiin.muted),
+  List<({EventCategory category, String label, Color color})> get _categories => [
+    (category: EventCategory.admin, label: 'Administratif', color: context.ac.secretariatAccent),
+    (category: EventCategory.personal, label: 'Personnel', color: context.ac.success),
+    (category: EventCategory.health, label: 'Santé', color: context.ac.secretariatAccent),
+    (category: EventCategory.education, label: 'Éducation', color: CategoryColors.education),
+    (category: EventCategory.other, label: 'Autre', color: context.ac.muted),
   ];
 
   final List<({int value, String label})> _reminders = [
@@ -110,15 +111,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le titre est requis.'), backgroundColor: ColorsAmiin.turquoise),
+        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
       );
       return;
     }
     if (!_endDate.isAfter(_startDate)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('La date de fin doit être après la date de début.'),
-          backgroundColor: ColorsAmiin.turquoise,
+          backgroundColor: context.ac.secretariatAccent,
         ),
       );
       return;
@@ -138,7 +139,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement modifié'), backgroundColor: ColorsAmiin.success),
+            SnackBar(content: Text('Événement modifié'), backgroundColor: context.ac.success),
           );
         }
       } else {
@@ -154,7 +155,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ));
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement créé'), backgroundColor: ColorsAmiin.success),
+            SnackBar(content: Text('Événement créé'), backgroundColor: context.ac.success),
           );
         }
       }
@@ -162,7 +163,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur : ${e.toString()}'), backgroundColor: ColorsAmiin.turquoise),
+          SnackBar(content: Text('Erreur : ${e.toString()}'), backgroundColor: context.ac.secretariatAccent),
         );
       }
     } finally {
@@ -174,7 +175,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.initialEvent != null;
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -236,7 +237,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         selectedColor: cat.color,
                         checkmarkColor: Colors.white,
                         labelStyle: TextStyle(
-                          color: _category == cat.category ? Colors.white : ColorsAmiin.mid,
+                          color: _category == cat.category ? Colors.white : context.ac.midTone,
                           fontFamily: FontFamily.geoMedium,
                         ),
                       )).toList(),
@@ -250,9 +251,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         selected: _reminder == rem.value,
                         onSelected: (_) => setState(() => _reminder = rem.value),
                         backgroundColor: Colors.white,
-                        selectedColor: ColorsAmiin.turquoise,
+                        selectedColor: context.ac.secretariatAccent,
                         labelStyle: TextStyle(
-                          color: _reminder == rem.value ? Colors.white : ColorsAmiin.mid,
+                          color: _reminder == rem.value ? Colors.white : context.ac.midTone,
                           fontFamily: FontFamily.geoMedium,
                         ),
                       )).toList(),
@@ -285,7 +286,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             fontFamily: FontFamily.geoBold,
             fontSize: 10,
             letterSpacing: 1.2,
-            color: ColorsAmiin.muted,
+            color: context.ac.muted,
           ),
         ),
         const SizedBox(height: 6),
@@ -297,21 +298,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   InputDecoration _inputDecoration(String hint) => InputDecoration(
     hintText: hint,
     filled: true,
-    fillColor: ColorsAmiin.white,
+    fillColor: context.ac.surface,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(RadiusAmiin.md),
-      borderSide: const BorderSide(color: ColorsAmiin.border),
+      borderSide: BorderSide(color: context.ac.border),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(RadiusAmiin.md),
-      borderSide: const BorderSide(color: ColorsAmiin.border),
+      borderSide: BorderSide(color: context.ac.border),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 10),
   );
 
   BoxDecoration _boxDecoration() => BoxDecoration(
-    color: ColorsAmiin.white,
+    color: context.ac.surface,
     borderRadius: BorderRadius.circular(RadiusAmiin.md),
-    border: Border.all(color: ColorsAmiin.border),
+    border: Border.all(color: context.ac.border),
   );
 }

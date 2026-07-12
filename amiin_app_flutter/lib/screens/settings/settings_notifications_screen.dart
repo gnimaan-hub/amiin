@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -19,7 +19,7 @@ class SettingsNotificationsScreen extends StatelessWidget {
     final enabled = settings.notifMaster;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -111,7 +111,7 @@ class SettingsNotificationsScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                             ),
                           ),
                           const SizedBox(height: Spacing.md),
@@ -126,7 +126,7 @@ class SettingsNotificationsScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: Spacing.md),
-                              Text('—', style: TextStyle(color: ColorsAmiin.muted, fontFamily: FontFamily.sans)),
+                              Text('—', style: TextStyle(color: context.ac.muted, fontFamily: FontFamily.sans)),
                               const SizedBox(width: Spacing.md),
                               Expanded(
                                 child: _TimeButton(
@@ -191,13 +191,13 @@ class _TimeButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: ColorsAmiin.ecru,
+          color: context.ac.background,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: ColorsAmiin.border),
+          border: Border.all(color: context.ac.border),
         ),
         child: Column(
           children: [
-            Text(label, style: TextStyle(fontSize: 11, color: ColorsAmiin.muted, fontFamily: FontFamily.sans)),
+            Text(label, style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
             const SizedBox(height: 4),
             Text('${hour.toString().padLeft(2, '0')}:00',
                 style: TextStyle(fontSize: 18, fontFamily: FontFamily.geoBold, color: primary)),

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import './create_event_screen.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -70,14 +70,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         await agendaService.deleteEvent(widget.eventId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Événement supprimé'), backgroundColor: ColorsAmiin.success),
+            SnackBar(content: Text('Événement supprimé'), backgroundColor: context.ac.success),
           );
           Navigator.pop(context); // retour à l'agenda
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de la suppression : $e'), backgroundColor: ColorsAmiin.turquoise),
+            SnackBar(content: Text('Erreur lors de la suppression : $e'), backgroundColor: context.ac.secretariatAccent),
           );
         }
       }
@@ -120,7 +120,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.turquoise)));
+      return Scaffold(body: Center(child: CircularProgressIndicator(color: context.ac.secretariatAccent)));
     }
     if (_event == null) return const SizedBox();
 
@@ -128,7 +128,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final end = DateTime.parse(_event!.endDate);
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -141,12 +141,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, color: ColorsAmiin.turquoise),
+                      icon: Icon(Icons.edit_outlined, color: context.ac.secretariatAccent),
                       onPressed: _editEvent,
                       tooltip: 'Modifier',
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: ColorsAmiin.turquoise),
+                      icon: Icon(Icons.delete_outline, color: context.ac.secretariatAccent),
                       onPressed: _deleteEvent,
                       tooltip: 'Supprimer',
                     ),
@@ -169,7 +169,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             style: TextStyle(
                               fontFamily: FontFamily.geo,
                               fontSize: 24,
-                              color: ColorsAmiin.ink,
+                              color: context.ac.ink,
                               height: 1.2,
                             ),
                           ),
@@ -208,7 +208,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 fontFamily: FontFamily.geoBold,
                                 fontSize: 10,
                                 letterSpacing: 1.2,
-                                color: ColorsAmiin.muted,
+                                color: context.ac.muted,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -217,7 +217,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 14,
-                                color: ColorsAmiin.mid,
+                                color: context.ac.midTone,
                                 height: 1.5,
                               ),
                             ),
@@ -238,7 +238,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 fontFamily: FontFamily.geoBold,
                                 fontSize: 10,
                                 letterSpacing: 1.2,
-                                color: ColorsAmiin.turquoiseDk,
+                                color: context.ac.secretariatAccentDark,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -247,7 +247,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 13,
-                                color: ColorsAmiin.turquoiseDk,
+                                color: context.ac.secretariatAccentDark,
                                 height: 1.5,
                               ),
                             ),
@@ -276,7 +276,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             style: TextStyle(
               fontFamily: FontFamily.sans,
               fontSize: 14,
-              color: ColorsAmiin.ink,
+              color: context.ac.ink,
             ),
           ),
         ),

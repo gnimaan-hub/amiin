@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -23,7 +23,7 @@ class SettingsScreen extends StatelessWidget {
     final initials = _initials(displayName);
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -216,9 +216,9 @@ class _UserCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(Spacing.lg),
         decoration: BoxDecoration(
-          color: ColorsAmiin.white,
+          color: context.ac.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ColorsAmiin.border),
+          border: Border.all(color: context.ac.border),
         ),
         child: Row(
           children: [
@@ -242,7 +242,7 @@ class _UserCard extends StatelessWidget {
                   Text(name, style: TextStyle(
                     fontFamily: FontFamily.geoBold,
                     fontSize: 16,
-                    color: ColorsAmiin.ink,
+                    color: context.ac.ink,
                   )),
                   const SizedBox(height: 2),
                   Text('Modifier mon profil', style: TextStyle(
@@ -253,7 +253,7 @@ class _UserCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: ColorsAmiin.muted, size: 18),
+            Icon(Icons.chevron_right, color: context.ac.muted, size: 18),
           ],
         ),
       ),

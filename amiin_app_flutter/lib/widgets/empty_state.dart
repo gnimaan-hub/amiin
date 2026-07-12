@@ -1,7 +1,7 @@
 ﻿// â”€â”€â”€ EmptyState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
@@ -37,7 +37,7 @@ class EmptyState extends StatelessWidget {
               style: TextStyle(
                 fontFamily: FontFamily.geo,
                 fontSize: 18,
-                color: ColorsAmiin.ink,
+                color: context.ac.ink,
               ),
               textAlign: TextAlign.center,
             ),
@@ -49,7 +49,7 @@ class EmptyState extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: FontFamily.sans,
                     fontSize: FontSize.base,
-                    color: ColorsAmiin.muted,
+                    color: context.ac.muted,
                     height: LineHeight.normal,
                   ),
                   textAlign: TextAlign.center,

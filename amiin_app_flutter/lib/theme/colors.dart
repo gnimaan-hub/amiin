@@ -52,14 +52,33 @@ class ColorsAmiin {
   static const Color shadow        = Color(0x1414213D);
   static const Color shadowMd      = Color(0x2414213D);
   static const Color shadowLg      = Color(0x3814213D);
+}
 
-  // ── Aliases pour rétrocompatibilité (seront supprimés progressivement) ───
-  @Deprecated('Use turquoise') static const Color terra       = turquoise;
-  @Deprecated('Use turquoiseDk') static const Color terraDk  = turquoiseDk;
-  @Deprecated('Use turquoiseLt') static const Color terraLt  = turquoiseLt;
-  @Deprecated('Use turquoiseMid') static const Color terraMid = turquoiseMid;
-  @Deprecated('Use ocre') static const Color indigo           = ocre;
-  @Deprecated('Use ocreLt') static const Color indigoLt       = ocreLt;
-  @Deprecated('Use success') static const Color olive         = success;
-  @Deprecated('Use successLt') static const Color oliveLt     = successLt;
+// ── Palette catégorielle — identique en clair et sombre ──────────────────────
+// Couleurs d'identification (annuaire, catégories d'événements) : elles ne
+// suivent pas le thème, comme les couleurs d'un logo.
+
+class CategoryColors {
+  static const Color education = Color(0xFF8C6D3F);
+
+  static const Map<String, Color> annuaire = {
+    'Alimentation & Restauration':               Color(0xFFE07B39),
+    'Hébergement':                               Color(0xFF1A7A6E),
+    'Santé':                                     Color(0xFFC0392B),
+    'Commerce & Courses':                        Color(0xFF6B7C3A),
+    'Transport & Logistique':                    Color(0xFF2980B9),
+    'Éducation & Formation':                     education,
+    'Administration & Services publics':         Color(0xFF3D5A8A),
+    'Services financiers & juridiques':          Color(0xFF8B6914),
+    'Culture & Culte':                           Color(0xFF7B4B94),
+    'Tourisme & Loisirs':                        Color(0xFF0097A7),
+    'Services automobile':                       Color(0xFF546E7A),
+    'Services à la personne':                    Color(0xFF6D4C7E),
+    'Géographie & Patrimoine naturel':           Color(0xFF388E3C),
+    'Diplomatie & Organisations internationales':Color(0xFF1A3A5C),
+    'Industrie, Énergie & Grandes entreprises':  Color(0xFF4E4E4E),
+    'Télécom & Tech':                            Color(0xFF1565C0),
+    'Associations & ONG':                        Color(0xFFAD1457),
+    'Défense internationale':                    Color(0xFF33691E),
+  };
 }

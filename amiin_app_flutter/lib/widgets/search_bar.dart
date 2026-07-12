@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
@@ -57,9 +57,9 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: ColorsAmiin.white,
+        color: context.ac.surface,
         borderRadius: BorderRadius.circular(RadiusAmiin.full),
-        border: Border.all(color: ColorsAmiin.border),
+        border: Border.all(color: context.ac.border),
       ),
       padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
       child: Row(
@@ -68,7 +68,7 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
             _searchIconSvg,
             width: 18,
             height: 18,
-            colorFilter: const ColorFilter.mode(ColorsAmiin.muted, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(context.ac.muted, BlendMode.srcIn),
           ),
           const SizedBox(width: Spacing.sm),
           Expanded(
@@ -79,7 +79,7 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
                 hintStyle: TextStyle(
                   fontFamily: FontFamily.sans,
                   fontSize: FontSize.base,
-                  color: ColorsAmiin.muted,
+                  color: context.ac.muted,
                 ),
                 border: InputBorder.none,
                 isDense: true,
@@ -88,7 +88,7 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
               style: TextStyle(
                 fontFamily: FontFamily.sans,
                 fontSize: FontSize.base,
-                color: ColorsAmiin.ink,
+                color: context.ac.ink,
               ),
             ),
           ),

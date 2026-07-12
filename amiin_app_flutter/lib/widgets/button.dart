@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
@@ -30,7 +30,7 @@ class AmiinButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _getVariantConfig(variant);
+    final config = _getVariantConfig(context, variant);
     final sizeConfig = _getSizeConfig(size);
 
     return ElevatedButton(
@@ -69,23 +69,23 @@ class AmiinButton extends StatelessWidget {
     );
   }
 
-  _ButtonVariantConfig _getVariantConfig(ButtonVariant v) {
+  _ButtonVariantConfig _getVariantConfig(BuildContext context, ButtonVariant v) {
     switch (v) {
       case ButtonVariant.primary:
         return _ButtonVariantConfig(
-            bg: ColorsAmiin.turquoise, text: ColorsAmiin.white, border: ColorsAmiin.turquoise);
+            bg: context.ac.secretariatAccent, text: context.ac.onAccent, border: context.ac.secretariatAccent);
       case ButtonVariant.secondary:
         return _ButtonVariantConfig(
-            bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, border: ColorsAmiin.turquoiseLt);
+            bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, border: context.ac.secretariatAccentLight);
       case ButtonVariant.ghost:
         return _ButtonVariantConfig(
-            bg: Colors.transparent, text: ColorsAmiin.turquoise, border: ColorsAmiin.border);
+            bg: Colors.transparent, text: context.ac.secretariatAccent, border: context.ac.border);
       case ButtonVariant.info:
         return _ButtonVariantConfig(
-            bg: ColorsAmiin.ocre, text: ColorsAmiin.white, border: ColorsAmiin.ocre);
+            bg: context.ac.infoAccent, text: context.ac.onAccent, border: context.ac.infoAccent);
       case ButtonVariant.danger:
         return _ButtonVariantConfig(
-            bg: ColorsAmiin.corail, text: ColorsAmiin.white, border: ColorsAmiin.corail);
+            bg: context.ac.alertColor, text: context.ac.onAccent, border: context.ac.alertColor);
     }
   }
 

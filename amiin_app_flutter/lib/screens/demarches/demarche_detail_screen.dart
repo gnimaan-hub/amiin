@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -67,7 +67,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
+      return Scaffold(body: Center(child: CircularProgressIndicator(color: context.ac.infoAccent)));
     }
     if (_demarche == null) return const SizedBox();
 
@@ -81,7 +81,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -98,7 +98,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: isInfo ? ColorsAmiin.ocreLt : ColorsAmiin.successLt,
+                            color: isInfo ? context.ac.infoAccentLight : context.ac.successLight,
                             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                           ),
                           child: Text(
@@ -106,14 +106,14 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                             style: TextStyle(
                               fontFamily: FontFamily.geoBold,
                               fontSize: 10,
-                              color: isInfo ? ColorsAmiin.ocre : ColorsAmiin.success,
+                              color: isInfo ? context.ac.infoAccent : context.ac.success,
                             ),
                           ),
                         ),
                         const SizedBox(width: Spacing.sm),
                         Text(
                           '${d.category.icon} ${d.category.label}',
-                          style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                          style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
                         ),
                       ],
                     ),
@@ -122,7 +122,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                     Text(d.title, style: TextStyle(
                       fontFamily: FontFamily.geo,
                       fontSize: 22,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                       height: 1.3,
                     )),
                     const SizedBox(height: Spacing.sm),
@@ -149,7 +149,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         icon: Icons.info_outline,
                         title: 'Description',
                         child: Text(d.summary, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: ColorsAmiin.mid, height: 1.5,
+                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
                         )),
                       ),
 
@@ -159,7 +159,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         icon: Icons.people_outline,
                         title: 'Qui peut faire cette démarche ?',
                         child: Text(d.beneficiaires!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: ColorsAmiin.mid, height: 1.5,
+                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
                         )),
                       ),
 
@@ -169,7 +169,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         icon: Icons.check_circle_outline,
                         title: 'Conditions requises',
                         child: Text(d.conditions!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: ColorsAmiin.mid, height: 1.5,
+                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
                         )),
                       ),
 
@@ -187,11 +187,11 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: ColorsAmiin.sand,
+                                    color: context.ac.surface2,
                                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                                   ),
                                   child: Text('Cas : $cas', style: TextStyle(
-                                    fontFamily: FontFamily.geoBold, fontSize: 11, color: ColorsAmiin.mid,
+                                    fontFamily: FontFamily.geoBold, fontSize: 11, color: context.ac.midTone,
                                   )),
                                 ),
                                 const SizedBox(height: 6),
@@ -224,7 +224,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                         icon: Icons.emoji_events_outlined,
                         title: 'Résultat attendu',
                         child: Text(d.resultat!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: ColorsAmiin.mid, height: 1.5,
+                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
                         )),
                       ),
 
@@ -280,37 +280,37 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
       children: [
         if (org.adresse != null && org.adresse!.isNotEmpty) ...[
           Row(children: [
-            Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
             Expanded(child: Text(org.adresse!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
             ))),
           ]),
           const SizedBox(height: 4),
         ],
         if (org.horaires != null && org.horaires!.isNotEmpty) ...[
           Row(children: [
-            Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
             Expanded(child: Text(org.horaires!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
             ))),
           ]),
           const SizedBox(height: Spacing.sm),
         ],
         for (int i = 0; i < lieux.length; i++) ...[
-          if (i > 0) const Padding(
+          if (i > 0) Padding(
             padding: EdgeInsets.only(top: 4, bottom: 8),
-            child: Divider(height: 1, color: ColorsAmiin.border),
+            child: Divider(height: 1, color: context.ac.border),
           ),
           Row(children: [
             Expanded(child: Text(lieux[i].nom, style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.ink,
+              fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.ink,
             ))),
             TextButton(
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
-                foregroundColor: ColorsAmiin.ocre,
+                foregroundColor: context.ac.infoAccent,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
@@ -333,13 +333,13 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, size: 14, color: ColorsAmiin.muted),
+                Icon(icon, size: 14, color: context.ac.muted),
                 const SizedBox(width: 6),
                 Text(title.toUpperCase(), style: TextStyle(
                   fontFamily: FontFamily.geoBold,
                   fontSize: 10,
                   letterSpacing: 1.2,
-                  color: ColorsAmiin.muted,
+                  color: context.ac.muted,
                 )),
               ],
             ),
@@ -356,8 +356,8 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 4),
       decoration: BoxDecoration(
-        color: ColorsAmiin.white,
-        border: Border.all(color: ColorsAmiin.border),
+        color: context.ac.surface,
+        border: Border.all(color: context.ac.border),
         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
       ),
       child: Row(
@@ -366,7 +366,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           Text(icon, style: const TextStyle(fontSize: 12)),
           const SizedBox(width: 4),
           Flexible(child: Text(truncated, style: TextStyle(
-            fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+            fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
           ))),
         ],
       ),
@@ -380,10 +380,10 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
         Container(
           width: 6, height: 6,
           margin: const EdgeInsets.only(top: 6, right: 8),
-          decoration: const BoxDecoration(color: ColorsAmiin.ocre, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: context.ac.infoAccent, shape: BoxShape.circle),
         ),
         Expanded(child: Text(name, style: TextStyle(
-          fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.ink, height: 1.4,
+          fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.ink, height: 1.4,
         ))),
       ],
     );
@@ -399,12 +399,12 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             children: [
               Container(
                 width: 28, height: 28,
-                decoration: const BoxDecoration(color: ColorsAmiin.ocre, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: context.ac.infoAccent, shape: BoxShape.circle),
                 child: Center(child: Text('${step.order}', style: TextStyle(
-                  fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.white,
+                  fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.onAccent,
                 ))),
               ),
-              if (!isLast) Container(width: 2, height: 36, color: ColorsAmiin.border),
+              if (!isLast) Container(width: 2, height: 36, color: context.ac.border),
             ],
           ),
         ),
@@ -416,12 +416,12 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(step.title, style: TextStyle(
-                  fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink,
+                  fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink,
                 )),
                 if (step.title != step.description) ...[
                   const SizedBox(height: 3),
                   Text(step.description, style: TextStyle(
-                    fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid, height: 1.4,
+                    fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone, height: 1.4,
                   )),
                 ],
               ],
@@ -436,24 +436,24 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink)),
+        Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink)),
         if (org.adresse != null && org.adresse!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Row(children: [
-            Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
             Expanded(child: Text(org.adresse!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
             ))),
           ]),
         ],
         if (org.horaires != null && org.horaires!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Row(children: [
-            Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
             Expanded(child: Text(org.horaires!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid,
+              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
             ))),
           ]),
         ],
@@ -469,10 +469,10 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               }
             },
             child: Row(children: [
-              Icon(Icons.contact_mail_outlined, size: 13, color: ColorsAmiin.ocre),
+              Icon(Icons.contact_mail_outlined, size: 13, color: context.ac.infoAccent),
               const SizedBox(width: 4),
               Expanded(child: Text(org.contact!, style: TextStyle(
-                fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.ocre,
+                fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.infoAccent,
               ))),
             ]),
           ),
@@ -482,7 +482,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           icon: const Icon(Icons.map_outlined, size: 14),
           label: const Text('Voir dans l\'annuaire'),
           style: TextButton.styleFrom(
-            foregroundColor: ColorsAmiin.ocre,
+            foregroundColor: context.ac.infoAccent,
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/header.dart';
@@ -18,7 +18,7 @@ class SettingsAccountScreen extends StatelessWidget {
     final displayName = auth.currentUser?.displayName ?? '';
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [

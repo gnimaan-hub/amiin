@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/themes.dart';
 import '../../theme/typography.dart';
@@ -27,11 +26,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<AmiinNote> _notes = [];
 
   // Tuiles d'accès rapide — turquoise pour secretariat, ocre pour info
-  static const _quickTiles = [
-    _QuickTile(label: 'Agenda',     tab: 'agenda',    bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, isInfo: false),
-    _QuickTile(label: 'Notes',      tab: 'notes',     bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, isInfo: false),
-    _QuickTile(label: 'Annuaire',   tab: 'annuaire',  bg: ColorsAmiin.ocreLt,      text: ColorsAmiin.ocreDk,      isInfo: true),
-    _QuickTile(label: 'Démarches',  tab: 'demarches', bg: ColorsAmiin.ocreLt,      text: ColorsAmiin.ocreDk,      isInfo: true),
+  List<_QuickTile> get _quickTiles => [
+    _QuickTile(label: 'Agenda',     tab: 'agenda',    bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, isInfo: false),
+    _QuickTile(label: 'Notes',      tab: 'notes',     bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, isInfo: false),
+    _QuickTile(label: 'Annuaire',   tab: 'annuaire',  bg: context.ac.infoAccentLight,      text: context.ac.infoAccentDark,      isInfo: true),
+    _QuickTile(label: 'Démarches',  tab: 'demarches', bg: context.ac.infoAccentLight,      text: context.ac.infoAccentDark,      isInfo: true),
   ];
 
   @override
@@ -81,11 +80,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Color _categoryColor(String category) {
     switch (category) {
-      case 'admin':     return ColorsAmiin.ocre;
-      case 'personal':  return ColorsAmiin.turquoise;
-      case 'health':    return ColorsAmiin.success;
-      case 'education': return ColorsAmiin.ocreMid;
-      default:          return ColorsAmiin.muted;
+      case 'admin':     return context.ac.infoAccent;
+      case 'personal':  return context.ac.secretariatAccent;
+      case 'health':    return context.ac.success;
+      case 'education': return context.ac.infoAccentMid;
+      default:          return context.ac.muted;
     }
   }
 
@@ -232,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: Spacing.xxxl),
                     // Ligne d'horizon — au bas du header
-                    const HorizonLine(color: ColorsAmiin.turquoise, height: 1.5),
+                    HorizonLine(color: context.ac.secretariatAccent, height: 1.5),
                   ],
                 ),
               ),

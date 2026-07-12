@@ -1,16 +1,12 @@
 // ─── Tag ──────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
 enum TagVariant { default_, turquoise, ocre, success, alert }
 
-// Alias rétrocompat
-const TagVariant tagTerra    = TagVariant.turquoise;
-const TagVariant tagIndigo   = TagVariant.ocre;
-const TagVariant tagOlive    = TagVariant.success;
 
 class AmiinTag extends StatelessWidget {
   final String label;
@@ -24,7 +20,7 @@ class AmiinTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _getConfig(variant);
+    final config = _getConfig(context, variant);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
       decoration: BoxDecoration(
@@ -44,18 +40,18 @@ class AmiinTag extends StatelessWidget {
     );
   }
 
-  _TagConfig _getConfig(TagVariant v) {
+  _TagConfig _getConfig(BuildContext context, TagVariant v) {
     switch (v) {
       case TagVariant.default_:
-        return _TagConfig(bg: ColorsAmiin.ecru, text: ColorsAmiin.mid, border: ColorsAmiin.border);
+        return _TagConfig(bg: context.ac.background, text: context.ac.midTone, border: context.ac.border);
       case TagVariant.turquoise:
-        return _TagConfig(bg: ColorsAmiin.turquoiseLt, text: ColorsAmiin.turquoiseDk, border: ColorsAmiin.turquoiseLt);
+        return _TagConfig(bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, border: context.ac.secretariatAccentLight);
       case TagVariant.ocre:
-        return _TagConfig(bg: ColorsAmiin.ocreLt, text: ColorsAmiin.ocreDk, border: ColorsAmiin.ocreLt);
+        return _TagConfig(bg: context.ac.infoAccentLight, text: context.ac.infoAccentDark, border: context.ac.infoAccentLight);
       case TagVariant.success:
-        return _TagConfig(bg: ColorsAmiin.successLt, text: ColorsAmiin.success, border: ColorsAmiin.successLt);
+        return _TagConfig(bg: context.ac.successLight, text: context.ac.success, border: context.ac.successLight);
       case TagVariant.alert:
-        return _TagConfig(bg: ColorsAmiin.corailLt, text: ColorsAmiin.corail, border: ColorsAmiin.corailLt);
+        return _TagConfig(bg: context.ac.alertColorLight, text: context.ac.alertColor, border: context.ac.alertColorLight);
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -18,7 +18,7 @@ class SettingsLanguageScreen extends StatelessWidget {
     final settings = context.watch<SettingsService>();
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -42,7 +42,7 @@ class SettingsLanguageScreen extends StatelessWidget {
                             current: settings.language,
                             onTap: () => settingsService.language = 'fr',
                           ),
-                          const Divider(color: ColorsAmiin.border, height: 1, indent: 56),
+                          Divider(color: context.ac.border, height: 1, indent: 56),
                           _LangOption(
                             flag: '🇬🇧',
                             label: 'English',
@@ -65,7 +65,7 @@ class SettingsLanguageScreen extends StatelessWidget {
                             current: settings.aiLanguage,
                             onTap: () => settingsService.aiLanguage = 'fr',
                           ),
-                          const Divider(color: ColorsAmiin.border, height: 1, indent: 56),
+                          Divider(color: context.ac.border, height: 1, indent: 56),
                           _LangOption(
                             flag: '🇬🇧',
                             label: 'English',
@@ -73,7 +73,7 @@ class SettingsLanguageScreen extends StatelessWidget {
                             current: settings.aiLanguage,
                             onTap: () => settingsService.aiLanguage = 'en',
                           ),
-                          const Divider(color: ColorsAmiin.border, height: 1, indent: 56),
+                          Divider(color: context.ac.border, height: 1, indent: 56),
                           _LangOption(
                             flag: '🇸🇦',
                             label: 'العربية',
@@ -81,7 +81,7 @@ class SettingsLanguageScreen extends StatelessWidget {
                             current: settings.aiLanguage,
                             onTap: () => settingsService.aiLanguage = 'ar',
                           ),
-                          const Divider(color: ColorsAmiin.border, height: 1, indent: 56),
+                          Divider(color: context.ac.border, height: 1, indent: 56),
                           _LangOption(
                             flag: '🇸🇴',
                             label: 'Soomaali',
@@ -190,13 +190,13 @@ class _LangOption extends StatelessWidget {
               child: Text(label, style: TextStyle(
                 fontFamily: FontFamily.sans,
                 fontSize: 15,
-                color: ColorsAmiin.ink,
+                color: context.ac.ink,
               )),
             ),
             if (selected)
               Icon(Icons.check_circle, color: primary, size: 20)
             else
-              Icon(Icons.circle_outlined, color: ColorsAmiin.border, size: 20),
+              Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
           ],
         ),
       ),
@@ -226,14 +226,14 @@ class _CurrencyOption extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: selected ? primary.withValues(alpha: 0.1) : ColorsAmiin.ecru,
+                color: selected ? primary.withValues(alpha: 0.1) : context.ac.background,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(symbol, style: TextStyle(
                   fontFamily: FontFamily.geoBold,
                   fontSize: 16,
-                  color: selected ? primary : ColorsAmiin.mid,
+                  color: selected ? primary : context.ac.midTone,
                 )),
               ),
             ),
@@ -243,15 +243,15 @@ class _CurrencyOption extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: ColorsAmiin.ink)),
-                  Text(code, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted)),
+                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink)),
+                  Text(code, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted)),
                 ],
               ),
             ),
             if (selected)
               Icon(Icons.check_circle, color: primary, size: 20)
             else
-              Icon(Icons.circle_outlined, color: ColorsAmiin.border, size: 20),
+              Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
           ],
         ),
       ),
@@ -282,15 +282,15 @@ class _FormatOption extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: ColorsAmiin.ink)),
-                  Text(subtitle, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.muted)),
+                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink)),
+                  Text(subtitle, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.muted)),
                 ],
               ),
             ),
             if (selected)
               Icon(Icons.check_circle, color: primary, size: 20)
             else
-              Icon(Icons.circle_outlined, color: ColorsAmiin.border, size: 20),
+              Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
           ],
         ),
       ),

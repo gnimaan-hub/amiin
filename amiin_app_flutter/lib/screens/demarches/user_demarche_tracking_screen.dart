@@ -11,7 +11,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -152,7 +152,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
+      return Scaffold(body: Center(child: CircularProgressIndicator(color: context.ac.infoAccent)));
     }
     if (_ud == null) return const SizedBox();
 
@@ -165,18 +165,18 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     for (final doc in d.documents) { docsByCas.putIfAbsent(doc.cas, () => []).add(doc); }
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
             AmiinHeader(title: d.title, back: true, rightAction: IconButton(
-              icon: const Icon(Icons.more_vert, color: ColorsAmiin.mid),
+              icon: Icon(Icons.more_vert, color: context.ac.midTone),
               onPressed: _showMenu,
             )),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _load,
-                color: ColorsAmiin.ocre,
+                color: context.ac.infoAccent,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(Spacing.lg),
@@ -214,8 +214,8 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                                   const SizedBox(height: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                    decoration: BoxDecoration(color: ColorsAmiin.sand, borderRadius: BorderRadius.circular(4)),
-                                    child: Text(cas, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 10, color: ColorsAmiin.mid)),
+                                    decoration: BoxDecoration(color: context.ac.surface2, borderRadius: BorderRadius.circular(4)),
+                                    child: Text(cas, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 10, color: context.ac.midTone)),
                                   ),
                                   const SizedBox(height: 4),
                                 ],
@@ -263,16 +263,16 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                           width: double.infinity,
                           padding: const EdgeInsets.all(Spacing.lg),
                           decoration: BoxDecoration(
-                            color: ColorsAmiin.successLt,
+                            color: context.ac.successLight,
                             borderRadius: BorderRadius.circular(RadiusAmiin.md),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('✓', style: TextStyle(fontSize: 18, color: ColorsAmiin.success)),
+                              Text('✓', style: TextStyle(fontSize: 18, color: context.ac.success)),
                               const SizedBox(width: Spacing.sm),
                               Text('Démarche terminée', style: TextStyle(
-                                fontFamily: FontFamily.geoBold, fontSize: 15, color: ColorsAmiin.success,
+                                fontFamily: FontFamily.geoBold, fontSize: 15, color: context.ac.success,
                               )),
                             ],
                           ),
@@ -283,7 +283,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                             await demarchesService.updateStatus(widget.userDemarcheId, DemarcheStatus.enCours);
                             await _load();
                           },
-                          child: Text('Rouvrir la démarche', style: TextStyle(color: ColorsAmiin.mid)),
+                          child: Text('Rouvrir la démarche', style: TextStyle(color: context.ac.midTone)),
                         ),
                       ],
                       const SizedBox(height: Spacing.lg),
@@ -312,9 +312,9 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                 ud.status == DemarcheStatus.terminee
                     ? 'Démarche terminée ✓'
                     : 'En cours — ${ud.completedSteps} sur ${ud.totalSteps} étapes',
-                style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink),
+                style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink),
               )),
-              Text('$pct %', style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 14, color: ColorsAmiin.ocre)),
+              Text('$pct %', style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 14, color: context.ac.infoAccent)),
             ],
           ),
           const SizedBox(height: 8),
@@ -322,8 +322,8 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: ud.progress,
-              backgroundColor: ColorsAmiin.border,
-              color: ud.status == DemarcheStatus.terminee ? ColorsAmiin.success : ColorsAmiin.ocre,
+              backgroundColor: context.ac.border,
+              color: ud.status == DemarcheStatus.terminee ? context.ac.success : context.ac.infoAccent,
               minHeight: 8,
             ),
           ),
@@ -331,7 +331,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             const SizedBox(height: 6),
             Text(
               '${ud.demarche.category.icon} ${ud.demarche.category.label}',
-              style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+              style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
             ),
           ],
         ],
@@ -355,9 +355,9 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         borderRadius: BorderRadius.circular(RadiusAmiin.md),
         child: Container(
           decoration: BoxDecoration(
-            color: ColorsAmiin.white,
+            color: context.ac.surface,
             borderRadius: BorderRadius.circular(RadiusAmiin.md),
-            border: Border.all(color: ColorsAmiin.border),
+            border: Border.all(color: context.ac.border),
           ),
           child: Column(
           children: [
@@ -373,10 +373,10 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                       duration: const Duration(milliseconds: 200),
                       width: 32, height: 32,
                       decoration: BoxDecoration(
-                        color: isDone ? ColorsAmiin.ocre : ColorsAmiin.white,
+                        color: isDone ? context.ac.infoAccent : context.ac.surface,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isDone ? ColorsAmiin.ocre : ColorsAmiin.border,
+                          color: isDone ? context.ac.infoAccent : context.ac.border,
                           width: 2,
                         ),
                       ),
@@ -384,7 +384,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         ? const Icon(Icons.check, color: Colors.white, size: 18)
                         : Text('${step.order}', style: TextStyle(
                             fontFamily: FontFamily.geoBold, fontSize: 13,
-                            color: ColorsAmiin.mid,
+                            color: context.ac.midTone,
                           )),
                       ),
                     ),
@@ -404,21 +404,21 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                                 Text(step.title, style: TextStyle(
                                   fontFamily: isDone ? FontFamily.sans : FontFamily.geoBold,
                                   fontSize: 14,
-                                  color: isDone ? ColorsAmiin.muted : ColorsAmiin.ink,
+                                  color: isDone ? context.ac.muted : context.ac.ink,
                                   decoration: isDone ? TextDecoration.lineThrough : null,
                                 )),
                                 if (isDone && st.completedAt != null) ...[
                                   const SizedBox(height: 2),
                                   Text(
                                     'Validé le ${_formatDate(st.completedAt!)}',
-                                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
                                   ),
                                 ] else if (st.agendaEventId != null) ...[
                                   const SizedBox(height: 2),
                                   Row(children: [
-                                    Icon(Icons.event, size: 12, color: ColorsAmiin.ocre),
+                                    Icon(Icons.event, size: 12, color: context.ac.infoAccent),
                                     const SizedBox(width: 3),
-                                    Text('RDV programmé', style: TextStyle(fontSize: 11, color: ColorsAmiin.ocre)),
+                                    Text('RDV programmé', style: TextStyle(fontSize: 11, color: context.ac.infoAccent)),
                                   ]),
                                 ],
                               ],
@@ -426,7 +426,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                           ),
                           Icon(
                             isExpanded ? Icons.expand_less : Icons.expand_more,
-                            color: ColorsAmiin.muted, size: 20,
+                            color: context.ac.muted, size: 20,
                           ),
                         ],
                       ),
@@ -437,7 +437,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             ),
             // Corps expandé
             if (isExpanded) ...[
-              const Divider(height: 1, color: ColorsAmiin.border),
+              Divider(height: 1, color: context.ac.border),
               Padding(
                 padding: const EdgeInsets.all(Spacing.md),
                 child: Column(
@@ -446,14 +446,14 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                     // Description complète
                     if (step.title != step.description)
                       Text(step.description, style: TextStyle(
-                        fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.mid, height: 1.5,
+                        fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.midTone, height: 1.5,
                       )),
                     if (step.lieu != null) ...[
                       const SizedBox(height: 8),
                       Row(children: [
-                        Icon(Icons.location_on_outlined, size: 14, color: ColorsAmiin.muted),
+                        Icon(Icons.location_on_outlined, size: 14, color: context.ac.muted),
                         const SizedBox(width: 4),
-                        Text(step.lieu!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid)),
+                        Text(step.lieu!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone)),
                       ]),
                     ],
 
@@ -462,7 +462,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                     // Note pour cette étape
                     Text('Ma note', style: TextStyle(
                       fontFamily: FontFamily.geoBold, fontSize: 11,
-                      letterSpacing: 0.8, color: ColorsAmiin.muted,
+                      letterSpacing: 0.8, color: context.ac.muted,
                     )),
                     const SizedBox(height: 6),
                     TextField(
@@ -470,20 +470,20 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText: 'Numéro de dossier, remarques, observations…',
-                        hintStyle: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.muted),
+                        hintStyle: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.muted),
                         filled: true,
-                        fillColor: ColorsAmiin.ecru,
+                        fillColor: context.ac.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                          borderSide: const BorderSide(color: ColorsAmiin.border),
+                          borderSide: BorderSide(color: context.ac.border),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                          borderSide: const BorderSide(color: ColorsAmiin.border),
+                          borderSide: BorderSide(color: context.ac.border),
                         ),
                         contentPadding: const EdgeInsets.all(10),
                       ),
-                      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.ink),
+                      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.ink),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -491,7 +491,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.save_outlined, size: 15),
                           label: const Text('Enregistrer'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.mid, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.midTone, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _saveStepNote(step.order),
                         ),
                         const Spacer(),
@@ -499,7 +499,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.notifications_outlined, size: 15),
                           label: const Text('Rappel'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.ocre, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _setStepReminder(step.order),
                         ),
                         const SizedBox(width: 4),
@@ -507,7 +507,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.calendar_today_outlined, size: 15),
                           label: const Text('RDV'),
-                          style: TextButton.styleFrom(foregroundColor: ColorsAmiin.ocre, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
                           onPressed: () => _scheduleStepEvent(step.order),
                         ),
                       ],
@@ -531,10 +531,10 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              Icon(icon, size: 14, color: ColorsAmiin.muted),
+              Icon(icon, size: 14, color: context.ac.muted),
               const SizedBox(width: 6),
               Text(title.toUpperCase(), style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
+                fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: context.ac.muted,
               )),
             ]),
             const SizedBox(height: 10),
@@ -546,7 +546,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   }
 
   Widget _sectionHeader(String title) => Text(title, style: TextStyle(
-    fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink,
+    fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink,
   ));
 
   Future<void> _toggleDocCheck(String docName) async {
@@ -583,7 +583,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             child: Icon(
               isChecked ? Icons.check_box : Icons.check_box_outline_blank,
               size: 18,
-              color: isChecked ? ColorsAmiin.success : ColorsAmiin.muted,
+              color: isChecked ? context.ac.success : context.ac.muted,
             ),
           ),
           const SizedBox(width: 8),
@@ -593,7 +593,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
               Text(doc.name, style: TextStyle(
                 fontFamily: FontFamily.sans,
                 fontSize: 13,
-                color: isChecked ? ColorsAmiin.muted : ColorsAmiin.ink,
+                color: isChecked ? context.ac.muted : context.ac.ink,
                 decoration: isChecked ? TextDecoration.lineThrough : null,
                 height: 1.4,
               )),
@@ -601,7 +601,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                 const SizedBox(height: 2),
                 Text(
                   _firstSentence(doc.description!),
-                  style: const TextStyle(fontSize: 11, color: ColorsAmiin.muted, fontStyle: FontStyle.italic),
+                  style: TextStyle(fontSize: 11, color: context.ac.muted, fontStyle: FontStyle.italic),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -627,33 +627,33 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       children: [
         if (org.adresse != null && org.adresse!.isNotEmpty) ...[
           Row(children: [
-            Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+            Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: 4),
         ],
         if (org.horaires != null && org.horaires!.isNotEmpty) ...[
           Row(children: [
-            Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+            Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+            Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: Spacing.sm),
         ],
         for (int i = 0; i < lieux.length; i++) ...[
-          if (i > 0) const Padding(
+          if (i > 0) Padding(
             padding: EdgeInsets.only(top: 4, bottom: 8),
-            child: Divider(height: 1, color: ColorsAmiin.border),
+            child: Divider(height: 1, color: context.ac.border),
           ),
           Row(children: [
             Expanded(child: Text(lieux[i].nom, style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 12, color: ColorsAmiin.ink,
+              fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.ink,
             ))),
             TextButton(
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
-                foregroundColor: ColorsAmiin.ocre,
+                foregroundColor: context.ac.infoAccent,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
@@ -672,14 +672,14 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: ColorsAmiin.white,
-        border: Border.all(color: ColorsAmiin.border),
+        color: context.ac.surface,
+        border: Border.all(color: context.ac.border),
         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 13, color: ColorsAmiin.muted),
+        Icon(icon, size: 13, color: context.ac.muted),
         const SizedBox(width: 5),
-        Flexible(child: Text(truncated, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+        Flexible(child: Text(truncated, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
       ]),
     );
   }
@@ -687,21 +687,21 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   Widget _organismeCard(DemarcheOrganisme org) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: ColorsAmiin.ink)),
+      Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink)),
       if (org.adresse != null && org.adresse!.isNotEmpty) ...[
         const SizedBox(height: 5),
         Row(children: [
-          Icon(Icons.location_on_outlined, size: 13, color: ColorsAmiin.muted),
+          Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
           const SizedBox(width: 4),
-          Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+          Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
         ]),
       ],
       if (org.horaires != null && org.horaires!.isNotEmpty) ...[
         const SizedBox(height: 4),
         Row(children: [
-          Icon(Icons.schedule_outlined, size: 13, color: ColorsAmiin.muted),
+          Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
           const SizedBox(width: 4),
-          Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.mid))),
+          Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
         ]),
       ],
       const SizedBox(height: Spacing.sm),
@@ -710,7 +710,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         icon: const Icon(Icons.map_outlined, size: 15),
         label: const Text('Voir dans l\'annuaire'),
         style: TextButton.styleFrom(
-          foregroundColor: ColorsAmiin.ocre,
+          foregroundColor: context.ac.infoAccent,
           textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 13),
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -726,20 +726,20 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Icon(Icons.sticky_note_2_outlined, size: 14, color: ColorsAmiin.muted),
+            Icon(Icons.sticky_note_2_outlined, size: 14, color: context.ac.muted),
             const SizedBox(width: 6),
             Text('NOTES GÉNÉRALES', style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: ColorsAmiin.muted,
+              fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: context.ac.muted,
             )),
           ]),
           const SizedBox(height: 10),
           Text(ud.notes?.isNotEmpty == true ? ud.notes! : 'Aucune note. Appuyez pour ajouter.',
-            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: ColorsAmiin.muted, fontStyle: FontStyle.italic)),
+            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.muted, fontStyle: FontStyle.italic)),
           const SizedBox(height: 6),
           TextButton.icon(
             icon: const Icon(Icons.edit_outlined, size: 14),
             label: const Text('Modifier les notes'),
-            style: TextButton.styleFrom(foregroundColor: ColorsAmiin.mid, padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            style: TextButton.styleFrom(foregroundColor: context.ac.midTone, padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               textStyle: TextStyle(fontFamily: FontFamily.sans, fontSize: 12)),
             onPressed: () => _editGlobalNotes(ud),
           ),
@@ -796,10 +796,10 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: ColorsAmiin.border, borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: context.ac.border, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 8),
             ListTile(
-              leading: const Icon(Icons.description_outlined, color: ColorsAmiin.mid),
+              leading: Icon(Icons.description_outlined, color: context.ac.midTone),
               title: const Text('Voir la fiche démarche'),
               onTap: () {
                 Navigator.pop(ctx);

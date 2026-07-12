@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/connectivity_service.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/typography.dart';
 
 class ConnectivityBanner extends StatelessWidget {
@@ -19,7 +19,7 @@ class ConnectivityBanner extends StatelessWidget {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: svc.isOnline ? 0 : 32,
-                color: ColorsAmiin.corail,
+                color: context.ac.alertColor,
                 child: svc.isOnline
                     ? const SizedBox()
                     : Center(
@@ -28,7 +28,7 @@ class ConnectivityBanner extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: FontFamily.geoMedium,
                             fontSize: 12,
-                            color: ColorsAmiin.white,
+                            color: context.ac.onAccent,
                           ),
                         ),
                       ),

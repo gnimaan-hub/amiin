@@ -1,7 +1,7 @@
 // ─── Widgets partagés entre tous les écrans Settings ─────────────────────────
 
 import 'package:flutter/material.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/card.dart';
@@ -22,7 +22,7 @@ class SettingsSection extends StatelessWidget {
           fontFamily: FontFamily.geoBold,
           fontSize: 10,
           letterSpacing: 1.2,
-          color: ColorsAmiin.muted,
+          color: context.ac.muted,
         ),
       ),
     );
@@ -60,7 +60,7 @@ class SettingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    final labelColor = destructive ? Colors.red : ColorsAmiin.ink;
+    final labelColor = destructive ? Colors.red : context.ac.ink;
 
     return InkWell(
       onTap: toggle ? null : onTap,
@@ -108,7 +108,7 @@ class SettingRow extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: FontFamily.sans,
                         fontSize: 12,
-                        color: ColorsAmiin.muted,
+                        color: context.ac.muted,
                       ),
                     ),
                   ],
@@ -121,7 +121,7 @@ class SettingRow extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: FontFamily.sans,
                   fontSize: 13,
-                  color: ColorsAmiin.muted,
+                  color: context.ac.muted,
                 ),
               ),
             if (toggle)
@@ -131,7 +131,7 @@ class SettingRow extends StatelessWidget {
                 activeColor: primary,
               )
             else if (onTap != null && showChevron)
-              const Icon(Icons.chevron_right, color: ColorsAmiin.muted, size: 18),
+              Icon(Icons.chevron_right, color: context.ac.muted, size: 18),
           ],
         ),
       ),
@@ -141,11 +141,13 @@ class SettingRow extends StatelessWidget {
 
 // ── Divider entre rows ────────────────────────────────────────────────────────
 
-const settingDivider = Divider(
-  color: ColorsAmiin.border,
-  height: 1,
-  indent: 60,
-);
+class SettingDivider extends StatelessWidget {
+  const SettingDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      Divider(color: context.ac.border, height: 1, indent: 60);
+}
 
 // ── Card groupant des rows ────────────────────────────────────────────────────
 
@@ -158,7 +160,7 @@ class SettingCard extends StatelessWidget {
     final items = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       items.add(children[i]);
-      if (i < children.length - 1) items.add(settingDivider);
+      if (i < children.length - 1) items.add(const SettingDivider());
     }
     return AmiinCard(child: Column(children: items));
   }
@@ -193,7 +195,7 @@ class ChoiceSelector extends StatelessWidget {
               margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                color: selected ? primary : ColorsAmiin.sand,
+                color: selected ? primary : context.ac.surface2,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -202,7 +204,7 @@ class ChoiceSelector extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: FontFamily.geoMedium,
                   fontSize: 12,
-                  color: selected ? Colors.white : ColorsAmiin.mid,
+                  color: selected ? Colors.white : context.ac.midTone,
                 ),
               ),
             ),

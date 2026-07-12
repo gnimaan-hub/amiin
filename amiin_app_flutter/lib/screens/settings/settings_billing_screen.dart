@@ -1,7 +1,7 @@
 // ─── SettingsBillingScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -16,7 +16,7 @@ class SettingsBillingScreen extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -60,7 +60,7 @@ class SettingsBillingScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: FontFamily.geoBold,
                                 fontSize: 18,
-                                color: ColorsAmiin.ink,
+                                color: context.ac.ink,
                               ),
                             ),
                           ),
@@ -72,7 +72,7 @@ class SettingsBillingScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 13,
-                                color: ColorsAmiin.muted,
+                                color: context.ac.muted,
                               ),
                             ),
                           ),
