@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="launch_bg">#2C2114</color>
+
+    <!-- Widget « Aujourd'hui » — palette Djibouti (theme/colors.dart).
+         Variante sombre dans values-night/colors.xml, mêmes noms. -->
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="widget_ink">#14213D</color>
+    <color name="widget_muted">#7A8BA8</color>
+    <color name="widget_accent">#C8902F</color>
+    <color name="widget_border">#D0D5E2</color>
 </resources>

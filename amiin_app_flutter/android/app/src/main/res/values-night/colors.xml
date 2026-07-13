@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget « Aujourd'hui » en mode sombre — mêmes noms que values/colors.xml,
+         résolus automatiquement par Android selon le thème système. -->
+    <color name="widget_bg">#1C2E52</color>
+    <color name="widget_ink">#F2EFE9</color>
+    <color name="widget_muted">#8090B0</color>
+    <color name="widget_accent">#DEA844</color>
+    <color name="widget_border">#2A3A5A</color>
+</resources>
