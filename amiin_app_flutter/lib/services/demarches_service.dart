@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'memory_service.dart';
 import 'notification_service.dart';
 import 'settings_service.dart';
+import 'widget_bridge.dart';
 import '../models/user_action.dart';
 
 // ── Enums ────────────────────────────────────────────────────────────────────
@@ -801,7 +802,21 @@ class DemarchesService {
 
   String _followUpId(String userDemarcheId) => 'demarche_followup_$userDemarcheId';
 
+  /// Reflète les démarches en cours sur le widget d'écran d'accueil.
+  Future<void> _syncWidget() async {
+    final enCours = _userBox.values
+        .where((ud) => ud.status == DemarcheStatus.enCours)
+        .map((ud) => <String, dynamic>{
+              'title': ud.demarche.title,
+              'step': ud.completedSteps,
+              'total': ud.totalSteps,
+            })
+        .toList();
+    await WidgetBridge.pushDemarches(enCours);
+  }
+
   Future<void> _rescheduleFollowUp(UserDemarche ud) async {
+    await _syncWidget();
     final id = _followUpId(ud.id);
     await notificationService.cancelReminder(id);
     if (ud.status != DemarcheStatus.enCours) return;
@@ -848,6 +863,7 @@ class DemarchesService {
     await _init();
     await notificationService.cancelReminder(_followUpId(userDemarcheId));
     await _userBox.delete(userDemarcheId);
+    await _syncWidget();
   }
 
   // Compatibilité ascendante avec l'ancienne API

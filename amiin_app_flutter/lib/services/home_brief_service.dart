@@ -10,13 +10,9 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:home_widget/home_widget.dart';
 import 'api_client.dart';
 import 'hive_utils.dart';
-
-/// Nom du provider Android (doit correspondre à AmiinBriefWidgetProvider.kt
-/// et à l'entrée `receiver` de AndroidManifest.xml).
-const _kWidgetAndroidName = 'AmiinBriefWidgetProvider';
+import 'widget_bridge.dart';
 
 class HomeBriefWeather {
   final int temp;
@@ -180,7 +176,7 @@ class HomeBriefService {
         _lastFetch = DateTime.now();
         await _box!.put('latest', fresh.toJson());
         await _box!.put('fetched_at', _lastFetch!.toIso8601String());
-        unawaited(_pushToHomeScreenWidget(fresh));
+        unawaited(WidgetBridge.pushBrief(fresh));
       }
     } catch (e) {
       debugPrint('Brief du jour indisponible : $e');
@@ -189,49 +185,7 @@ class HomeBriefService {
     }
   }
 
-  /// Reflète le brief sur le widget d'écran d'accueil Android. Best-effort :
-  /// une erreur ici (widget non ajouté, plateforme non supportée) ne doit
-  /// jamais remonter à l'appelant ni affecter l'app elle-même.
-  Future<void> _pushToHomeScreenWidget(HomeBrief b) async {
-    try {
-      final weather = b.weather;
-      await HomeWidget.saveWidgetData<String>(
-        'widget_weather_value', weather != null ? '${weather.temp}°' : '—');
-      await HomeWidget.saveWidgetData<String>(
-        'widget_weather_label', weather?.desc ?? 'Météo indisponible');
-
-      final prayers = b.prayers;
-      if (prayers != null) {
-        final (name, time) = prayers.next(DateTime.now());
-        await HomeWidget.saveWidgetData<String>('widget_prayer_value', time);
-        await HomeWidget.saveWidgetData<String>('widget_prayer_label', name);
-      } else {
-        await HomeWidget.saveWidgetData<String>('widget_prayer_value', '—');
-        await HomeWidget.saveWidgetData<String>('widget_prayer_label', 'Prière');
-      }
-
-      final fx = b.fx;
-      if (fx != null) {
-        final eur = fx.eurFdj;
-        await HomeWidget.saveWidgetData<String>('widget_fx_value',
-            eur != null ? '${eur.round()} FDJ' : '${fx.usdFdj.round()} FDJ');
-        await HomeWidget.saveWidgetData<String>(
-            'widget_fx_label', eur != null ? '1 euro' : '1 dollar');
-      } else {
-        await HomeWidget.saveWidgetData<String>('widget_fx_value', '—');
-        await HomeWidget.saveWidgetData<String>('widget_fx_label', 'Taux');
-      }
-
-      final now = DateTime.now();
-      final hh = now.hour.toString().padLeft(2, '0');
-      final mm = now.minute.toString().padLeft(2, '0');
-      await HomeWidget.saveWidgetData<String>('widget_updated_at', '$hh:$mm');
-
-      await HomeWidget.updateWidget(androidName: _kWidgetAndroidName);
-    } catch (e) {
-      debugPrint('Widget d\'écran d\'accueil non mis à jour : $e');
-    }
-  }
 }
+
 
 final homeBriefService = HomeBriefService();

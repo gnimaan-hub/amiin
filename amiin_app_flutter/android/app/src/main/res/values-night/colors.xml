@@ -7,4 +7,6 @@
     <color name="widget_muted">#8090B0</color>
     <color name="widget_accent">#DEA844</color>
     <color name="widget_border">#2A3A5A</color>
+    <color name="widget_pill_bg">#162038</color>
+    <color name="widget_mic">#1E8A8A</color>
 </resources>

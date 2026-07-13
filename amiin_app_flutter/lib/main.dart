@@ -14,6 +14,7 @@ import 'services/demarches_service.dart';
 import 'services/notification_service.dart';
 import 'services/connectivity_service.dart';
 import 'services/settings_service.dart';
+import 'services/widget_bridge.dart';
 import 'app.dart';
 
 void main() async {
@@ -36,6 +37,7 @@ void main() async {
   // Initialisations non critiques : en arrière-plan, sans retarder le démarrage
   unawaited(notificationService.init());
   unawaited(connectivityService.init());
+  unawaited(WidgetBridge.init());
 
   // Badge agenda réactif : se met à jour dès qu'un événement change,
   // qu'il soit créé manuellement ou par Amiin.
