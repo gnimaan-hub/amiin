@@ -11,4 +11,6 @@
     <color name="widget_border">#D0D5E2</color>
     <color name="widget_pill_bg">#F2EFE9</color>
     <color name="widget_mic">#1E8A8A</color>
+    <color name="widget_chip_bg">#CCEBEB</color>
+    <color name="widget_chip_text">#135E5E</color>
 </resources>

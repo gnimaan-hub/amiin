@@ -119,13 +119,19 @@ class WidgetBridge {
     _lastUriAt = now;
 
     final target = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
-    if (target != 'chat') return; // amiin://home → comportement par défaut
+    const routes = {
+      'chat': '/chat',
+      'agenda': '/agenda',
+      'demarches': '/demarches',
+    };
+    final route = routes[target];
+    if (route == null) return; // amiin://home → comportement par défaut
 
     // Lancement à froid : attendre que le premier frame soit rendu avant de
     // naviguer, sinon GoRouter n'est pas encore attaché.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      appRouter.go('/chat');
-      if (uri.queryParameters['voice'] == '1') {
+      appRouter.go(route);
+      if (target == 'chat' && uri.queryParameters['voice'] == '1') {
         // Laisse le temps au ChatScreen de monter et d'attacher son listener.
         Future.delayed(const Duration(milliseconds: 400), () {
           chatListenRequest.value++;
@@ -154,19 +160,16 @@ class WidgetBridge {
     final fx = b.fx;
     if (fx != null) {
       final eur = fx.eurFdj;
-      await HomeWidget.saveWidgetData<String>('widget_fx_value',
-          eur != null ? '${eur.round()} FDJ' : '${fx.usdFdj.round()} FDJ');
+      final parts = <String>[
+        if (eur != null) '1 € = ${eur.round()} FDJ',
+        '1 \$ = ${fx.usdFdj.round()} FDJ',
+      ];
       await HomeWidget.saveWidgetData<String>(
-          'widget_fx_label', eur != null ? '1 euro' : '1 dollar');
+          'widget_fx_line', '💱  ${parts.join('  ·  ')}');
     } else {
-      await HomeWidget.saveWidgetData<String>('widget_fx_value', '—');
-      await HomeWidget.saveWidgetData<String>('widget_fx_label', 'Taux');
+      await HomeWidget.saveWidgetData<String>(
+          'widget_fx_line', '💱  Taux du jour indisponible');
     }
-
-    final now = DateTime.now();
-    final hh = now.hour.toString().padLeft(2, '0');
-    final mm = now.minute.toString().padLeft(2, '0');
-    await HomeWidget.saveWidgetData<String>('widget_updated_at', '$hh:$mm');
   }
 
   /// Pousse le brief et rafraîchit le widget. Best-effort, jamais bloquant.
