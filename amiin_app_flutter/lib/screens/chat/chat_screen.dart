@@ -59,6 +59,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _isSpeaking = false;
   String? _speakingMsgId;
 
+  /// Session TTS « live » : la voix démarre pendant le streaming SSE,
+  /// alimentée phrase par phrase depuis _onChatChanged.
+  bool _liveTtsActive = false;
+
   // Animation dots
   late AnimationController _dotsController;
   late Animation<double> _dotsAnimation;
@@ -134,6 +138,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   void _onChatChanged() {
     if (!mounted) return;
+
+    // Voix en direct : chaque notification du stream pousse le texte
+    // accumulé — le service n'en synthétise que les nouvelles phrases.
+    if (_liveTtsActive) {
+      final msgs = _chat?.messages ?? const [];
+      if (msgs.isNotEmpty && msgs.last.role == 'agent') {
+        cloudTtsService.setSessionMsgId(msgs.last.id);
+        cloudTtsService.feedText(msgs.last.content);
+      }
+    }
+
     final follow = _nearBottom;
     setState(() {});
     if (follow) {
@@ -298,6 +313,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _stopSpeaking() async {
+    _liveTtsActive = false;
     if (settingsService.useCloudTts) {
       await cloudTtsService.stop();
     } else {
@@ -336,15 +352,38 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _controller.clear();
     _scrollToBottom();
 
-    final reply = await chat.sendMessage(text);
-
     // 'none'  → jamais de lecture auto
     // 'tts'   → lecture auto sur toute réponse (texte ou voix)
     // 'voice' → lecture seulement si le message a été dicté
     final mode = settingsService.defaultVoiceMode;
-    if (reply != null &&
-        mounted &&
-        (mode == 'tts' || (mode == 'voice' && wasVoice))) {
+    final wantAutoRead = mode == 'tts' || (mode == 'voice' && wasVoice);
+
+    // Voix en direct (cloud uniquement) : la session démarre AVANT la
+    // réponse — la 1re phrase sera parlée pendant que le reste streame.
+    final liveTts = wantAutoRead && settingsService.useCloudTts;
+    if (liveTts) {
+      _liveTtsActive = true;
+      cloudTtsService.beginSession(cleaner: _cleanTextForTts);
+      setState(() => _isSpeaking = true);
+    }
+
+    final reply = await chat.sendMessage(text);
+
+    if (liveTts) {
+      _liveTtsActive = false;
+      final produced = await cloudTtsService.endSession(reply ?? '');
+      if (mounted) {
+        setState(() {
+          _isSpeaking = false;
+          _speakingMsgId = null;
+        });
+      }
+      // Rien n'a pu être synthétisé (réseau TTS en panne pendant tout le
+      // stream) → repli sur le moteur local avec le texte complet.
+      if (!produced && reply != null && mounted) {
+        await _flutterTts.speak(_cleanTextForTts(reply));
+      }
+    } else if (reply != null && mounted && wantAutoRead) {
       final msgs = chat.messages;
       final msgId = msgs.isNotEmpty ? msgs.last.id : null;
       await _speak(reply, msgId: msgId);
