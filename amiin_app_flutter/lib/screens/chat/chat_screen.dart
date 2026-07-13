@@ -40,6 +40,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  /// La liste reste invisible tant que le scroll initial n'est pas posé en
+  /// bas — évite le flash « haut de conversation → saut vers le bas ».
+  bool _listReady = false;
+
   ChatController? _chat;
   StreamSubscription<ChatNotice>? _noticeSub;
 
@@ -94,6 +98,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         if (mounted && _scrollController.hasClients) {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
         }
+        // Le rendu markdown peut encore étendre la liste après ce frame :
+        // on re-cale une fois, puis on révèle la liste déjà en bas.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          if (_scrollController.hasClients) {
+            _scrollController.jumpTo(
+              _scrollController.position.maxScrollExtent,
+            );
+          }
+          setState(() => _listReady = true);
+        });
       });
     });
   }
@@ -135,8 +150,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       if (!mounted || !_scrollController.hasClients) return;
       final max = _scrollController.position.maxScrollExtent;
       if (animate) {
-        _scrollController.animateTo(max,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _scrollController.animateTo(
+          max,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       } else {
         _scrollController.jumpTo(max);
       }
@@ -183,7 +201,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
 
     if (!_speechAvailable) {
-      if (mounted) AmiinToast.show(context, 'Reconnaissance vocale non disponible.', success: false);
+      if (mounted)
+        AmiinToast.show(
+          context,
+          'Reconnaissance vocale non disponible.',
+          success: false,
+        );
       return;
     }
 
@@ -191,7 +214,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (!hasPermission) {
       final ok = await _speech.initialize();
       if (!ok) {
-        if (mounted) AmiinToast.show(context, 'Permission microphone refusée.', success: false);
+        if (mounted)
+          AmiinToast.show(
+            context,
+            'Permission microphone refusée.',
+            success: false,
+          );
         return;
       }
     }
@@ -216,7 +244,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _flutterTts.setSpeechRate(0.75);
     _flutterTts.setPitch(1.0);
     _flutterTts.setCompletionHandler(() {
-      if (mounted) setState(() { _isSpeaking = false; _speakingMsgId = null; });
+      if (mounted)
+        setState(() {
+          _isSpeaking = false;
+          _speakingMsgId = null;
+        });
     });
   }
 
@@ -240,7 +272,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (_isSpeaking) await _stopSpeaking();
     final cleaned = _cleanTextForTts(text);
     if (cleaned.isEmpty) return;
-    if (mounted) setState(() { _isSpeaking = true; _speakingMsgId = msgId; });
+    if (mounted)
+      setState(() {
+        _isSpeaking = true;
+        _speakingMsgId = msgId;
+      });
 
     if (settingsService.useCloudTts) {
       // Moteur cloud Edge TTS — haute qualité, indépendant des voix système.
@@ -250,7 +286,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       } catch (_) {
         await _flutterTts.speak(cleaned);
       }
-      if (mounted) setState(() { _isSpeaking = false; _speakingMsgId = null; });
+      if (mounted)
+        setState(() {
+          _isSpeaking = false;
+          _speakingMsgId = null;
+        });
     } else {
       // Moteur local flutter_tts — fin de lecture gérée par setCompletionHandler.
       await _flutterTts.speak(cleaned);
@@ -263,7 +303,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     } else {
       await _flutterTts.stop();
     }
-    if (mounted) setState(() { _isSpeaking = false; _speakingMsgId = null; });
+    if (mounted)
+      setState(() {
+        _isSpeaking = false;
+        _speakingMsgId = null;
+      });
   }
 
   Future<void> _sendMessage([String? presetText]) async {
@@ -272,7 +316,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (text.isEmpty || chat.isBusy) return;
 
     if (!connectivityService.isOnline) {
-      AmiinToast.show(context, 'Vous êtes hors ligne — message non envoyé.', success: false);
+      AmiinToast.show(
+        context,
+        'Vous êtes hors ligne — message non envoyé.',
+        success: false,
+      );
       return;
     }
 
@@ -294,7 +342,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     // 'tts'   → lecture auto sur toute réponse (texte ou voix)
     // 'voice' → lecture seulement si le message a été dicté
     final mode = settingsService.defaultVoiceMode;
-    if (reply != null && mounted &&
+    if (reply != null &&
+        mounted &&
         (mode == 'tts' || (mode == 'voice' && wasVoice))) {
       final msgs = chat.messages;
       final msgId = msgs.isNotEmpty ? msgs.last.id : null;
@@ -314,7 +363,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         title: const Text('Nouvelle conversation'),
-        content: const Text('Effacer la conversation actuelle et repartir de zéro ?'),
+        content: const Text(
+          'Effacer la conversation actuelle et repartir de zéro ?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
@@ -350,27 +401,35 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           Expanded(
             child: chat.messages.isEmpty
                 ? _buildEmptyState(chat, ac)
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(
-                        Spacing.lg, Spacing.lg, Spacing.lg, Spacing.sm),
-                    itemCount: chat.messages.length + (chat.isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (chat.isLoading && index == chat.messages.length) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: Spacing.sm),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              _AvatarA(color: ac.secretariatAccent),
-                              const SizedBox(width: Spacing.sm),
-                              _ThinkingBubble(color: ac.secretariatAccent),
-                            ],
-                          ),
-                        );
-                      }
-                      return _buildMessageItem(chat, index, ac);
-                    },
+                : Opacity(
+                    opacity: _listReady ? 1.0 : 0.0,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.fromLTRB(
+                        Spacing.lg,
+                        Spacing.lg,
+                        Spacing.lg,
+                        Spacing.sm,
+                      ),
+                      itemCount:
+                          chat.messages.length + (chat.isLoading ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (chat.isLoading && index == chat.messages.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: Spacing.sm),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _AvatarA(color: ac.secretariatAccent),
+                                const SizedBox(width: Spacing.sm),
+                                _ThinkingBubble(color: ac.secretariatAccent),
+                              ],
+                            ),
+                          );
+                        }
+                        return _buildMessageItem(chat, index, ac);
+                      },
+                    ),
                   ),
           ),
           _buildInputBar(insets, chat, ac),
@@ -381,7 +440,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // ── Header ─────────────────────────────────────────────────────────────────
 
-  Widget _buildHeader(EdgeInsets insets, ChatController chat, AmiinThemeColors ac) {
+  Widget _buildHeader(
+    EdgeInsets insets,
+    ChatController chat,
+    AmiinThemeColors ac,
+  ) {
     return Container(
       color: ac.headerGradientEnd,
       child: Column(
@@ -394,25 +457,33 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               children: [
                 GestureDetector(
                   onTap: () => context.go('/home'),
-                  child: const AmiinLogo(size: 30, variant: AmiinLogoVariant.turquoise),
+                  child: const AmiinLogo(
+                    size: 30,
+                    variant: AmiinLogoVariant.turquoise,
+                  ),
                 ),
                 const SizedBox(width: Spacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Amiin',
-                          style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 15,
-                              letterSpacing: 0.3,
-                              color: ac.onHeader)),
+                      Text(
+                        'Amiin',
+                        style: TextStyle(
+                          fontFamily: FontFamily.geoBold,
+                          fontSize: 15,
+                          letterSpacing: 0.3,
+                          color: ac.onHeader,
+                        ),
+                      ),
                       _buildHeaderStatus(chat, ac),
                     ],
                   ),
                 ),
                 IconButton(
-                  onPressed: chat.messages.isEmpty ? null : _confirmNewConversation,
+                  onPressed: chat.messages.isEmpty
+                      ? null
+                      : _confirmNewConversation,
                   tooltip: 'Nouvelle conversation',
                   icon: Icon(
                     Icons.add_comment_outlined,
@@ -426,10 +497,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
           ),
           // Ligne d'horizon — chargement ou état stable
-          HorizonLine(
-            color: ac.secretariatAccent,
-            animating: chat.isBusy,
-          ),
+          HorizonLine(color: ac.secretariatAccent, animating: chat.isBusy),
         ],
       ),
     );
@@ -440,47 +508,61 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       listenable: connectivityService,
       builder: (context, _) {
         if (!connectivityService.isOnline) {
-          return Text('Hors ligne',
-              style: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 11,
-                  color: context.ac.alertColor));
+          return Text(
+            'Hors ligne',
+            style: TextStyle(
+              fontFamily: FontFamily.sans,
+              fontSize: 11,
+              color: context.ac.alertColor,
+            ),
+          );
         }
         if (chat.isBusy) {
           return Row(
             children: [
               Text(
                 chat.isLoading
-                    ? (chat.streamStatus.isNotEmpty ? chat.streamStatus : 'Recherche…')
+                    ? (chat.streamStatus.isNotEmpty
+                          ? chat.streamStatus
+                          : 'Recherche…')
                     : 'Rédige…',
                 style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 11,
-                    color: ac.secretariatAccent),
+                  fontFamily: FontFamily.sans,
+                  fontSize: 11,
+                  color: ac.secretariatAccent,
+                ),
               ),
               const SizedBox(width: 4),
               AnimatedBuilder(
                 animation: _dotsAnimation,
                 builder: (context, _) {
                   final count = ((_dotsAnimation.value * 3).floor() % 3) + 1;
-                  return Text('.' * count,
-                      style: TextStyle(
-                          fontFamily: FontFamily.sans,
-                          fontSize: 14,
-                          color: ac.secretariatAccent));
+                  return Text(
+                    '.' * count,
+                    style: TextStyle(
+                      fontFamily: FontFamily.sans,
+                      fontSize: 14,
+                      color: ac.secretariatAccent,
+                    ),
+                  );
                 },
               ),
             ],
           );
         }
         return Text(
-          _isListening ? 'Écoute…' : _isSpeaking ? 'Parle…' : 'En ligne',
+          _isListening
+              ? 'Écoute…'
+              : _isSpeaking
+              ? 'Parle…'
+              : 'En ligne',
           style: TextStyle(
-              fontFamily: FontFamily.sans,
-              fontSize: 11,
-              color: _isListening
-                  ? context.ac.secretariatAccentMid
-                  : ac.onHeader.withValues(alpha: 0.4)),
+            fontFamily: FontFamily.sans,
+            fontSize: 11,
+            color: _isListening
+                ? context.ac.secretariatAccentMid
+                : ac.onHeader.withValues(alpha: 0.4),
+          ),
         );
       },
     );
@@ -488,10 +570,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // ── Message ────────────────────────────────────────────────────────────────
 
-  Widget _buildMessageItem(ChatController chat, int index, AmiinThemeColors ac) {
+  Widget _buildMessageItem(
+    ChatController chat,
+    int index,
+    AmiinThemeColors ac,
+  ) {
     final msg = chat.messages[index];
     final isUser = msg.role == 'user';
-    final showDateSep = index == 0 ||
+    final showDateSep =
+        index == 0 ||
         !_isSameDay(msg.timestamp, chat.messages[index - 1].timestamp);
 
     return Column(
@@ -502,7 +589,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(vertical: Spacing.md),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.md,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: ac.surface2,
                   borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -510,9 +600,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Text(
                   DateFormat('EEEE d MMMM', 'fr').format(msg.timestamp),
                   style: TextStyle(
-                      fontFamily: FontFamily.geoMedium,
-                      fontSize: 11,
-                      color: ac.muted),
+                    fontFamily: FontFamily.geoMedium,
+                    fontSize: 11,
+                    color: ac.muted,
+                  ),
                 ),
               ),
             ),
@@ -520,7 +611,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         Padding(
           padding: const EdgeInsets.only(bottom: Spacing.xs),
           child: Row(
-            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (!isUser) ...[
@@ -532,7 +625,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   onLongPress: () => _showMessageMenu(context, msg),
                   child: Container(
                     constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.76),
+                      maxWidth: MediaQuery.of(context).size.width * 0.76,
+                    ),
                     decoration: BoxDecoration(
                       color: isUser ? ac.secretariatAccent : ac.surface,
                       borderRadius: BorderRadius.only(
@@ -545,12 +639,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             ? const Radius.circular(4)
                             : const Radius.circular(RadiusAmiin.lg),
                       ),
-                      border: isUser
-                          ? null
-                          : Border.all(color: ac.border),
+                      border: isUser ? null : Border.all(color: ac.border),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: Spacing.md, vertical: Spacing.sm + 2),
+                      horizontal: Spacing.md,
+                      vertical: Spacing.sm + 2,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -558,19 +652,21 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           data: msg.content,
                           styleSheet: MarkdownStyleSheet(
                             p: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 14,
-                                color: isUser ? context.ac.onAccent : ac.ink,
-                                height: 1.6),
+                              fontFamily: FontFamily.sans,
+                              fontSize: 14,
+                              color: isUser ? context.ac.onAccent : ac.ink,
+                              height: 1.6,
+                            ),
                             code: TextStyle(
-                                fontFamily: FontFamily.mono,
-                                fontSize: 12,
-                                color: isUser
-                                    ? context.ac.onAccent.withValues(alpha: 0.85)
-                                    : ac.secretariatAccent,
-                                backgroundColor: isUser
-                                    ? Colors.white.withValues(alpha: 0.1)
-                                    : ac.secretariatAccentLight),
+                              fontFamily: FontFamily.mono,
+                              fontSize: 12,
+                              color: isUser
+                                  ? context.ac.onAccent.withValues(alpha: 0.85)
+                                  : ac.secretariatAccent,
+                              backgroundColor: isUser
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : ac.secretariatAccentLight,
+                            ),
                           ),
                           selectable: true,
                         ),
@@ -580,17 +676,23 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               padding: const EdgeInsets.only(top: Spacing.sm),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: Spacing.sm, vertical: 3),
+                                  horizontal: Spacing.sm,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
-                                    color: ac.secretariatAccentLight,
-                                    borderRadius:
-                                        BorderRadius.circular(RadiusAmiin.sm)),
+                                  color: ac.secretariatAccentLight,
+                                  borderRadius: BorderRadius.circular(
+                                    RadiusAmiin.sm,
+                                  ),
+                                ),
                                 child: Text(
-                                    ChatController.actionLabel(action.name),
-                                    style: TextStyle(
-                                        fontFamily: FontFamily.geoBold,
-                                        fontSize: 11,
-                                        color: ac.secretariatAccent)),
+                                  ChatController.actionLabel(action.name),
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.geoBold,
+                                    fontSize: 11,
+                                    color: ac.secretariatAccent,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -599,14 +701,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             noteId: chat.noteResults[msg.id]!.id,
                             noteTitle: chat.noteResults[msg.id]!.title,
                             noteContent: chat.noteResults[msg.id]!.content,
-                            isUpdate: msg.actions?.any((a) => a.name == 'update_note') ?? false,
+                            isUpdate:
+                                msg.actions?.any(
+                                  (a) => a.name == 'update_note',
+                                ) ??
+                                false,
                           ),
                         if (!isUser && chat.eventResults.containsKey(msg.id))
                           ChatEventCard(
                             eventId: chat.eventResults[msg.id]!.id,
                             eventTitle: chat.eventResults[msg.id]!.title,
                             eventDate: chat.eventResults[msg.id]!.date,
-                            isUpdate: msg.actions?.any((a) => a.name == 'update_event') ?? false,
+                            isUpdate:
+                                msg.actions?.any(
+                                  (a) => a.name == 'update_event',
+                                ) ??
+                                false,
                           ),
                       ],
                     ),
@@ -624,14 +734,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             bottom: Spacing.md,
           ),
           child: Row(
-            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             children: [
               Text(
                 DateFormat('HH:mm').format(msg.timestamp),
                 style: TextStyle(
-                    fontFamily: FontFamily.mono,
-                    fontSize: 9,
-                    color: ac.muted),
+                  fontFamily: FontFamily.mono,
+                  fontSize: 9,
+                  color: ac.muted,
+                ),
               ),
               if (!isUser && msg.content.isNotEmpty) ...[
                 const SizedBox(width: Spacing.sm),
@@ -663,7 +776,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             chat.pendingDeletionMsgId == msg.id &&
             chat.pendingDeletions.isNotEmpty)
           ChatDeleteConfirm(
-            descriptions: chat.pendingDeletions.map((p) => p.description).toList(),
+            descriptions: chat.pendingDeletions
+                .map((p) => p.description)
+                .toList(),
             onConfirm: chat.confirmPendingDeletions,
             onDismiss: chat.dismissPendingDeletions,
           ),
@@ -680,17 +795,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildUsageBar(Map<String, dynamic> usage, AmiinThemeColors ac) {
-    final claudeIn  = usage['claude_input']      as int? ?? 0;
-    final claudeOut = usage['claude_output']     as int? ?? 0;
+    final claudeIn = usage['claude_input'] as int? ?? 0;
+    final claudeOut = usage['claude_output'] as int? ?? 0;
     final cacheRead = usage['claude_cache_read'] as int? ?? 0;
-    final jinaTokens = usage['jina_tokens']     as int? ?? 0;
+    final jinaTokens = usage['jina_tokens'] as int? ?? 0;
     final tools = (usage['tools'] as List?)?.cast<String>() ?? const <String>[];
 
     final parts = <String>[
       '↑$claudeIn ↓$claudeOut',
       if (cacheRead > 0) '⊙ $cacheRead',
       if (jinaTokens > 0) '· $jinaTokens',
-      if (tools.isNotEmpty) '· ${tools.map(ChatController.actionLabel).join(', ')}',
+      if (tools.isNotEmpty)
+        '· ${tools.map(ChatController.actionLabel).join(', ')}',
     ];
 
     return Padding(
@@ -708,13 +824,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // ── Barre de saisie ────────────────────────────────────────────────────────
 
-  Widget _buildInputBar(EdgeInsets insets, ChatController chat, AmiinThemeColors ac) {
+  Widget _buildInputBar(
+    EdgeInsets insets,
+    ChatController chat,
+    AmiinThemeColors ac,
+  ) {
     return Container(
       padding: EdgeInsets.only(
-          left: Spacing.md,
-          right: Spacing.md,
-          top: Spacing.sm,
-          bottom: insets.bottom + 8),
+        left: Spacing.md,
+        right: Spacing.md,
+        top: Spacing.sm,
+        bottom: insets.bottom + 8,
+      ),
       decoration: BoxDecoration(
         color: ac.surface,
         border: Border(top: BorderSide(color: ac.border, width: 0.5)),
@@ -734,33 +855,42 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ? 'En écoute… tapez à nouveau le micro pour arrêter'
                     : 'Écrivez votre question…',
                 hintStyle: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 14,
-                    color: ac.muted),
+                  fontFamily: FontFamily.sans,
+                  fontSize: 14,
+                  color: ac.muted,
+                ),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(RadiusAmiin.xl),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(RadiusAmiin.xl),
+                  borderSide: BorderSide.none,
+                ),
                 filled: true,
                 fillColor: _isListening
                     ? context.ac.secretariatAccentLight.withValues(alpha: 0.5)
                     : ac.surface2,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.md, vertical: Spacing.sm),
+                  horizontal: Spacing.md,
+                  vertical: Spacing.sm,
+                ),
               ),
-              buildCounter: (context,
-                  {required currentLength, required isFocused, maxLength}) {
-                if (currentLength < 900 || maxLength == null) return null;
-                return Text(
-                  '$currentLength / $maxLength',
-                  style: TextStyle(
-                    fontFamily: FontFamily.mono,
-                    fontSize: 10,
-                    color: currentLength >= maxLength
-                        ? context.ac.alertColor
-                        : ac.muted,
-                  ),
-                );
-              },
+              buildCounter:
+                  (
+                    context, {
+                    required currentLength,
+                    required isFocused,
+                    maxLength,
+                  }) {
+                    if (currentLength < 900 || maxLength == null) return null;
+                    return Text(
+                      '$currentLength / $maxLength',
+                      style: TextStyle(
+                        fontFamily: FontFamily.mono,
+                        fontSize: 10,
+                        color: currentLength >= maxLength
+                            ? context.ac.alertColor
+                            : ac.muted,
+                      ),
+                    );
+                  },
             ),
           ),
           const SizedBox(width: Spacing.sm),
@@ -769,7 +899,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           if (!chat.isBusy)
             Semantics(
               button: true,
-              label: _isListening ? 'Arrêter la dictée vocale' : 'Dicter une question',
+              label: _isListening
+                  ? 'Arrêter la dictée vocale'
+                  : 'Dicter une question',
               child: Material(
                 color: Colors.transparent,
                 shape: const CircleBorder(),
@@ -783,12 +915,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       color: _isListening
                           ? context.ac.secretariatAccent
-                          : context.ac.secretariatAccent.withValues(alpha: 0.12),
+                          : context.ac.secretariatAccent.withValues(
+                              alpha: 0.12,
+                            ),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _isListening ? Icons.mic : Icons.mic_none,
-                      color: _isListening ? context.ac.onAccent : context.ac.secretariatAccent,
+                      color: _isListening
+                          ? context.ac.onAccent
+                          : context.ac.secretariatAccent,
                       size: 20,
                     ),
                   ),
@@ -812,8 +948,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   child: SizedBox(
                     width: 42,
                     height: 42,
-                    child: Icon(Icons.stop_rounded,
-                        color: ac.muted, size: 22),
+                    child: Icon(Icons.stop_rounded, color: ac.muted, size: 22),
                   ),
                 ),
               ),
@@ -832,7 +967,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     width: 42,
                     height: 42,
                     child: Center(
-                        child: SvgPicture.string(_sendSvg, width: 18, height: 18)),
+                      child: SvgPicture.string(_sendSvg, width: 18, height: 18),
+                    ),
                   ),
                 ),
               ),
@@ -859,7 +995,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           children: [
             const SizedBox(height: 8),
             Container(
-              width: 32, height: 3,
+              width: 32,
+              height: 3,
               decoration: BoxDecoration(
                 color: ac.border,
                 borderRadius: BorderRadius.circular(2),
@@ -868,8 +1005,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             const SizedBox(height: 12),
             ListTile(
               leading: Icon(Icons.copy_outlined, color: ac.secretariatAccent),
-              title: Text('Copier',
-                  style: TextStyle(fontFamily: FontFamily.geoMedium)),
+              title: Text(
+                'Copier',
+                style: TextStyle(fontFamily: FontFamily.geoMedium),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Clipboard.setData(ClipboardData(text: msg.content));
@@ -878,9 +1017,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
             if (msg.role != 'user')
               ListTile(
-                leading: Icon(Icons.volume_up_outlined, color: ac.secretariatAccent),
-                title: Text('Écouter',
-                    style: TextStyle(fontFamily: FontFamily.geoMedium)),
+                leading: Icon(
+                  Icons.volume_up_outlined,
+                  color: ac.secretariatAccent,
+                ),
+                title: Text(
+                  'Écouter',
+                  style: TextStyle(fontFamily: FontFamily.geoMedium),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _speak(msg.content, msgId: msg.id);
@@ -888,9 +1032,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             if (msg.role == 'user')
               ListTile(
-                leading: Icon(Icons.refresh_outlined, color: ac.secretariatAccent),
-                title: Text('Retenter',
-                    style: TextStyle(fontFamily: FontFamily.geoMedium)),
+                leading: Icon(
+                  Icons.refresh_outlined,
+                  color: ac.secretariatAccent,
+                ),
+                title: Text(
+                  'Retenter',
+                  style: TextStyle(fontFamily: FontFamily.geoMedium),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _sendMessage(msg.content);
@@ -914,20 +1063,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           children: [
             const AmiinLogo(size: 52, variant: AmiinLogoVariant.turquoise),
             const SizedBox(height: Spacing.lg),
-            Text('Bonjour — je suis Amiin',
-                style: TextStyle(
-                    fontFamily: FontFamily.geoBold,
-                    fontSize: 20,
-                    color: ac.ink,
-                    letterSpacing: -0.3)),
+            Text(
+              'Bonjour — je suis Amiin',
+              style: TextStyle(
+                fontFamily: FontFamily.geoBold,
+                fontSize: 20,
+                color: ac.ink,
+                letterSpacing: -0.3,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
             Text(
               'Posez-moi une question sur vos démarches administratives,\nvotre agenda ou les services publics de Djibouti.',
               style: TextStyle(
-                  fontFamily: FontFamily.sansLight,
-                  fontSize: 14,
-                  color: ac.muted,
-                  height: 1.6),
+                fontFamily: FontFamily.sansLight,
+                fontSize: 14,
+                color: ac.muted,
+                height: 1.6,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: Spacing.xl),
@@ -945,19 +1098,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(10),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: Spacing.lg, vertical: Spacing.sm + 2),
+                        horizontal: Spacing.lg,
+                        vertical: Spacing.sm + 2,
+                      ),
                       child: Row(
                         children: [
-                          Icon(Icons.arrow_forward_ios_rounded,
-                              size: 11, color: ac.secretariatAccent),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 11,
+                            color: ac.secretariatAccent,
+                          ),
                           const SizedBox(width: Spacing.sm),
                           Flexible(
                             child: Text(
                               q,
                               style: TextStyle(
-                                  fontFamily: FontFamily.sans,
-                                  fontSize: 13,
-                                  color: ac.ink),
+                                fontFamily: FontFamily.sans,
+                                fontSize: 13,
+                                color: ac.ink,
+                              ),
                             ),
                           ),
                         ],
@@ -990,14 +1149,18 @@ class _AvatarA extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 26, height: 26,
+      width: 26,
+      height: 26,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       child: Center(
-        child: Text('A',
-            style: TextStyle(
-                fontFamily: FontFamily.geoBold,
-                fontSize: 12,
-                color: context.ac.onAccent)),
+        child: Text(
+          'A',
+          style: TextStyle(
+            fontFamily: FontFamily.geoBold,
+            fontSize: 12,
+            color: context.ac.onAccent,
+          ),
+        ),
       ),
     );
   }
@@ -1024,11 +1187,17 @@ class _ThinkingBubbleState extends State<_ThinkingBubble>
     _controllers = List.generate(
       3,
       (_) => AnimationController(
-          duration: const Duration(milliseconds: 500), vsync: this),
+        duration: const Duration(milliseconds: 500),
+        vsync: this,
+      ),
     );
     _offsets = _controllers
-        .map((c) => Tween(begin: 0.0, end: -5.0).animate(
-            CurvedAnimation(parent: c, curve: Curves.easeInOut)))
+        .map(
+          (c) => Tween(
+            begin: 0.0,
+            end: -5.0,
+          ).animate(CurvedAnimation(parent: c, curve: Curves.easeInOut)),
+        )
         .toList();
 
     for (int i = 0; i < 3; i++) {
@@ -1040,7 +1209,9 @@ class _ThinkingBubbleState extends State<_ThinkingBubble>
 
   @override
   void dispose() {
-    for (final c in _controllers) { c.dispose(); }
+    for (final c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -1067,7 +1238,8 @@ class _ThinkingBubbleState extends State<_ThinkingBubble>
             builder: (_, __) => Transform.translate(
               offset: Offset(0, _offsets[i].value),
               child: Container(
-                width: 6, height: 6,
+                width: 6,
+                height: 6,
                 margin: EdgeInsets.only(right: i < 2 ? 5 : 0),
                 decoration: BoxDecoration(
                   color: widget.color.withValues(alpha: 0.6),

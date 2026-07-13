@@ -142,12 +142,25 @@ class WidgetBridge {
 
   // ── Brief (météo / prières / taux) ──────────────────────────────────────────
 
+  /// Emoji correspondant au code d'icône OpenWeatherMap (01d, 10n, …).
+  static String _weatherEmoji(String icon) {
+    if (icon.startsWith('01')) return '☀️';
+    if (icon.startsWith('02')) return '🌤️';
+    if (icon.startsWith('03') || icon.startsWith('04')) return '☁️';
+    if (icon.startsWith('09') || icon.startsWith('10')) return '🌧️';
+    if (icon.startsWith('11')) return '⛈️';
+    if (icon.startsWith('13')) return '❄️';
+    if (icon.startsWith('50')) return '🌫️';
+    return '🌡️';
+  }
+
   /// Écrit les données du brief dans le stockage du widget. Utilisé par
   /// l'app (via pushBrief) et par la tâche de fond.
   static Future<void> writeBriefData(HomeBrief b) async {
     final weather = b.weather;
     await HomeWidget.saveWidgetData<String>(
-        'widget_weather_value', weather != null ? '${weather.temp}°' : '—');
+        'widget_weather_value',
+        weather != null ? '${_weatherEmoji(weather.icon)} ${weather.temp}°' : '—');
     await HomeWidget.saveWidgetData<String>(
         'widget_weather_label', weather?.desc ?? 'Météo');
 

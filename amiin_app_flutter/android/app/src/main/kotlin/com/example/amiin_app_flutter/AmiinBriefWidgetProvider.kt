@@ -4,8 +4,14 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Typeface
 import android.net.Uri
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import org.json.JSONArray
@@ -48,8 +54,8 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_prayer_chip, "$prayerName · $prayerTime")
 
             // ── Zone rotative ──
-            views.setTextViewText(R.id.widget_event_line, eventLine(data))
-            views.setTextViewText(R.id.widget_demarche_line, demarcheLine(data))
+            views.setTextViewText(R.id.widget_event_line, eventLine(context, data))
+            views.setTextViewText(R.id.widget_demarche_line, demarcheLine(context, data))
             views.setTextViewText(
                 R.id.widget_fx_line,
                 data.getString("widget_fx_line", "💱  Taux du jour indisponible"))
@@ -67,6 +73,21 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    /** "prefix" normal + "strong" coloré et gras + "rest" normal. */
+    private fun accentLine(
+        prefix: String, strong: String, rest: String, color: Int,
+    ): CharSequence {
+        val sb = SpannableStringBuilder(prefix)
+        val start = sb.length
+        sb.append(strong)
+        sb.setSpan(ForegroundColorSpan(color), start, sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(StyleSpan(Typeface.BOLD), start, sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append(rest)
+        return sb
     }
 
     // ── Prochaine prière (calculée à l'affichage) ─────────────────────────────
@@ -98,7 +119,7 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
 
     // ── Rendez-vous : celui du jour à venir, sinon le prochain de la semaine ──
 
-    private fun eventLine(data: SharedPreferences): String {
+    private fun eventLine(context: Context, data: SharedPreferences): CharSequence {
         val raw = data.getString("widget_events_json", "") ?: ""
         if (raw.isEmpty()) return "📅  Aucun rendez-vous à venir"
         return try {
@@ -134,7 +155,8 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
                 val days = arrayOf("dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam.")
                 "${days[chosen.get(Calendar.DAY_OF_WEEK) - 1]} $hm"
             }
-            "📅  $prefix · $bestTitle"
+            accentLine("📅  ", prefix,
+                " · $bestTitle", ContextCompat.getColor(context, R.color.widget_secretariat))
         } catch (e: Exception) {
             "📅  Aucun rendez-vous à venir"
         }
@@ -142,7 +164,7 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
 
     // ── Démarches en cours ────────────────────────────────────────────────────
 
-    private fun demarcheLine(data: SharedPreferences): String {
+    private fun demarcheLine(context: Context, data: SharedPreferences): CharSequence {
         val raw = data.getString("widget_demarches_json", "") ?: ""
         if (raw.isEmpty()) return "📋  Aucune démarche en cours"
         return try {
@@ -152,12 +174,10 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
             val title = first.optString("title", "")
             val step = first.optInt("step", 0)
             val total = first.optInt("total", 0)
-            val progress = if (total > 0) " ($step/$total)" else ""
-            if (list.length() == 1) {
-                "📋  $title$progress"
-            } else {
-                "📋  ${list.length()} en cours · $title$progress"
-            }
+            val ocre = ContextCompat.getColor(context, R.color.widget_accent)
+            val strong = if (total > 0) "$step/$total" else "en cours"
+            val prefix = if (list.length() > 1) "📋  ${list.length()} en cours · " else "📋  "
+            accentLine(prefix, strong, "  $title", ocre)
         } catch (e: Exception) {
             "📋  Aucune démarche en cours"
         }

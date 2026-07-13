@@ -21,7 +21,10 @@ class AgendaScreen extends StatefulWidget {
   State<AgendaScreen> createState() => _AgendaScreenState();
 }
 
+enum _AgendaView { month, week }
+
 class _AgendaScreenState extends State<AgendaScreen> {
+  _AgendaView _view = _AgendaView.month;
   DateTime _currentDate = DateTime.now();
   DateTime _selectedDay = DateTime.now();
   List<AmiinEvent> _events = [];
@@ -43,12 +46,37 @@ class _AgendaScreenState extends State<AgendaScreen> {
     super.dispose();
   }
 
+  /// Lundi de la semaine contenant [d].
+  DateTime _mondayOf(DateTime d) =>
+      DateTime(d.year, d.month, d.day).subtract(Duration(days: d.weekday - 1));
+
+  /// Les 7 jours de la semaine affichée.
+  List<DateTime> _weekDays() {
+    final monday = _mondayOf(_currentDate);
+    return List.generate(7, (i) => monday.add(Duration(days: i)));
+  }
+
+  ({DateTime from, DateTime to}) _visibleRange() {
+    if (_view == _AgendaView.week) {
+      final monday = _mondayOf(_currentDate);
+      return (
+        from: monday,
+        to: monday.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59)),
+      );
+    }
+    return (
+      from: DateTime(_currentDate.year, _currentDate.month, 1),
+      to: DateTime(_currentDate.year, _currentDate.month + 1, 0, 23, 59, 59),
+    );
+  }
+
   Future<void> _loadEvents() async {
     if (_refreshing) return;
     setState(() => _loading = true);
     try {
-      final from = DateTime(_currentDate.year, _currentDate.month, 1);
-      final to = DateTime(_currentDate.year, _currentDate.month + 1, 0, 23, 59, 59);
+      final range = _visibleRange();
+      final from = range.from;
+      final to = range.to;
       final events = await agendaService.getEvents(
         from.toIso8601String(),
         to.toIso8601String(),
@@ -69,8 +97,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
     if (_refreshing) return;
     setState(() => _refreshing = true);
     try {
-      final from = DateTime(_currentDate.year, _currentDate.month, 1);
-      final to = DateTime(_currentDate.year, _currentDate.month + 1, 0, 23, 59, 59);
+      final range = _visibleRange();
+      final from = range.from;
+      final to = range.to;
       final events = await agendaService.getEvents(
         from.toIso8601String(),
         to.toIso8601String(),
@@ -148,6 +177,45 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   void _goToNextMonth() => _changeMonth(1);
 
+  void _changeWeek(int delta) {
+    setState(() {
+      _currentDate = _currentDate.add(Duration(days: 7 * delta));
+      final days = _weekDays();
+      final now = DateTime.now();
+      _selectedDay = days.any((d) => _isSameDay(d, now)) ? now : days.first;
+    });
+    _loadEvents();
+  }
+
+  void _goToPrevious() =>
+      _view == _AgendaView.month ? _changeMonth(-1) : _changeWeek(-1);
+
+  void _goToNext() =>
+      _view == _AgendaView.month ? _changeMonth(1) : _changeWeek(1);
+
+  void _switchView(_AgendaView v) {
+    if (v == _view) return;
+    setState(() {
+      _view = v;
+      // Recentre sur le jour sélectionné pour une transition naturelle.
+      _currentDate = _selectedDay;
+    });
+    _loadEvents();
+  }
+
+  String _navLabel() {
+    if (_view == _AgendaView.month) {
+      return DateFormat('MMMM yyyy', 'fr').format(_currentDate);
+    }
+    final days = _weekDays();
+    final first = days.first;
+    final last = days.last;
+    if (first.month == last.month) {
+      return '${first.day} – ${DateFormat('d MMM yyyy', 'fr').format(last)}';
+    }
+    return '${DateFormat('d MMM', 'fr').format(first)} – ${DateFormat('d MMM yyyy', 'fr').format(last)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final days = _getDaysInMonth();
@@ -169,32 +237,41 @@ class _AgendaScreenState extends State<AgendaScreen> {
                 },
               ),
             ),
-            // Month navigation
+            // Navigation période + bascule Mois/Semaine
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.xl, vertical: Spacing.md),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.xl, vertical: Spacing.sm),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: SvgPicture.string(_chevronLeftSvg, width: 20, height: 20),
-                    onPressed: _goToPreviousMonth,
+                    onPressed: _goToPrevious,
                   ),
-                  Text(
-                    DateFormat('MMMM yyyy', 'fr').format(_currentDate),
-                    style: TextStyle(
-                      fontFamily: FontFamily.geo,
-                      fontSize: 18,
-                      color: context.ac.ink,
+                  Expanded(
+                    child: Text(
+                      _navLabel(),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: FontFamily.geo,
+                        fontSize: 17,
+                        color: context.ac.ink,
+                      ),
                     ),
                   ),
                   IconButton(
                     icon: SvgPicture.string(_chevronRightSvg, width: 20, height: 20),
-                    onPressed: _goToNextMonth,
+                    onPressed: _goToNext,
                   ),
                 ],
               ),
             ),
-            // Weekday headers
+            _ViewToggle(view: _view, onChanged: _switchView),
+            const SizedBox(height: Spacing.sm),
+            // Weekday headers (vue mensuelle uniquement)
+            if (_view == _AgendaView.month)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
               child: Row(
@@ -215,7 +292,83 @@ class _AgendaScreenState extends State<AgendaScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            // Calendar grid
+            // Bande hebdomadaire (vue semaine)
+            if (_view == _AgendaView.week)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                child: Row(
+                  children: [
+                    for (final day in _weekDays())
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _selectedDay = day),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _isSameDay(day, _selectedDay)
+                                  ? context.ac.secretariatAccent
+                                  : _isToday(day)
+                                      ? context.ac.secretariatAccentLight
+                                      : null,
+                              borderRadius: BorderRadius.circular(RadiusAmiin.md),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  ['LU', 'MA', 'ME', 'JE', 'VE', 'SA', 'DI']
+                                      [day.weekday - 1],
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.geoBold,
+                                    fontSize: 9,
+                                    letterSpacing: 0.5,
+                                    color: _isSameDay(day, _selectedDay)
+                                        ? context.ac.onAccent.withValues(alpha: 0.8)
+                                        : context.ac.muted,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  day.day.toString(),
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.geoMedium,
+                                    fontSize: 15,
+                                    color: _isSameDay(day, _selectedDay)
+                                        ? context.ac.onAccent
+                                        : _isToday(day)
+                                            ? context.ac.secretariatAccent
+                                            : context.ac.ink,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: _eventsForDay(day)
+                                      .take(3)
+                                      .map((e) => Container(
+                                            width: 4,
+                                            height: 4,
+                                            margin: const EdgeInsets
+                                                .symmetric(horizontal: 1),
+                                            decoration: BoxDecoration(
+                                              color: _isSameDay(day, _selectedDay)
+                                                  ? context.ac.onAccent
+                                                  : _categoryColor(e.category),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            // Calendar grid (vue mensuelle)
+            if (_view == _AgendaView.month)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
               child: GridView.count(
@@ -510,4 +663,63 @@ class _AgendaScreenState extends State<AgendaScreen> {
       <path d="M7 4l6 6-6 6" stroke="#7A6A5E" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
   ''';
+}
+
+// ── Bascule Mois / Semaine ────────────────────────────────────────────────────
+
+class _ViewToggle extends StatelessWidget {
+  final _AgendaView view;
+  final ValueChanged<_AgendaView> onChanged;
+
+  const _ViewToggle({required this.view, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+
+    Widget segment(String label, _AgendaView v) {
+      final selected = view == v;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => onChanged(v),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              color: selected ? ac.surface : Colors.transparent,
+              borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+              boxShadow: selected ? ShadowAmiin.sm : null,
+            ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: selected ? FontFamily.geoBold : FontFamily.geoMedium,
+                fontSize: 12,
+                color: selected ? ac.secretariatAccent : ac.muted,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: ac.surface2,
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
+        ),
+        child: Row(
+          children: [
+            segment('Mois', _AgendaView.month),
+            segment('Semaine', _AgendaView.week),
+          ],
+        ),
+      ),
+    );
+  }
 }
