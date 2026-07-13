@@ -102,8 +102,22 @@ class WidgetBridge {
     HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
   }
 
+  static Uri? _lastUri;
+  static DateTime _lastUriAt = DateTime.fromMillisecondsSinceEpoch(0);
+
   static void _handleWidgetUri(Uri? uri) {
     if (uri == null) return;
+    // Au lancement à froid, la même URI arrive deux fois (valeur initiale +
+    // flux). Sans dédup : double navigation et double toggle du micro
+    // (qui démarrerait puis s'arrêterait aussitôt).
+    final now = DateTime.now();
+    if (uri.toString() == _lastUri.toString() &&
+        now.difference(_lastUriAt) < const Duration(seconds: 2)) {
+      return;
+    }
+    _lastUri = uri;
+    _lastUriAt = now;
+
     final target = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
     if (target != 'chat') return; // amiin://home → comportement par défaut
 

@@ -153,14 +153,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   void _initSpeech() async {
     _speech = stt.SpeechToText();
-    _speechAvailable = await _speech.initialize(
-      onStatus: (status) {
-        if ((status == 'done' || status == 'notListening') && mounted) {
-          setState(() => _isListening = false);
-        }
-      },
-      onError: (error) => debugPrint('STT error: $error'),
-    );
+    try {
+      _speechAvailable = await _speech.initialize(
+        onStatus: (status) {
+          if ((status == 'done' || status == 'notListening') && mounted) {
+            setState(() => _isListening = false);
+          }
+        },
+        onError: (error) => debugPrint('STT error: $error'),
+      );
+    } catch (e) {
+      // Certains téléphones n'ont pas de service de reconnaissance vocale
+      // (ou Google app désactivée) : on dégrade sans crasher, le micro
+      // affichera un message explicatif au tap.
+      _speechAvailable = false;
+      debugPrint('Reconnaissance vocale indisponible : $e');
+    }
     if (mounted) setState(() {});
   }
 
