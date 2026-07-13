@@ -34,7 +34,6 @@ import '../widgets/connectivity_banner.dart';
 import '../widgets/horizon_line.dart';
 import '../services/agenda_badge_notifier.dart';
 import '../services/auth_service.dart';
-import '../theme/colors.dart';
 import '../theme/typography.dart';
 import '../theme/themes.dart';
 
@@ -47,10 +46,10 @@ final GlobalKey<NavigatorState> _notesNavKey     = GlobalKey<NavigatorState>();
 
 // Couleur de la ligne d'horizon selon l'onglet actif
 // 0=Accueil(neutre) 1=Chat(secr) 2=Agenda(secr) 3=Notes(secr) 4=Annuaire(info) 5=Démarches(info)
-Color _horizonColor(int index) {
-  if (index >= 4) return ColorsAmiin.ocre;
-  if (index >= 1) return ColorsAmiin.turquoise;
-  return ColorsAmiin.muted;
+Color _horizonColor(BuildContext context, int index) {
+  if (index >= 4) return context.ac.infoAccent;
+  if (index >= 1) return context.ac.secretariatAccent;
+  return context.ac.muted;
 }
 
 final GoRouter appRouter = GoRouter(
@@ -287,7 +286,7 @@ class _AmiinNavBarState extends State<_AmiinNavBar> {
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
-    final horizonColor = _horizonColor(widget.currentIndex);
+    final horizonColor = _horizonColor(context, widget.currentIndex);
 
     return Container(
       decoration: BoxDecoration(
@@ -311,7 +310,7 @@ class _AmiinNavBarState extends State<_AmiinNavBar> {
                   final item = _items[i];
                   final selected = i == widget.currentIndex;
                   final itemColor = selected
-                      ? (i >= 4 ? ColorsAmiin.ocre : i >= 1 ? ColorsAmiin.turquoise : ac.ink)
+                      ? (i >= 4 ? context.ac.infoAccent : i >= 1 ? context.ac.secretariatAccent : ac.ink)
                       : ac.muted;
 
                   return Expanded(
@@ -330,7 +329,7 @@ class _AmiinNavBarState extends State<_AmiinNavBar> {
                                       isLabelVisible: count > 0,
                                       label: Text('$count',
                                           style: const TextStyle(fontSize: 9)),
-                                      backgroundColor: ColorsAmiin.corail,
+                                      backgroundColor: context.ac.alertColor,
                                       child: Icon(
                                         selected ? item.activeIcon : item.icon,
                                         size: 22,

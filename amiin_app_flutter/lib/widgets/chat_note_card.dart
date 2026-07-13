@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../theme/colors.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
@@ -31,9 +31,9 @@ class ChatNoteCard extends StatelessWidget {
         margin: const EdgeInsets.only(top: Spacing.sm),
         padding: const EdgeInsets.all(Spacing.sm + 2),
         decoration: BoxDecoration(
-          color: ColorsAmiin.turquoiseLt,
+          color: context.ac.secretariatAccentLight,
           borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.35)),
+          border: Border.all(color: context.ac.secretariatAccent.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,12 +42,12 @@ class ChatNoteCard extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: ColorsAmiin.turquoise.withValues(alpha: 0.12),
+                color: context.ac.secretariatAccent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_note_outlined : Icons.note_outlined,
-                color: ColorsAmiin.turquoiseDk,
+                color: context.ac.secretariatAccentDark,
                 size: 18,
               ),
             ),
@@ -61,7 +61,7 @@ class ChatNoteCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: ColorsAmiin.turquoiseDk,
+                      color: context.ac.secretariatAccentDark,
                       letterSpacing: 0.4,
                     ),
                   ),
@@ -73,7 +73,7 @@ class ChatNoteCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.geoMedium,
                       fontSize: 13,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                     ),
                   ),
                   if (noteContent.isNotEmpty) ...[
@@ -85,7 +85,7 @@ class ChatNoteCard extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: FontFamily.sans,
                         fontSize: 11,
-                        color: ColorsAmiin.muted,
+                        color: context.ac.muted,
                         height: 1.4,
                       ),
                     ),
@@ -94,10 +94,10 @@ class ChatNoteCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: Spacing.sm),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 11,
-              color: ColorsAmiin.turquoiseDk,
+              color: context.ac.secretariatAccentDark,
             ),
           ],
         ),
@@ -139,9 +139,9 @@ class ChatEventCard extends StatelessWidget {
         margin: const EdgeInsets.only(top: Spacing.sm),
         padding: const EdgeInsets.all(Spacing.sm + 2),
         decoration: BoxDecoration(
-          color: ColorsAmiin.turquoiseLt,
+          color: context.ac.secretariatAccentLight,
           borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.35)),
+          border: Border.all(color: context.ac.secretariatAccent.withValues(alpha: 0.35)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -150,12 +150,12 @@ class ChatEventCard extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: ColorsAmiin.turquoise.withValues(alpha: 0.12),
+                color: context.ac.secretariatAccent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_calendar_outlined : Icons.event_outlined,
-                color: ColorsAmiin.turquoise,
+                color: context.ac.secretariatAccent,
                 size: 18,
               ),
             ),
@@ -169,7 +169,7 @@ class ChatEventCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: ColorsAmiin.turquoise,
+                      color: context.ac.secretariatAccent,
                       letterSpacing: 0.4,
                     ),
                   ),
@@ -181,7 +181,7 @@ class ChatEventCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.geoMedium,
                       fontSize: 13,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                     ),
                   ),
                   const SizedBox(height: 1),
@@ -190,17 +190,17 @@ class ChatEventCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.sans,
                       fontSize: 11,
-                      color: ColorsAmiin.muted,
+                      color: context.ac.muted,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: Spacing.sm),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 11,
-              color: ColorsAmiin.turquoise,
+              color: context.ac.secretariatAccent,
             ),
           ],
         ),
@@ -229,9 +229,9 @@ class ChatDeleteConfirm extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: Spacing.md, vertical: Spacing.sm),
       decoration: BoxDecoration(
-        color: ColorsAmiin.white,
+        color: context.ac.surface,
         borderRadius: BorderRadius.circular(RadiusAmiin.md),
-        border: Border.all(color: const Color(0xFFD32F2F).withValues(alpha: 0.45)),
+        border: Border.all(color: context.ac.alertColor.withValues(alpha: 0.45)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,8 +239,8 @@ class ChatDeleteConfirm extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.warning_amber_rounded,
-                  size: 16, color: Color(0xFFD32F2F)),
+              Icon(Icons.warning_amber_rounded,
+                  size: 16, color: context.ac.alertColor),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -250,7 +250,7 @@ class ChatDeleteConfirm extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: FontFamily.sans,
                     fontSize: 13,
-                    color: ColorsAmiin.ink,
+                    color: context.ac.ink,
                     height: 1.4,
                   ),
                 ),
@@ -291,9 +291,9 @@ class ChatNoteSuggestion extends StatelessWidget {
       margin: const EdgeInsets.only(left: 36, right: 0, top: 2, bottom: 4),
       padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
       decoration: BoxDecoration(
-        color: ColorsAmiin.white,
+        color: context.ac.surface,
         borderRadius: BorderRadius.circular(RadiusAmiin.md),
-        border: Border.all(color: ColorsAmiin.turquoise.withValues(alpha: 0.45)),
+        border: Border.all(color: context.ac.secretariatAccent.withValues(alpha: 0.45)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class ChatNoteSuggestion extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.note_add_outlined, size: 15, color: ColorsAmiin.turquoiseDk),
+              Icon(Icons.note_add_outlined, size: 15, color: context.ac.secretariatAccentDark),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -309,7 +309,7 @@ class ChatNoteSuggestion extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: FontFamily.sans,
                     fontSize: 13,
-                    color: ColorsAmiin.ink,
+                    color: context.ac.ink,
                     height: 1.4,
                   ),
                 ),
@@ -344,10 +344,10 @@ class _SuggestionBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: primary ? ColorsAmiin.turquoise : Colors.transparent,
+      color: primary ? context.ac.secretariatAccent : Colors.transparent,
       shape: StadiumBorder(
         side: BorderSide(
-          color: primary ? ColorsAmiin.turquoise : ColorsAmiin.border,
+          color: primary ? context.ac.secretariatAccent : context.ac.border,
         ),
       ),
       child: InkWell(
@@ -360,7 +360,7 @@ class _SuggestionBtn extends StatelessWidget {
             style: TextStyle(
               fontFamily: FontFamily.geoMedium,
               fontSize: 12,
-              color: primary ? ColorsAmiin.white : ColorsAmiin.muted,
+              color: primary ? context.ac.onAccent : context.ac.muted,
             ),
           ),
         ),

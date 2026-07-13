@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -18,7 +18,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
     final settings = context.watch<SettingsService>();
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -48,7 +48,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.info_outline, size: 16, color: ColorsAmiin.muted),
+                          Icon(Icons.info_outline, size: 16, color: context.ac.muted),
                           const SizedBox(width: Spacing.sm),
                           Expanded(
                             child: Text(
@@ -56,7 +56,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 12,
-                                color: ColorsAmiin.muted,
+                                color: context.ac.muted,
                                 height: 1.4,
                               ),
                             ),

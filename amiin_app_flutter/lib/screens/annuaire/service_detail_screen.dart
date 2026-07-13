@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -68,14 +68,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorsAmiin.ocre)));
+      return Scaffold(body: Center(child: CircularProgressIndicator(color: context.ac.infoAccent)));
     }
     if (_service == null) return const SizedBox();
 
     final s = _service!;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -88,7 +88,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   width: 22,
                   height: 22,
                   colorFilter: ColorFilter.mode(
-                    _isFavorite ? ColorsAmiin.ocre : ColorsAmiin.ocre.withValues(alpha: 0.4),
+                    _isFavorite ? context.ac.infoAccent : context.ac.infoAccent.withValues(alpha: 0.4),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -104,7 +104,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     Text(s.name, style: TextStyle(
                       fontFamily: FontFamily.geo,
                       fontSize: 24,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                     )),
                     const SizedBox(height: 4),
                     Wrap(
@@ -112,11 +112,11 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       runSpacing: 4,
                       children: [
                         if (s.sousCategorie.isNotEmpty)
-                          _tagChip(s.sousCategorie, ColorsAmiin.ocre),
+                          _tagChip(s.sousCategorie, context.ac.infoAccent),
                         if (s.quartier.isNotEmpty)
-                          _tagChip(s.quartier, ColorsAmiin.ocre),
+                          _tagChip(s.quartier, context.ac.infoAccent),
                         if (s.ministry != null)
-                          _tagChip(s.ministry!, ColorsAmiin.muted),
+                          _tagChip(s.ministry!, context.ac.muted),
                       ],
                     ),
                     const SizedBox(height: Spacing.md),
@@ -128,7 +128,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                             fontFamily: FontFamily.geoBold,
                             fontSize: 10,
                             letterSpacing: 1.2,
-                            color: ColorsAmiin.muted,
+                            color: context.ac.muted,
                           )),
                           const SizedBox(height: 8),
                           if (s.phone != null) ...[
@@ -154,13 +154,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                             fontFamily: FontFamily.geoBold,
                             fontSize: 10,
                             letterSpacing: 1.2,
-                            color: ColorsAmiin.muted,
+                            color: context.ac.muted,
                           )),
                           const SizedBox(height: 8),
                           Text('${s.address.street}\n${s.address.district}, ${s.address.city}', style: TextStyle(
                             fontFamily: FontFamily.sans,
                             fontSize: 14,
-                            color: ColorsAmiin.mid,
+                            color: context.ac.midTone,
                           )),
                           if (s.address.coordinates != null)
                             Padding(
@@ -189,13 +189,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                               fontFamily: FontFamily.geoBold,
                               fontSize: 10,
                               letterSpacing: 1.2,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                             )),
                             const SizedBox(height: 8),
                             Text(s.hours!, style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 14,
-                              color: ColorsAmiin.mid,
+                              color: context.ac.midTone,
                             )),
                           ],
                         ),
@@ -211,13 +211,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                               fontFamily: FontFamily.geoBold,
                               fontSize: 10,
                               letterSpacing: 1.2,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                             )),
                             const SizedBox(height: 8),
                             Text(s.description!, style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 14,
-                              color: ColorsAmiin.mid,
+                              color: context.ac.midTone,
                               height: 1.5,
                             )),
                           ],
@@ -244,7 +244,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           Expanded(child: Text(text, style: TextStyle(
             fontFamily: FontFamily.sans,
             fontSize: 14,
-            color: ColorsAmiin.ocre,
+            color: context.ac.infoAccent,
           ))),
         ],
       ),

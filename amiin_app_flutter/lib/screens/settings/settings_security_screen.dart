@@ -1,7 +1,7 @@
 // ─── SettingsSecurityScreen ───────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/header.dart';
 import 'settings_widgets.dart';
@@ -12,7 +12,7 @@ class SettingsSecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [

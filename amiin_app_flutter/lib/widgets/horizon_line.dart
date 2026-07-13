@@ -4,6 +4,7 @@
 // Sert également d'indicateur de chargement quand `animating = true`.
 
 import 'package:flutter/material.dart';
+import '../theme/themes.dart';
 
 class HorizonLine extends StatefulWidget {
   final Color color;
@@ -138,11 +139,11 @@ class _SweepPainter extends CustomPainter {
 enum AmiinMode { secretariat, info, neutral }
 
 extension AmiinModeColor on AmiinMode {
-  Color get color {
+  Color color(BuildContext context) {
     switch (this) {
-      case AmiinMode.secretariat: return const Color(0xFF1E8A8A);
-      case AmiinMode.info:        return const Color(0xFFC8902F);
-      case AmiinMode.neutral:     return const Color(0xFF8090B0);
+      case AmiinMode.secretariat: return context.ac.secretariatAccent;
+      case AmiinMode.info:        return context.ac.infoAccent;
+      case AmiinMode.neutral:     return context.ac.muted;
     }
   }
 }

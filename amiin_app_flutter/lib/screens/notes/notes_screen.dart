@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -118,7 +118,7 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -167,7 +167,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               'Appuyez sur + pour créer votre première note.')
                       : RefreshIndicator(
                           onRefresh: _loadData,
-                          color: ColorsAmiin.turquoise,
+                          color: context.ac.secretariatAccent,
                           child: ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(Spacing.lg),
@@ -182,7 +182,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 direction: DismissDirection.endToStart,
                                 background: Container(
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFD32F2F),
+                                    color: context.ac.alertColor,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   alignment: Alignment.centerRight,
@@ -239,7 +239,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   fontFamily:
                                                       FontFamily.geoBold,
                                                   fontSize: 15,
-                                                  color: ColorsAmiin.ink,
+                                                  color: context.ac.ink,
                                                 ),
                                               ),
                                             ),
@@ -260,7 +260,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                         horizontal: 6,
                                                         vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: ColorsAmiin.turquoiseLt,
+                                                  color: context.ac.secretariatAccentLight,
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           RadiusAmiin.sm),
@@ -272,7 +272,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                         FontFamily.geoBold,
                                                     fontSize: 10,
                                                     color:
-                                                        ColorsAmiin.turquoiseDk,
+                                                        context.ac.secretariatAccentDark,
                                                   ),
                                                 ),
                                               ),
@@ -287,7 +287,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                           style: TextStyle(
                                             fontFamily: FontFamily.sans,
                                             fontSize: 13,
-                                            color: ColorsAmiin.mid,
+                                            color: context.ac.midTone,
                                             height: 1.4,
                                           ),
                                         ),
@@ -303,7 +303,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               style: TextStyle(
                                                 fontFamily: FontFamily.sans,
                                                 fontSize: 11,
-                                                color: ColorsAmiin.muted,
+                                                color: context.ac.muted,
                                               ),
                                             ),
                                             if (note.tags.isNotEmpty)
@@ -340,8 +340,8 @@ class _NotesScreenState extends State<NotesScreen> {
             child: FloatingActionButton.small(
               heroTag: 'notesScrollTop',
               onPressed: _scrollToTop,
-              backgroundColor: ColorsAmiin.white,
-              foregroundColor: ColorsAmiin.turquoise,
+              backgroundColor: context.ac.surface,
+              foregroundColor: context.ac.secretariatAccent,
               elevation: 2,
               child: const Icon(Icons.keyboard_arrow_up),
             ),
@@ -351,8 +351,8 @@ class _NotesScreenState extends State<NotesScreen> {
             heroTag: 'notesCreate',
             onPressed: () =>
                 context.push('/notes/create').then((_) => _loadData()),
-            backgroundColor: ColorsAmiin.turquoise,
-            child: const Icon(Icons.add, color: ColorsAmiin.white),
+            backgroundColor: context.ac.secretariatAccent,
+            child: Icon(Icons.add, color: context.ac.onAccent),
           ),
         ],
       ),

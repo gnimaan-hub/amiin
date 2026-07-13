@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -32,7 +32,7 @@ class SettingsAssistantScreen extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -56,7 +56,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               height: 1.4,
                             ),
                           ),
@@ -82,7 +82,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               height: 1.4,
                             ),
                           ),
@@ -108,7 +108,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               height: 1.4,
                             ),
                           ),
@@ -134,7 +134,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               height: 1.4,
                             ),
                           ),
@@ -198,7 +198,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               height: 1.4,
                             ),
                           ),
@@ -228,7 +228,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                               Text('Vitesse de lecture', style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 15,
-                                color: ColorsAmiin.ink,
+                                color: context.ac.ink,
                               )),
                               const Spacer(),
                               Text(
@@ -252,8 +252,8 @@ class SettingsAssistantScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('0.5×', style: TextStyle(fontSize: 11, color: ColorsAmiin.muted, fontFamily: FontFamily.sans)),
-                              Text('2.0×', style: TextStyle(fontSize: 11, color: ColorsAmiin.muted, fontFamily: FontFamily.sans)),
+                              Text('0.5×', style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
+                              Text('2.0×', style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
                             ],
                           ),
                         ],
@@ -277,17 +277,17 @@ class SettingsAssistantScreen extends StatelessWidget {
                                     Text('Voix neuronales Microsoft', style: TextStyle(
                                       fontFamily: FontFamily.sans,
                                       fontSize: 15,
-                                      color: ColorsAmiin.ink,
+                                      color: context.ac.ink,
                                     )),
                                     Text('Indépendantes des voix installées sur le téléphone.', style: TextStyle(
                                       fontFamily: FontFamily.sans,
                                       fontSize: 12,
-                                      color: ColorsAmiin.muted,
+                                      color: context.ac.muted,
                                     )),
                                     Text('Ajoute 2–5 s de délai avant la lecture.', style: TextStyle(
                                       fontFamily: FontFamily.sans,
                                       fontSize: 12,
-                                      color: ColorsAmiin.ocre,
+                                      color: context.ac.infoAccent,
                                     )),
                                   ],
                                 ),
@@ -304,7 +304,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                             Text('Choisir une voix', style: TextStyle(
                               fontFamily: FontFamily.geoMedium,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                             )),
                             const SizedBox(height: Spacing.sm),
                             ..._buildVoiceList(context, settings, primary),
@@ -344,7 +344,7 @@ class SettingsAssistantScreen extends StatelessWidget {
           fontFamily: FontFamily.sans,
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: ColorsAmiin.muted,
+          color: context.ac.muted,
           letterSpacing: 0.5,
         )),
       ));
@@ -433,10 +433,10 @@ class _TopicsPicker extends StatelessWidget {
             duration: const Duration(milliseconds: 150),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: isSelected ? primary.withValues(alpha: 0.12) : ColorsAmiin.ecru,
+              color: isSelected ? primary.withValues(alpha: 0.12) : context.ac.background,
               borderRadius: BorderRadius.circular(RadiusAmiin.full),
               border: Border.all(
-                color: isSelected ? primary : ColorsAmiin.border,
+                color: isSelected ? primary : context.ac.border,
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -450,7 +450,7 @@ class _TopicsPicker extends StatelessWidget {
                 Text(topic, style: TextStyle(
                   fontFamily: FontFamily.geoMedium,
                   fontSize: 12,
-                  color: isSelected ? primary : ColorsAmiin.mid,
+                  color: isSelected ? primary : context.ac.midTone,
                 )),
               ],
             ),
@@ -502,7 +502,7 @@ class _VoiceModeDescription extends StatelessWidget {
               child: Text(desc, style: TextStyle(
                 fontFamily: FontFamily.sans,
                 fontSize: 12,
-                color: ColorsAmiin.ink,
+                color: context.ac.ink,
                 height: 1.5,
               )),
             ),
@@ -567,7 +567,7 @@ class _VoiceTileState extends State<_VoiceTile> {
             Icon(
               widget.selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
               size: 18,
-              color: widget.selected ? widget.primary : ColorsAmiin.muted,
+              color: widget.selected ? widget.primary : context.ac.muted,
             ),
             const SizedBox(width: Spacing.sm),
             Expanded(
@@ -578,7 +578,7 @@ class _VoiceTileState extends State<_VoiceTile> {
                     style: TextStyle(
                       fontFamily: FontFamily.sans,
                       fontSize: 14,
-                      color: widget.selected ? ColorsAmiin.ink : ColorsAmiin.mid,
+                      color: widget.selected ? context.ac.ink : context.ac.midTone,
                       fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),

@@ -1,7 +1,7 @@
 // ─── SettingsAboutScreen ── À propos & Support ────────────────────────────────
 
 import 'package:flutter/material.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -18,7 +18,7 @@ class SettingsAboutScreen extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -63,7 +63,7 @@ class SettingsAboutScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 13,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -71,7 +71,7 @@ class SettingsAboutScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 12,
-                                color: ColorsAmiin.muted,
+                                color: context.ac.muted,
                               )),
                         ],
                       ),
@@ -159,7 +159,7 @@ class SettingsAboutScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: FontFamily.sans,
                           fontSize: 11,
-                          color: ColorsAmiin.muted,
+                          color: context.ac.muted,
                         ),
                       ),
                     ),
@@ -221,7 +221,7 @@ class SettingsAboutScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Nouveautés v1.0', style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 18, color: ColorsAmiin.ink,
+                fontFamily: FontFamily.geoBold, fontSize: 18, color: context.ac.ink,
               )),
               const SizedBox(height: Spacing.md),
               ...[
@@ -233,7 +233,7 @@ class SettingsAboutScreen extends StatelessWidget {
               ].map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(e, style: TextStyle(
-                  fontFamily: FontFamily.sans, fontSize: 14, color: ColorsAmiin.ink, height: 1.4,
+                  fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.ink, height: 1.4,
                 )),
               )),
               const SizedBox(height: Spacing.md),

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/settings_service.dart';
@@ -102,7 +102,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 13,
-                                color: ColorsAmiin.ink,
+                                color: context.ac.ink,
                                 height: 1.5,
                               ),
                             ),
@@ -179,7 +179,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
       fontFamily: FontFamily.geoBold,
       fontSize: 10,
       letterSpacing: 1.2,
-      color: ColorsAmiin.muted,
+      color: context.ac.muted,
     )),
   );
 
@@ -191,15 +191,15 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
-        fillColor: ColorsAmiin.white,
-        hintStyle: TextStyle(color: ColorsAmiin.muted, fontFamily: FontFamily.sans),
+        fillColor: context.ac.surface,
+        hintStyle: TextStyle(color: context.ac.muted, fontFamily: FontFamily.sans),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsAmiin.border),
+          borderSide: BorderSide(color: context.ac.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsAmiin.border),
+          borderSide: BorderSide(color: context.ac.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -207,7 +207,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       ),
-      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: ColorsAmiin.ink),
+      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink),
     );
   }
 }
@@ -238,7 +238,7 @@ class _BirthYearPicker extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text('Année de naissance', style: TextStyle(
-                    fontFamily: FontFamily.geoBold, fontSize: 16, color: ColorsAmiin.ink,
+                    fontFamily: FontFamily.geoBold, fontSize: 16, color: context.ac.ink,
                   )),
                 ),
                 SizedBox(
@@ -248,7 +248,7 @@ class _BirthYearPicker extends StatelessWidget {
                     itemBuilder: (_, i) => ListTile(
                       title: Text('${years[i]}', style: TextStyle(
                         fontFamily: FontFamily.sans,
-                        color: years[i] == value ? Theme.of(context).colorScheme.primary : ColorsAmiin.ink,
+                        color: years[i] == value ? Theme.of(context).colorScheme.primary : context.ac.ink,
                         fontWeight: years[i] == value ? FontWeight.bold : FontWeight.normal,
                       )),
                       trailing: years[i] == value
@@ -274,9 +274,9 @@ class _BirthYearPicker extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: BoxDecoration(
-          color: ColorsAmiin.white,
+          color: context.ac.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: ColorsAmiin.border),
+          border: Border.all(color: context.ac.border),
         ),
         child: Row(
           children: [
@@ -286,11 +286,11 @@ class _BirthYearPicker extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: FontFamily.sans,
                   fontSize: 15,
-                  color: value != null ? ColorsAmiin.ink : ColorsAmiin.muted,
+                  color: value != null ? context.ac.ink : context.ac.muted,
                 ),
               ),
             ),
-            const Icon(Icons.expand_more, color: ColorsAmiin.muted, size: 20),
+            Icon(Icons.expand_more, color: context.ac.muted, size: 20),
           ],
         ),
       ),
@@ -325,17 +325,17 @@ class _EmploymentPicker extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             decoration: BoxDecoration(
-              color: selected ? primary.withValues(alpha: 0.1) : ColorsAmiin.white,
+              color: selected ? primary.withValues(alpha: 0.1) : context.ac.surface,
               borderRadius: BorderRadius.circular(30),
               border: Border.all(
-                color: selected ? primary : ColorsAmiin.border,
+                color: selected ? primary : context.ac.border,
                 width: selected ? 1.5 : 1,
               ),
             ),
             child: Text(opt.$2, style: TextStyle(
               fontFamily: FontFamily.geoMedium,
               fontSize: 13,
-              color: selected ? primary : ColorsAmiin.mid,
+              color: selected ? primary : context.ac.midTone,
             )),
           ),
         );

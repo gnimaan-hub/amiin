@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -99,33 +99,33 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
 
   Color _statusColor(DemarcheStatus status) {
     switch (status) {
-      case DemarcheStatus.aFaire:   return ColorsAmiin.mid;
-      case DemarcheStatus.enCours:  return ColorsAmiin.ocre;
-      case DemarcheStatus.terminee: return ColorsAmiin.success;
-      case DemarcheStatus.expiree:  return ColorsAmiin.muted;
+      case DemarcheStatus.aFaire:   return context.ac.midTone;
+      case DemarcheStatus.enCours:  return context.ac.infoAccent;
+      case DemarcheStatus.terminee: return context.ac.success;
+      case DemarcheStatus.expiree:  return context.ac.muted;
     }
   }
 
   Color _statusBgColor(DemarcheStatus status) {
     switch (status) {
-      case DemarcheStatus.aFaire:   return ColorsAmiin.sand;
-      case DemarcheStatus.enCours:  return ColorsAmiin.ocreLt;
-      case DemarcheStatus.terminee: return ColorsAmiin.successLt;
-      case DemarcheStatus.expiree:  return ColorsAmiin.ecru;
+      case DemarcheStatus.aFaire:   return context.ac.surface2;
+      case DemarcheStatus.enCours:  return context.ac.infoAccentLight;
+      case DemarcheStatus.terminee: return context.ac.successLight;
+      case DemarcheStatus.expiree:  return context.ac.background;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
             const AmiinHeader(title: 'Démarches'),
             // Onglets Catalogue / Mes démarches
             Container(
-              color: ColorsAmiin.white,
+              color: context.ac.surface,
               child: Row(
                 children: [
                   _buildTab('Catalogue', 0),
@@ -158,9 +158,9 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
                         decoration: BoxDecoration(
-                          color: selected ? ColorsAmiin.ocre : ColorsAmiin.white,
+                          color: selected ? context.ac.infoAccent : context.ac.surface,
                           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                          border: Border.all(color: selected ? ColorsAmiin.ocre : ColorsAmiin.border),
+                          border: Border.all(color: selected ? context.ac.infoAccent : context.ac.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -170,7 +170,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                             Text(cat.label, style: TextStyle(
                               fontFamily: FontFamily.geoMedium,
                               fontSize: 12,
-                              color: selected ? ColorsAmiin.white : ColorsAmiin.mid,
+                              color: selected ? context.ac.onAccent : context.ac.midTone,
                             )),
                           ],
                         ),
@@ -186,7 +186,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                   ? const SkeletonList()
                   : RefreshIndicator(
                       onRefresh: _loadData,
-                      color: ColorsAmiin.ocre,
+                      color: context.ac.infoAccent,
                       child: _tabIndex == 0
                           ? _buildCatalogList()
                           : _buildUserDemarchesList(),
@@ -207,7 +207,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(
-              color: isActive ? ColorsAmiin.ocre : Colors.transparent,
+              color: isActive ? context.ac.infoAccent : Colors.transparent,
               width: 2,
             )),
           ),
@@ -217,7 +217,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             style: TextStyle(
               fontFamily: FontFamily.geoMedium,
               fontSize: 13,
-              color: isActive ? ColorsAmiin.ocre : ColorsAmiin.muted,
+              color: isActive ? context.ac.infoAccent : context.ac.muted,
             ),
           ),
         ),
@@ -272,17 +272,17 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             Text(cat.label, style: TextStyle(
               fontFamily: FontFamily.geoBold,
               fontSize: 13,
-              color: ColorsAmiin.ink,
+              color: context.ac.ink,
             )),
             const SizedBox(width: Spacing.sm),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: ColorsAmiin.sand,
+                color: context.ac.surface2,
                 borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
               child: Text('${items.length}', style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 10, color: ColorsAmiin.mid,
+                fontFamily: FontFamily.geoBold, fontSize: 10, color: context.ac.midTone,
               )),
             ),
           ],
@@ -326,7 +326,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         style: TextStyle(
                           fontFamily: FontFamily.geoBold,
                           fontSize: 14,
-                          color: ColorsAmiin.ink,
+                          color: context.ac.ink,
                           height: 1.3,
                         ),
                       ),
@@ -338,7 +338,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                           style: TextStyle(
                             fontFamily: FontFamily.sans,
                             fontSize: 12,
-                            color: ColorsAmiin.muted,
+                            color: context.ac.muted,
                             height: 1.4,
                           ),
                         ),
@@ -350,7 +350,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isInfo ? ColorsAmiin.ocreLt : ColorsAmiin.successLt,
+                    color: isInfo ? context.ac.infoAccentLight : context.ac.successLight,
                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                   ),
                   child: Text(
@@ -358,7 +358,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                     style: TextStyle(
                       fontFamily: FontFamily.geoBold,
                       fontSize: 10,
-                      color: isInfo ? ColorsAmiin.ocre : ColorsAmiin.success,
+                      color: isInfo ? context.ac.infoAccent : context.ac.success,
                     ),
                   ),
                 ),
@@ -395,7 +395,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
         Flexible(
           child: Text(
             label,
-            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -475,7 +475,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                   children: [
                     Expanded(
                       child: Text(ud.demarche.title, style: TextStyle(
-                        fontFamily: FontFamily.geoBold, fontSize: 14, color: ColorsAmiin.ink,
+                        fontFamily: FontFamily.geoBold, fontSize: 14, color: context.ac.ink,
                       )),
                     ),
                     Container(
@@ -492,7 +492,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(ud.demarche.category.label, style: TextStyle(
-                  fontFamily: FontFamily.sans, fontSize: 12, color: ColorsAmiin.muted,
+                  fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.muted,
                 )),
                 if (ud.totalSteps > 0) ...[
                   const SizedBox(height: 10),
@@ -503,10 +503,10 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                           borderRadius: BorderRadius.circular(2),
                           child: LinearProgressIndicator(
                             value: ud.progress,
-                            backgroundColor: ColorsAmiin.border,
+                            backgroundColor: context.ac.border,
                             color: ud.status == DemarcheStatus.terminee
-                                ? ColorsAmiin.success
-                                : ColorsAmiin.ocre,
+                                ? context.ac.success
+                                : context.ac.infoAccent,
                             minHeight: 4,
                           ),
                         ),
@@ -514,7 +514,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       const SizedBox(width: Spacing.sm),
                       Text(
                         '${ud.completedSteps}/${ud.totalSteps}',
-                        style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 11, color: ColorsAmiin.mid),
+                        style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 11, color: context.ac.midTone),
                       ),
                     ],
                   ),
@@ -523,7 +523,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                     ud.status == DemarcheStatus.terminee
                         ? 'Terminée ✓'
                         : 'Étape ${ud.currentStep} sur ${ud.totalSteps}',
-                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: ColorsAmiin.muted),
+                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
                   ),
                 ],
               ],

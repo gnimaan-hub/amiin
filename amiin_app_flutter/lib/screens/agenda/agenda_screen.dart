@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -86,7 +87,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: ColorsAmiin.turquoise),
+      SnackBar(content: Text(message), backgroundColor: context.ac.secretariatAccent),
     );
   }
 
@@ -116,15 +117,15 @@ class _AgendaScreenState extends State<AgendaScreen> {
   Color _categoryColor(EventCategory category) {
     switch (category) {
       case EventCategory.admin:
-        return ColorsAmiin.turquoise;
+        return context.ac.secretariatAccent;
       case EventCategory.personal:
-        return ColorsAmiin.success;
+        return context.ac.success;
       case EventCategory.health:
-        return ColorsAmiin.ocre;
+        return context.ac.infoAccent;
       case EventCategory.education:
-        return const Color(0xFF8C6D3F);
+        return CategoryColors.education;
       default:
-        return ColorsAmiin.muted;
+        return context.ac.muted;
     }
   }
 
@@ -154,7 +155,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
     final leadingEmpty = (firstWeekday - 1) % 7;
 
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -183,7 +184,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     style: TextStyle(
                       fontFamily: FontFamily.geo,
                       fontSize: 18,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                     ),
                   ),
                   IconButton(
@@ -205,7 +206,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                             style: TextStyle(
                               fontFamily: FontFamily.geoBold,
                               fontSize: 10,
-                              color: ColorsAmiin.muted,
+                              color: context.ac.muted,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -231,9 +232,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: _isSameDay(day, _selectedDay)
-                              ? ColorsAmiin.turquoise
+                              ? context.ac.secretariatAccent
                               : _isToday(day)
-                                  ? ColorsAmiin.turquoiseLt
+                                  ? context.ac.secretariatAccentLight
                                   : null,
                           borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                         ),
@@ -246,10 +247,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                 fontFamily: FontFamily.geoMedium,
                                 fontSize: 13,
                                 color: _isSameDay(day, _selectedDay)
-                                    ? ColorsAmiin.white
+                                    ? context.ac.onAccent
                                     : _isToday(day)
-                                        ? ColorsAmiin.turquoise
-                                        : ColorsAmiin.ink,
+                                        ? context.ac.secretariatAccent
+                                        : context.ac.ink,
                               ),
                             ),
                             if (_eventsForDay(day).isNotEmpty)
@@ -292,7 +293,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
     }
     return RefreshIndicator(
       onRefresh: _refreshEvents,
-      color: ColorsAmiin.turquoise,
+      color: context.ac.secretariatAccent,
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -308,7 +309,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     style: TextStyle(
                       fontFamily: FontFamily.geo,
                       fontSize: 16,
-                      color: ColorsAmiin.ink,
+                      color: context.ac.ink,
                     ),
                   ),
                   // Bouton Créer à côté de la date sélectionnée
@@ -321,8 +322,8 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     icon: const Icon(Icons.add, size: 18),
                     label: const Text('Créer'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorsAmiin.turquoise,
-                      foregroundColor: ColorsAmiin.white,
+                      backgroundColor: context.ac.secretariatAccent,
+                      foregroundColor: context.ac.onAccent,
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -343,7 +344,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     style: TextStyle(
                       fontFamily: FontFamily.sans,
                       fontSize: 13,
-                      color: ColorsAmiin.muted,
+                      color: context.ac.muted,
                     ),
                   ),
                 ),
@@ -363,7 +364,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                       direction: DismissDirection.endToStart,
                       background: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD32F2F),
+                          color: context.ac.alertColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         alignment: Alignment.centerRight,
@@ -435,7 +436,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                     style: TextStyle(
                                       fontFamily: FontFamily.geoMedium,
                                       fontSize: 14,
-                                      color: ColorsAmiin.ink,
+                                      color: context.ac.ink,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -444,7 +445,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                     style: TextStyle(
                                       fontFamily: FontFamily.sans,
                                       fontSize: 12,
-                                      color: ColorsAmiin.muted,
+                                      color: context.ac.muted,
                                     ),
                                   ),
                                   if (ev.location != null)
@@ -453,7 +454,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                       style: TextStyle(
                                         fontFamily: FontFamily.sans,
                                         fontSize: 12,
-                                        color: ColorsAmiin.muted,
+                                        color: context.ac.muted,
                                       ),
                                     ),
                                 ],
@@ -463,7 +464,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: ColorsAmiin.turquoiseLt,
+                                  color: context.ac.secretariatAccentLight,
                                   borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                                 ),
                                 child: Text(
@@ -471,7 +472,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                   style: TextStyle(
                                     fontFamily: FontFamily.geoBold,
                                     fontSize: 10,
-                                    color: ColorsAmiin.turquoiseDk,
+                                    color: context.ac.secretariatAccentDark,
                                   ),
                                 ),
                               ),

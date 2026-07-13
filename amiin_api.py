@@ -21,12 +21,12 @@ from contextlib import asynccontextmanager
 
 import edge_tts
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from auth import router as auth_router
+from auth import router as auth_router, get_current_user
 
 import requests as _requests
 from dotenv import load_dotenv
@@ -930,25 +930,57 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS — l'app mobile n'en a pas besoin (pas de navigateur) ; pour un éventuel
+# front web, lister les origines dans CORS_ORIGINS (séparées par des virgules).
+# Auth par header Bearer (pas de cookies) → allow_credentials=False.
+_cors_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins or ["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(auth_router, prefix="/v1")
 
+# ─── Rate limiting par utilisateur (fenêtre glissante en mémoire) ─────────────
+# Protège le budget LLM/TTS contre un client qui boucle. En mémoire : se vide
+# au redéploiement, suffisant pour une instance unique.
+
+from collections import defaultdict, deque
+
+_rate_buckets: Dict[str, deque] = defaultdict(deque)
+
+def _check_rate(user_id: str, scope: str, max_calls: int, window_s: int = 60) -> None:
+    now = time.monotonic()
+    bucket = _rate_buckets[f"{scope}:{user_id}"]
+    while bucket and now - bucket[0] > window_s:
+        bucket.popleft()
+    if len(bucket) >= max_calls:
+        raise HTTPException(
+            status_code=429,
+            detail="Trop de requêtes — réessayez dans une minute.",
+        )
+    bucket.append(now)
+
+def chat_user(user: dict = Depends(get_current_user)) -> dict:
+    _check_rate(user["sub"], "chat", max_calls=30)
+    return user
+
+def tts_user(user: dict = Depends(get_current_user)) -> dict:
+    _check_rate(user["sub"], "tts", max_calls=60)
+    return user
+
 # ─── Health ───────────────────────────────────────────────────────────────────
 
 @app.get("/v1/logs")
 async def get_logs(n: int = 100, secret: Optional[str] = None):
     """Retourne les n dernières lignes de amiin_requests.log.
-    Protégé par la variable d'env LOG_SECRET si elle est définie."""
+    Accessible uniquement si LOG_SECRET est définie ET fournie en ?secret=…"""
     log_secret = os.environ.get("LOG_SECRET", "")
-    if log_secret and secret != log_secret:
-        raise HTTPException(status_code=401, detail="Secret invalide. Ajouter ?secret=… dans l'URL.")
+    if not log_secret or secret != log_secret:
+        raise HTTPException(status_code=401, detail="Accès refusé — LOG_SECRET requis.")
     log_path = "amiin_requests.log"
     if not os.path.exists(log_path):
         return {"lines": [], "total": 0, "message": "Aucun log encore — le fichier est créé dès le premier message."}
@@ -978,7 +1010,7 @@ async def health():
 
 # ─── Chat non-streaming (fallback) ────────────────────────────────────────────
 
-@app.post("/v1/chat", response_model=ChatResponse)
+@app.post("/v1/chat", response_model=ChatResponse, dependencies=[Depends(chat_user)])
 async def chat(request: ChatRequest):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
@@ -1006,7 +1038,7 @@ async def chat(request: ChatRequest):
 
 # ─── Chat streaming SSE ───────────────────────────────────────────────────────
 
-@app.post("/v1/chat/stream")
+@app.post("/v1/chat/stream", dependencies=[Depends(chat_user)])
 async def chat_stream(request: ChatRequest):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
@@ -1033,7 +1065,7 @@ async def chat_stream(request: ChatRequest):
 
 # ─── Stats ────────────────────────────────────────────────────────────────────
 
-@app.get("/v1/stats", response_model=StatsResponse)
+@app.get("/v1/stats", response_model=StatsResponse, dependencies=[Depends(get_current_user)])
 async def stats():
     if not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
@@ -1071,7 +1103,7 @@ def _annuaire_filter(categorie: str = None, sous_categorie: str = None,
     return Filter(must=conditions)
 
 
-@app.get("/v1/annuaire/categories")
+@app.get("/v1/annuaire/categories", dependencies=[Depends(get_current_user)])
 async def annuaire_categories():
     """Retourne les catégories, sous-catégories, quartiers et villes disponibles avec comptages."""
     if not qdrant_client:
@@ -1121,7 +1153,7 @@ async def annuaire_categories():
     }
 
 
-@app.get("/v1/annuaire/browse")
+@app.get("/v1/annuaire/browse", dependencies=[Depends(get_current_user)])
 async def annuaire_browse(
     categorie:      Optional[str] = None,
     sous_categorie: Optional[str] = None,
@@ -1157,7 +1189,7 @@ async def annuaire_browse(
     return {"services": services, "count": len(services)}
 
 
-@app.get("/v1/annuaire/services")
+@app.get("/v1/annuaire/services", dependencies=[Depends(get_current_user)])
 async def annuaire_search(
     q:              str,
     categorie:      Optional[str] = None,
@@ -1184,7 +1216,7 @@ async def annuaire_search(
     ]
     return {"services": services}
 
-@app.get("/v1/annuaire/services/nearby")
+@app.get("/v1/annuaire/services/nearby", dependencies=[Depends(get_current_user)])
 async def annuaire_nearby(lat: float, lng: float, radius: int = 5,
                           categorie: Optional[str] = None):
     """Scroller TOUTES les entrées annuaire géolocalisées et filtrer par distance.
@@ -1227,7 +1259,7 @@ async def annuaire_nearby(lat: float, lng: float, radius: int = 5,
     services = await loop.run_in_executor(None, _fetch_nearby)
     return {"services": services}
 
-@app.get("/v1/annuaire/services/{service_id}")
+@app.get("/v1/annuaire/services/{service_id}", dependencies=[Depends(get_current_user)])
 async def annuaire_service_detail(service_id: str):
     if not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
@@ -1249,7 +1281,7 @@ async def annuaire_service_detail(service_id: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Service non trouvé : {e}")
 
-@app.get("/v1/annuaire/favorites")
+@app.get("/v1/annuaire/favorites", dependencies=[Depends(get_current_user)])
 async def annuaire_get_favorites():
     if not qdrant_client:
         raise HTTPException(status_code=503, detail="Base non chargée")
@@ -1275,15 +1307,125 @@ async def annuaire_get_favorites():
     except Exception:
         return {"services": []}
 
-@app.post("/v1/annuaire/favorites/{service_id}")
+@app.post("/v1/annuaire/favorites/{service_id}", dependencies=[Depends(get_current_user)])
 async def annuaire_add_favorite(service_id: str):
     _favorites.add(service_id)
     return {"ok": True}
 
-@app.delete("/v1/annuaire/favorites/{service_id}")
+@app.delete("/v1/annuaire/favorites/{service_id}", dependencies=[Depends(get_current_user)])
 async def annuaire_remove_favorite(service_id: str):
     _favorites.discard(service_id)
     return {"ok": True}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# BRIEF DU JOUR — météo + horaires de prière + taux FDJ pour l'écran d'accueil
+# Chaque bloc est indépendant et nullable : si une source échoue, les autres
+# restent servies et l'app masque simplement la tuile correspondante.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Djibouti-ville par défaut (si l'app n'a pas la localisation)
+_DJIBOUTI_LAT, _DJIBOUTI_LON = 11.589, 43.145
+# Parité fixe depuis 1973 : 1 USD = 177.721 FDJ (Banque Centrale de Djibouti)
+_USD_FDJ_PEG = 177.721
+
+_brief_weather_cache: dict = {}   # {coords: (payload, ts)} — TTL 30 min
+_prayer_cache: dict = {}          # {(date, coords): payload} — valide la journée
+_fx_cache: dict = {}              # {"eur": (rate, ts)} — TTL 12 h
+
+def _brief_weather(lat: float, lon: float) -> Optional[dict]:
+    """Météo courante OWM condensée pour la tuile d'accueil."""
+    if not _owm_api_key:
+        return None
+    key = f"{lat:.2f},{lon:.2f}"
+    cached = _brief_weather_cache.get(key)
+    if cached and time.time() - cached[1] < 1800:
+        return cached[0]
+    try:
+        cw = _requests.get(
+            "https://api.openweathermap.org/data/2.5/weather",
+            params={"lat": lat, "lon": lon, "appid": _owm_api_key,
+                    "units": "metric", "lang": "fr"},
+            timeout=5,
+        ).json()
+        payload = {
+            "temp": round(cw["main"]["temp"]),
+            "feels_like": round(cw["main"]["feels_like"]),
+            "desc": cw["weather"][0]["description"] if cw.get("weather") else "",
+            "icon": cw["weather"][0]["icon"] if cw.get("weather") else "",
+        }
+        _brief_weather_cache[key] = (payload, time.time())
+        return payload
+    except Exception as e:
+        logging.warning(f"[brief] météo indisponible: {e}")
+        return None
+
+def _brief_prayers(lat: float, lon: float) -> Optional[dict]:
+    """Horaires de prière du jour via l'API AlAdhan (gratuite, sans clé)."""
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    today = _dt.now(_tz(_td(hours=3))).strftime("%d-%m-%Y")   # heure de Djibouti (EAT)
+    key = (today, f"{lat:.2f},{lon:.2f}")
+    if key in _prayer_cache:
+        return _prayer_cache[key]
+    try:
+        resp = _requests.get(
+            f"https://api.aladhan.com/v1/timings/{today}",
+            params={"latitude": lat, "longitude": lon, "method": 3},   # méthode MWL
+            timeout=6,
+        ).json()
+        t = resp["data"]["timings"]
+        payload = {
+            "fajr":    t["Fajr"][:5],
+            "dhuhr":   t["Dhuhr"][:5],
+            "asr":     t["Asr"][:5],
+            "maghrib": t["Maghrib"][:5],
+            "isha":    t["Isha"][:5],
+        }
+        _prayer_cache[key] = payload
+        if len(_prayer_cache) > 50:   # purge des jours passés
+            for k in list(_prayer_cache):
+                if k[0] != today:
+                    del _prayer_cache[k]
+        return payload
+    except Exception as e:
+        logging.warning(f"[brief] horaires de prière indisponibles: {e}")
+        return None
+
+def _brief_fx() -> Optional[dict]:
+    """Taux de change FDJ : USD à parité fixe, EUR via open.er-api.com (sans clé)."""
+    payload = {"usd_fdj": round(_USD_FDJ_PEG, 2), "eur_fdj": None}
+    cached = _fx_cache.get("eur")
+    if cached and time.time() - cached[1] < 12 * 3600:
+        payload["eur_fdj"] = cached[0]
+        return payload
+    try:
+        resp = _requests.get("https://open.er-api.com/v6/latest/USD", timeout=6).json()
+        usd_per_eur = resp["rates"]["EUR"]      # EUR pour 1 USD
+        eur_fdj = round(_USD_FDJ_PEG / usd_per_eur, 1)
+        _fx_cache["eur"] = (eur_fdj, time.time())
+        payload["eur_fdj"] = eur_fdj
+    except Exception as e:
+        logging.warning(f"[brief] taux EUR indisponible: {e}")
+    return payload
+
+@app.get("/v1/home/brief", dependencies=[Depends(get_current_user)])
+async def home_brief(lat: Optional[float] = None, lon: Optional[float] = None):
+    """Brief du jour pour l'écran d'accueil : météo, prières, taux de change.
+    Les trois blocs sont récupérés en parallèle ; chacun peut être null."""
+    la = lat if lat is not None else _DJIBOUTI_LAT
+    lo = lon if lon is not None else _DJIBOUTI_LON
+    loop = asyncio.get_event_loop()
+    weather, prayers, fx = await asyncio.gather(
+        loop.run_in_executor(None, _brief_weather, la, lo),
+        loop.run_in_executor(None, _brief_prayers, la, lo),
+        loop.run_in_executor(None, _brief_fx),
+    )
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    return {
+        "date": _dt.now(_tz(_td(hours=3))).strftime("%Y-%m-%d"),
+        "weather": weather,
+        "prayers": prayers,
+        "fx": fx,
+    }
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SYNTHÈSE VOCALE CLOUD — Edge TTS (Microsoft, gratuit, sans clé API)
@@ -1376,12 +1518,12 @@ class TTSRequest(BaseModel):
     # Format edge-tts : "+10%", "-5%", "+0%" — converti depuis ttsSpeed côté Flutter
     rate: str = "+0%"
 
-@app.get("/v1/tts/voices")
+@app.get("/v1/tts/voices", dependencies=[Depends(get_current_user)])
 async def tts_voices():
     """Retourne la liste curatée des voix Edge TTS disponibles."""
     return {"voices": _TTS_VOICES}
 
-@app.post("/v1/tts")
+@app.post("/v1/tts", dependencies=[Depends(tts_user)])
 async def text_to_speech(req: TTSRequest):
     """
     Génère un fichier MP3 à partir du texte via Edge TTS (Microsoft, gratuit).

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../theme/colors.dart';
+import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
@@ -18,26 +19,6 @@ import '../../services/annuaire_service.dart';
 
 // ── Mapping catégorie → couleur + emoji ──────────────────────────────────────
 
-const Map<String, Color> _catColors = {
-  'Alimentation & Restauration':               Color(0xFFE07B39),
-  'Hébergement':                               Color(0xFF1A7A6E),
-  'Santé':                                     Color(0xFFC0392B),
-  'Commerce & Courses':                        Color(0xFF6B7C3A),
-  'Transport & Logistique':                    Color(0xFF2980B9),
-  'Éducation & Formation':                     Color(0xFF8C6D3F),
-  'Administration & Services publics':         Color(0xFF3D5A8A),
-  'Services financiers & juridiques':          Color(0xFF8B6914),
-  'Culture & Culte':                           Color(0xFF7B4B94),
-  'Tourisme & Loisirs':                        Color(0xFF0097A7),
-  'Services automobile':                       Color(0xFF546E7A),
-  'Services à la personne':                    Color(0xFF6D4C7E),
-  'Géographie & Patrimoine naturel':           Color(0xFF388E3C),
-  'Diplomatie & Organisations internationales':Color(0xFF1A3A5C),
-  'Industrie, Énergie & Grandes entreprises':  Color(0xFF4E4E4E),
-  'Télécom & Tech':                            Color(0xFF1565C0),
-  'Associations & ONG':                        Color(0xFFAD1457),
-  'Défense internationale':                    Color(0xFF33691E),
-};
 
 const Map<String, String> _catEmoji = {
   'Alimentation & Restauration':               '🍽️',
@@ -249,7 +230,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsAmiin.ecru,
+      backgroundColor: context.ac.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -267,8 +248,8 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
           heroTag: 'annTop',
           onPressed: () => _scroll.animateTo(0,
               duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
-          backgroundColor: ColorsAmiin.white,
-          foregroundColor: ColorsAmiin.ocre,
+          backgroundColor: context.ac.surface,
+          foregroundColor: context.ac.infoAccent,
           elevation: 2,
           child: const Icon(Icons.keyboard_arrow_up),
         ),
@@ -346,7 +327,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
           _FilterChip(
             label: 'Partout',
             selected: _selectedQuartier == null,
-            color: ColorsAmiin.ocre,
+            color: context.ac.infoAccent,
             onTap: () => _selectQuartier(null),
           ),
           ...qs.map((q) => Padding(
@@ -354,7 +335,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                 child: _FilterChip(
                   label: q,
                   selected: _selectedQuartier == q,
-                  color: ColorsAmiin.ocre,
+                  color: context.ac.infoAccent,
                   onTap: () =>
                       _selectQuartier(_selectedQuartier == q ? null : q),
                 ),
@@ -419,7 +400,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
             label: cat,
             count: counts[cat] ?? 0,
             emoji: _catEmoji[cat] ?? '📍',
-            color: _catColors[cat] ?? ColorsAmiin.ocre,
+            color: CategoryColors.annuaire[cat] ?? context.ac.infoAccent,
             onTap: () => _selectCat(cat),
           );
         },
@@ -449,7 +430,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _catColors[s.category] ?? ColorsAmiin.ocre,
+                        color: CategoryColors.annuaire[s.category] ?? context.ac.infoAccent,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -464,13 +445,13 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                               style: TextStyle(
                                   fontFamily: FontFamily.geoBold,
                                   fontSize: 14,
-                                  color: ColorsAmiin.ink)),
+                                  color: context.ac.ink)),
                           if (s.sousCategorie.isNotEmpty)
                             Text(s.sousCategorie,
                                 style: TextStyle(
                                     fontFamily: FontFamily.sans,
                                     fontSize: 11,
-                                    color: ColorsAmiin.muted)),
+                                    color: context.ac.muted)),
                         ],
                       ),
                     ),
@@ -479,7 +460,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                           style: TextStyle(
                               fontFamily: FontFamily.geoBold,
                               fontSize: 11,
-                              color: ColorsAmiin.ocre)),
+                              color: context.ac.infoAccent)),
                   ],
                 ),
                 if (s.address.street.isNotEmpty ||
@@ -490,8 +471,8 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                       SvgPicture.string(_locSvg,
                           width: 11,
                           height: 11,
-                          colorFilter: const ColorFilter.mode(
-                              ColorsAmiin.muted, BlendMode.srcIn)),
+                          colorFilter: ColorFilter.mode(
+                              context.ac.muted, BlendMode.srcIn)),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -503,7 +484,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                           style: TextStyle(
                               fontFamily: FontFamily.sans,
                               fontSize: 12,
-                              color: ColorsAmiin.muted),
+                              color: context.ac.muted),
                         ),
                       ),
                     ],
@@ -515,7 +496,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                       style: TextStyle(
                           fontFamily: FontFamily.sans,
                           fontSize: 12,
-                          color: ColorsAmiin.ocre)),
+                          color: context.ac.infoAccent)),
                 ],
               ],
             ),
@@ -605,22 +586,22 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? ColorsAmiin.ocre;
+    final c = color ?? context.ac.infoAccent;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding:
             const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? c : ColorsAmiin.white,
+          color: selected ? c : context.ac.surface,
           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-          border: Border.all(color: selected ? c : ColorsAmiin.border),
+          border: Border.all(color: selected ? c : context.ac.border),
         ),
         child: Text(label,
             style: TextStyle(
                 fontFamily: FontFamily.geoMedium,
                 fontSize: 11,
-                color: selected ? ColorsAmiin.white : ColorsAmiin.mid)),
+                color: selected ? context.ac.onAccent : context.ac.midTone)),
       ),
     );
   }
@@ -640,21 +621,21 @@ class _NearbyButton extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
         decoration: BoxDecoration(
-          color: active ? ColorsAmiin.ocreLt : ColorsAmiin.white,
+          color: active ? context.ac.infoAccentLight : context.ac.surface,
           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-          border: Border.all(color: ColorsAmiin.border),
+          border: Border.all(color: context.ac.border),
         ),
         child: Row(
           children: [
             Icon(Icons.near_me,
                 size: 15,
-                color: active ? ColorsAmiin.ocreDk : ColorsAmiin.muted),
+                color: active ? context.ac.infoAccentDark : context.ac.muted),
             const SizedBox(width: 4),
             Text('Proche',
                 style: TextStyle(
                     fontFamily: FontFamily.geoMedium,
                     fontSize: 12,
-                    color: active ? ColorsAmiin.ocreDk : ColorsAmiin.muted)),
+                    color: active ? context.ac.infoAccentDark : context.ac.muted)),
           ],
         ),
       ),

@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'memory_service.dart';
+import 'notification_service.dart';
+import 'settings_service.dart';
 import '../models/user_action.dart';
 
 // ── Enums ────────────────────────────────────────────────────────────────────
@@ -614,6 +616,7 @@ class DemarchesService {
       timestamp: DateTime.now(),
       context: 'Action manuelle depuis l\'interface',
     ));
+    await _rescheduleFollowUp(ud);
     return ud;
   }
 
@@ -662,6 +665,7 @@ class DemarchesService {
       updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 
@@ -693,6 +697,7 @@ class DemarchesService {
       updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 
@@ -717,6 +722,7 @@ class DemarchesService {
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 
@@ -741,6 +747,7 @@ class DemarchesService {
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 
@@ -756,6 +763,7 @@ class DemarchesService {
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 
@@ -777,11 +785,68 @@ class DemarchesService {
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
+  }
+
+  // ── Rappel de suivi (intelligent, non intrusif) ───────────────────────────
+  //
+  // Un seul rappel par démarche, planifié à J+3 à 18 h. Chaque progression le
+  // repousse de 3 jours : un utilisateur actif ne le voit donc jamais. Il est
+  // annulé dès que la démarche est terminée ou supprimée, et n'est jamais
+  // programmé si les notifications de démarches sont désactivées.
+
+  static const _followUpDelay = Duration(days: 3);
+  static const _followUpHour = 18;
+
+  String _followUpId(String userDemarcheId) => 'demarche_followup_$userDemarcheId';
+
+  Future<void> _rescheduleFollowUp(UserDemarche ud) async {
+    final id = _followUpId(ud.id);
+    await notificationService.cancelReminder(id);
+    if (ud.status != DemarcheStatus.enCours) return;
+    if (!settingsService.notifMaster || !settingsService.notifDemarches) return;
+
+    final step = ud.demarche.steps
+        .where((s) => s.order == ud.currentStep)
+        .firstOrNull;
+    final stepLabel = step != null
+        ? 'étape ${ud.currentStep}/${ud.totalSteps} : ${step.title}'
+        : 'étape ${ud.currentStep}/${ud.totalSteps}';
+
+    final now = DateTime.now();
+    final at = DateTime(now.year, now.month, now.day, _followUpHour)
+        .add(_followUpDelay);
+
+    await notificationService.scheduleReminder(
+      id: id,
+      title: ud.demarche.title,
+      body: 'Votre démarche vous attend — $stepLabel.',
+      scheduledAt: at,
+    );
+  }
+
+  /// Annule tous les rappels de suivi (appelé quand l'utilisateur désactive
+  /// les notifications de démarches dans les réglages).
+  Future<void> cancelAllFollowUps() async {
+    await _init();
+    for (final ud in _userBox.values) {
+      await notificationService.cancelReminder(_followUpId(ud.id));
+    }
+  }
+
+  /// Reprogramme les rappels des démarches en cours (réactivation des
+  /// notifications dans les réglages).
+  Future<void> rescheduleAllFollowUps() async {
+    await _init();
+    for (final ud in _userBox.values) {
+      await _rescheduleFollowUp(ud);
+    }
   }
 
   Future<void> deleteDemarche(String userDemarcheId) async {
     await _init();
+    await notificationService.cancelReminder(_followUpId(userDemarcheId));
     await _userBox.delete(userDemarcheId);
   }
 
@@ -801,6 +866,7 @@ class DemarchesService {
       startedAt: ud.startedAt, updatedAt: DateTime.now().toIso8601String(),
     );
     await _userBox.put(ud.id, updated);
+    await _rescheduleFollowUp(updated);
     return updated;
   }
 

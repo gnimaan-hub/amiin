@@ -109,7 +109,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
           HorizonLine(
             color: mode == AmiinMode.neutral
                 ? (dark ? ac.onHeader.withValues(alpha: 0.12) : ac.border)
-                : mode.color,
+                : mode.color(context),
           ),
         ],
       ),

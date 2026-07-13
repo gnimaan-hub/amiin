@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AmiinToast {
@@ -93,8 +94,8 @@ class _ToastWidgetState extends State<_ToastWidget>
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: widget.success
-                    ? const Color(0xFF1B4332)
-                    : const Color(0xFF7F1D1D),
+                    ? context.ac.success
+                    : context.ac.alertColor,
                 borderRadius: BorderRadius.circular(100),
                 boxShadow: [
                   BoxShadow(

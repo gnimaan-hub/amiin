@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/themes.dart';
 import '../theme/spacing.dart';
 
 class SkeletonBox extends StatefulWidget {
@@ -20,7 +21,6 @@ class SkeletonBox extends StatefulWidget {
 class _SkeletonBoxState extends State<SkeletonBox>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
-  late final Animation<Color?> _color;
 
   @override
   void initState() {
@@ -29,10 +29,6 @@ class _SkeletonBoxState extends State<SkeletonBox>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
-    _color = ColorTween(
-      begin: const Color(0xFFE8E0D8),
-      end: const Color(0xFFF5F0EC),
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
     _ctrl.repeat(reverse: true);
   }
 
@@ -44,13 +40,14 @@ class _SkeletonBoxState extends State<SkeletonBox>
 
   @override
   Widget build(BuildContext context) {
+    final curve = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, __) => Container(
         width: widget.width,
         height: widget.height,
         decoration: BoxDecoration(
-          color: _color.value,
+          color: Color.lerp(context.ac.surface2, context.ac.background, curve.value),
           borderRadius: BorderRadius.circular(widget.radius),
         ),
       ),
@@ -66,7 +63,7 @@ class SkeletonCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.ac.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Column(

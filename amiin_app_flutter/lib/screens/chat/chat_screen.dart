@@ -18,7 +18,6 @@ import 'package:go_router/go_router.dart';
 import '../../services/cloud_tts_service.dart';
 import '../../services/settings_service.dart';
 
-import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../theme/themes.dart';
@@ -319,7 +318,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               _stopSpeaking();
               chat.clearConversation();
             },
-            style: TextButton.styleFrom(foregroundColor: ColorsAmiin.corail),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Effacer'),
           ),
         ],
@@ -437,7 +436,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               style: TextStyle(
                   fontFamily: FontFamily.sans,
                   fontSize: 11,
-                  color: ColorsAmiin.corail));
+                  color: context.ac.alertColor));
         }
         if (chat.isBusy) {
           return Row(
@@ -472,7 +471,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               fontFamily: FontFamily.sans,
               fontSize: 11,
               color: _isListening
-                  ? ColorsAmiin.turquoiseMid
+                  ? context.ac.secretariatAccentMid
                   : ac.onHeader.withValues(alpha: 0.4)),
         );
       },
@@ -553,13 +552,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             p: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontSize: 14,
-                                color: isUser ? ColorsAmiin.white : ac.ink,
+                                color: isUser ? context.ac.onAccent : ac.ink,
                                 height: 1.6),
                             code: TextStyle(
                                 fontFamily: FontFamily.mono,
                                 fontSize: 12,
                                 color: isUser
-                                    ? ColorsAmiin.white.withValues(alpha: 0.85)
+                                    ? context.ac.onAccent.withValues(alpha: 0.85)
                                     : ac.secretariatAccent,
                                 backgroundColor: isUser
                                     ? Colors.white.withValues(alpha: 0.1)
@@ -735,7 +734,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     borderSide: BorderSide.none),
                 filled: true,
                 fillColor: _isListening
-                    ? ColorsAmiin.turquoiseLt.withValues(alpha: 0.5)
+                    ? context.ac.secretariatAccentLight.withValues(alpha: 0.5)
                     : ac.surface2,
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: Spacing.md, vertical: Spacing.sm),
@@ -749,7 +748,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     fontFamily: FontFamily.mono,
                     fontSize: 10,
                     color: currentLength >= maxLength
-                        ? ColorsAmiin.corail
+                        ? context.ac.alertColor
                         : ac.muted,
                   ),
                 );
@@ -775,13 +774,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     height: 42,
                     decoration: BoxDecoration(
                       color: _isListening
-                          ? ColorsAmiin.turquoise
-                          : ColorsAmiin.turquoise.withValues(alpha: 0.12),
+                          ? context.ac.secretariatAccent
+                          : context.ac.secretariatAccent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _isListening ? Icons.mic : Icons.mic_none,
-                      color: _isListening ? ColorsAmiin.white : ColorsAmiin.turquoise,
+                      color: _isListening ? context.ac.onAccent : context.ac.secretariatAccent,
                       size: 20,
                     ),
                   ),
@@ -816,7 +815,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               button: true,
               label: 'Envoyer le message',
               child: Material(
-                color: ColorsAmiin.turquoise,
+                color: context.ac.secretariatAccent,
                 shape: const CircleBorder(),
                 child: InkWell(
                   onTap: _sendMessage,
@@ -990,7 +989,7 @@ class _AvatarA extends StatelessWidget {
             style: TextStyle(
                 fontFamily: FontFamily.geoBold,
                 fontSize: 12,
-                color: ColorsAmiin.white)),
+                color: context.ac.onAccent)),
       ),
     );
   }
