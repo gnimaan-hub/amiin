@@ -75,7 +75,7 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <View
+        <FrameLayout
             android:layout_width="1dp"
             android:layout_height="26dp"
             android:background="@color/widget_border" />
@@ -105,7 +105,7 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <View
+        <FrameLayout
             android:layout_width="1dp"
             android:layout_height="26dp"
             android:background="@color/widget_border" />
@@ -136,7 +136,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <View
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/widget_border"
