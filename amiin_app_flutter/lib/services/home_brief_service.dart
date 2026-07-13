@@ -6,10 +6,13 @@
 // le rafraîchissement réseau se fait en arrière-plan, au plus une fois
 // toutes les 30 minutes.
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'api_client.dart';
 import 'hive_utils.dart';
+import 'widget_bridge.dart';
 
 class HomeBriefWeather {
   final int temp;
@@ -173,6 +176,7 @@ class HomeBriefService {
         _lastFetch = DateTime.now();
         await _box!.put('latest', fresh.toJson());
         await _box!.put('fetched_at', _lastFetch!.toIso8601String());
+        unawaited(WidgetBridge.pushBrief(fresh));
       }
     } catch (e) {
       debugPrint('Brief du jour indisponible : $e');
@@ -180,6 +184,8 @@ class HomeBriefService {
       _fetching = false;
     }
   }
+
 }
+
 
 final homeBriefService = HomeBriefService();
