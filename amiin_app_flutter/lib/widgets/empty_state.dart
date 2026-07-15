@@ -29,8 +29,22 @@ class EmptyState extends StatelessWidget {
           children: [
             if (icon != null)
               Container(
-                margin: const EdgeInsets.only(bottom: Spacing.md),
-                child: Opacity(opacity: 0.5, child: icon),
+                width: 72,
+                height: 72,
+                margin: const EdgeInsets.only(bottom: Spacing.lg),
+                decoration: BoxDecoration(
+                  color: context.ac.secretariatAccentLight.withValues(alpha: 0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: IconTheme(
+                    data: IconThemeData(
+                      color: context.ac.secretariatAccent,
+                      size: 30,
+                    ),
+                    child: icon!,
+                  ),
+                ),
               ),
             Text(
               title,

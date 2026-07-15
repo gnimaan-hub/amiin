@@ -137,3 +137,18 @@ d'app ne correspond plus à l'interface.
 ---
 *Chiffres mesurés par grep sur l'arbre `lib/` au moment de l'audit ; ils
 serviront de baseline pour mesurer la progression de chaque phase.*
+
+---
+
+## 5. État d'avancement de la refonte (mise à jour post-exécution)
+
+| Phase | Fait | Reste |
+|---|---|---|
+| P1 Fondations | TextStyles réécrits theme-aware (8 styles) ; AmiinCard sur RadiusAmiin.lg ; 33 rayons + 36 paddings + 9 tailles hors échelle normalisés | Migration progressive des ~280 TextStyle inline vers TextStyles (écran par écran, lors des retouches) |
+| P2 Composants | 31 SnackBar → AmiinToast ; skeletons déjà branchés sur les 4 listes (correction de baseline : l'audit cherchait SkeletonBox, les écrans utilisent SkeletonList) | 7 SnackBar complexes (action/duration) ; AmiinDialog dédié (AlertDialog reste thémé via dialogTheme) ; AmiinListTile |
+| P3 Identité | Dualité activée sur 10 headers (ocre = annuaire/démarches, turquoise = agenda/notes) ; 12 SVG centralisés dans widgets/amiin_svg_icons.dart | Choix d'un langage d'icônes Material unique ; regénération du pack amiin-icons aux couleurs actuelles (nécessite un outil graphique) |
+| P4 Motion | Press 0.98 + haptique sur toutes les AmiinCard ; transitions fondu+glissement sur les 18 sous-routes ; EmptyState avec pastille teintée | Entrées en cascade des listes ; hero du logo splash→accueil |
+
+**Mesures après refonte** : 14 rayons en dur restants (valeurs 2-4 pour les
+indicateurs, assumées) ; 7 SnackBar restants (complexes) ; 10 headers colorés ;
+0 SVG inline dans les écrans ; 18 transitions de pages actives.
