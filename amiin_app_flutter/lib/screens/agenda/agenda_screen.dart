@@ -115,9 +115,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: context.ac.secretariatAccent),
-    );
+    AmiinToast.show(context, message, success: false);
   }
 
   List<DateTime> _getDaysInMonth() {
@@ -172,10 +170,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
     });
     _loadEvents();
   }
-
-  void _goToPreviousMonth() => _changeMonth(-1);
-
-  void _goToNextMonth() => _changeMonth(1);
 
   void _changeWeek(int delta) {
     setState(() {

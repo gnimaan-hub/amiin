@@ -1,6 +1,7 @@
 // ─── NoteDetailScreen & CreateNoteScreen ─────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -40,15 +41,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
 
   Future<void> _save() async {
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le titre est requis.', success: false);
       return;
     }
     if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le contenu ne peut pas être vide.', success: false);
       return;
     }
     try {
@@ -60,7 +57,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        AmiinToast.show(context, e.toString());
       }
     }
   }
@@ -208,7 +205,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible de charger la note.')));
+        AmiinToast.show(context, 'Impossible de charger la note.');
         setState(() => _loading = false);
       }
     }
@@ -217,15 +214,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _save() async {
     if (_note == null) return;
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le titre est requis.', success: false);
       return;
     }
     if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le contenu ne peut pas être vide.', success: false);
       return;
     }
     try {
@@ -241,7 +234,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        AmiinToast.show(context, e.toString());
       }
     }
   }

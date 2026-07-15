@@ -1,6 +1,7 @@
 // ─── SettingsPrivacyScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:provider/provider.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
@@ -197,9 +198,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Action effectuée')),
-              );
+              AmiinToast.show(context, 'Action effectuée');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Supprimer'),

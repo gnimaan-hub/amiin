@@ -1,6 +1,7 @@
 // ─── DemarcheDetailScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/themes.dart';
@@ -37,9 +38,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
       if (mounted) setState(() { _demarche = d; _loading = false; });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossible de charger cette démarche.')),
-        );
+        AmiinToast.show(context, 'Impossible de charger cette démarche.');
         setState(() => _loading = false);
       }
     }
@@ -50,14 +49,12 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     try {
       final ud = await demarchesService.startDemarche(widget.demarcheId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Démarche démarrée — retrouvez-la dans « Mes démarches ».')),
-        );
+        AmiinToast.show(context, 'Démarche démarrée — retrouvez-la dans « Mes démarches ».');
         context.pushReplacement('/demarches/user/${ud.id}');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))));
+        AmiinToast.show(context, e.toString().replaceAll('Exception: ', ''));
       }
     } finally {
       if (mounted) setState(() => _starting = false);
@@ -263,9 +260,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     if (results.isNotEmpty) {
       context.go('/annuaire/${results.first.id}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
-      );
+      AmiinToast.show(context, '« ${org.nom} » introuvable dans l\'annuaire.');
       context.go('/annuaire');
     }
   }

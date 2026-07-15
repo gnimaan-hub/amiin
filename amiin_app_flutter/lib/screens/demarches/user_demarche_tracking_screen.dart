@@ -9,6 +9,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../theme/themes.dart';
@@ -53,7 +54,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       if (mounted) setState(() { _ud = ud; _loading = false; });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Démarche introuvable.')));
+        AmiinToast.show(context, 'Démarche introuvable.');
         context.pop();
       }
     }
@@ -80,7 +81,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     if (ctrl == null) return;
     await demarchesService.addStepNote(widget.userDemarcheId, stepOrder, ctrl.text);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Note enregistrée.')));
+      AmiinToast.show(context, 'Note enregistrée.');
     }
   }
 
@@ -93,7 +94,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       await demarchesService.setStepAgendaEvent(widget.userDemarcheId, stepOrder, result);
       final updated = await demarchesService.getUserDemarche(widget.userDemarcheId);
       if (mounted) setState(() => _ud = updated);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rendez-vous ajouté à l\'agenda.')));
+      if (mounted) AmiinToast.show(context, 'Rendez-vous ajouté à l\'agenda.');
     }
   }
 
@@ -109,9 +110,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       scheduledAt: picked,
     );
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}')),
-      );
+      AmiinToast.show(context, 'Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}');
     }
   }
 
@@ -780,9 +779,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     if (results.isNotEmpty) {
       context.go('/annuaire/${results.first.id}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
-      );
+      AmiinToast.show(context, '« ${org.nom} » introuvable dans l\'annuaire.');
       context.go('/annuaire');
     }
   }

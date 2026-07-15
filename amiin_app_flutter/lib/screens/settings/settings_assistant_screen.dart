@@ -1,6 +1,7 @@
 // ─── SettingsAssistantScreen ── Comportement d'Amiin ─────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:provider/provider.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
@@ -376,9 +377,7 @@ class SettingsAssistantScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Mémoire effacée')),
-              );
+              AmiinToast.show(context, 'Mémoire effacée');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Effacer'),

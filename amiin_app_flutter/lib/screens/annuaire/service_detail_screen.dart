@@ -1,6 +1,7 @@
 ﻿// â”€â”€â”€ ServiceDetailScreen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,7 +43,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible de charger le service')));
+      AmiinToast.show(context, 'Impossible de charger le service');
       setState(() => _loading = false);
     }
   }
@@ -61,7 +62,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       if (!mounted) return;
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible dâ€™ouvrir le lien')));
+      AmiinToast.show(context, 'Impossible dâ€™ouvrir le lien');
     }
   }
 

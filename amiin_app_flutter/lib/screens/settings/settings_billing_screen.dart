@@ -1,6 +1,7 @@
 // ─── SettingsBillingScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -157,9 +158,7 @@ class SettingsBillingScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fonctionnalité bientôt disponible')),
-              );
+              AmiinToast.show(context, 'Fonctionnalité bientôt disponible');
             },
             child: const Text('Appliquer'),
           ),
