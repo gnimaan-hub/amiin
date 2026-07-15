@@ -44,36 +44,19 @@ class SettingsAboutScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                             ),
                             child: Center(
-                              child: Text('A', style: TextStyle(
-                                fontFamily: FontFamily.geoBold,
-                                fontSize: 36,
-                                color: Colors.white,
-                              )),
+                              child: Text('A', style: TextStyles.displayTitle(context).copyWith(fontSize: 36, color: Colors.white)),
                             ),
                           ),
                           const SizedBox(height: Spacing.md),
-                          Text('Amiin', style: TextStyle(
-                            fontFamily: FontFamily.geo,
-                            fontSize: FontSize.xxl,
-                            color: primary,
-                            letterSpacing: 2,
-                          )),
+                          Text('Amiin', style: TextStyles.cardTitle(context).copyWith(fontSize: FontSize.xxl, color: primary, letterSpacing: 2, fontFamily: FontFamily.geo)),
                           const SizedBox(height: 4),
                           Text(
                             'Version $_version (build $_build)',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                           ),
                           const SizedBox(height: 4),
                           Text('أمين · Guide universel de Djibouti',
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 12,
-                                color: context.ac.muted,
-                              )),
+                              style: TextStyles.caption(context)),
                         ],
                       ),
                     ),
@@ -157,11 +140,7 @@ class SettingsAboutScreen extends StatelessWidget {
                     Center(
                       child: Text(
                         '© 2026 Amiin · Fait avec ❤ à Djibouti',
-                        style: TextStyle(
-                          fontFamily: FontFamily.sans,
-                          fontSize: 11,
-                          color: context.ac.muted,
-                        ),
+                        style: TextStyles.caption(context).copyWith(fontSize: 11),
                       ),
                     ),
                     const SizedBox(height: Spacing.xl),
@@ -221,9 +200,7 @@ class SettingsAboutScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Nouveautés v1.0', style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 18, color: context.ac.ink,
-              )),
+              Text('Nouveautés v1.0', style: TextStyles.screenTitle(context)),
               const SizedBox(height: Spacing.md),
               ...[
                 '✦ Page paramètres complète avec 4 thèmes graphiques',
@@ -233,9 +210,7 @@ class SettingsAboutScreen extends StatelessWidget {
                 '✦ Agenda, notes et chat vocal',
               ].map((e) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Text(e, style: TextStyle(
-                  fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.ink, height: 1.4,
-                )),
+                child: Text(e, style: TextStyles.body(context).copyWith(height: 1.4)),
               )),
               const SizedBox(height: Spacing.md),
             ],

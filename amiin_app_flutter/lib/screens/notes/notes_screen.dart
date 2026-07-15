@@ -238,12 +238,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 maxLines: 1,
                                                 overflow:
                                                     TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      FontFamily.geoBold,
-                                                  fontSize: 15,
-                                                  color: context.ac.ink,
-                                                ),
+                                                style: TextStyles.cardTitle(context).copyWith(fontSize: 15, fontFamily: FontFamily.geoBold),
                                               ),
                                             ),
                                             if (note.isPinned == true) ...[
@@ -270,13 +265,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 ),
                                                 child: Text(
                                                   'Amiin',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        FontFamily.geoBold,
-                                                    fontSize: 10,
-                                                    color:
-                                                        context.ac.secretariatAccentDark,
-                                                  ),
+                                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccentDark, fontFamily: FontFamily.geoBold),
                                                 ),
                                               ),
                                             ],
@@ -287,12 +276,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                           note.content,
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontFamily: FontFamily.sans,
-                                            fontSize: 13,
-                                            color: context.ac.midTone,
-                                            height: 1.4,
-                                          ),
+                                          style: TextStyles.body(context).copyWith(fontSize: 13, color: context.ac.midTone, height: 1.4),
                                         ),
                                         const SizedBox(height: 8),
                                         Row(
@@ -303,11 +287,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               DateFormat('d MMM', 'fr').format(
                                                   DateTime.parse(
                                                       note.updatedAt)),
-                                              style: TextStyle(
-                                                fontFamily: FontFamily.sans,
-                                                fontSize: 11,
-                                                color: context.ac.muted,
-                                              ),
+                                              style: TextStyles.caption(context).copyWith(fontSize: 11),
                                             ),
                                             if (note.tags.isNotEmpty)
                                               Wrap(

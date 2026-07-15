@@ -54,12 +54,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Comment Amiin doit-il s\'exprimer avec vous ?',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                              height: 1.4,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, height: 1.4),
                           ),
                           const SizedBox(height: Spacing.md),
                           ChoiceSelector(
@@ -80,12 +75,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Quelle verbosité préférez-vous dans les réponses ?',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                              height: 1.4,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, height: 1.4),
                           ),
                           const SizedBox(height: Spacing.md),
                           ChoiceSelector(
@@ -106,12 +96,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                         children: [
                           Text(
                             'À quel niveau de détail souhaitez-vous les explications ?',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                              height: 1.4,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, height: 1.4),
                           ),
                           const SizedBox(height: Spacing.md),
                           ChoiceSelector(
@@ -132,12 +117,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Amiin priorisera ces thématiques dans ses réponses.',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                              height: 1.4,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, height: 1.4),
                           ),
                           const SizedBox(height: Spacing.md),
                           _TopicsPicker(
@@ -196,12 +176,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Comportement vocal à l\'ouverture d\'une conversation.',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                              height: 1.4,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, height: 1.4),
                           ),
                           const SizedBox(height: Spacing.md),
                           ChoiceSelector(
@@ -226,19 +201,11 @@ class SettingsAssistantScreen extends StatelessWidget {
                             children: [
                               Icon(Icons.speed_outlined, size: 18, color: primary),
                               const SizedBox(width: Spacing.sm),
-                              Text('Vitesse de lecture', style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 15,
-                                color: context.ac.ink,
-                              )),
+                              Text('Vitesse de lecture', style: TextStyles.body(context).copyWith(fontSize: 15)),
                               const Spacer(),
                               Text(
                                 '${settings.ttsSpeed.toStringAsFixed(1)}×',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.geoMedium,
-                                  fontSize: 14,
-                                  color: primary,
-                                ),
+                                style: TextStyles.cardTitle(context).copyWith(color: primary),
                               ),
                             ],
                           ),
@@ -253,8 +220,8 @@ class SettingsAssistantScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('0.5×', style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
-                              Text('2.0×', style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
+                              Text('0.5×', style: TextStyles.caption(context).copyWith(fontSize: 11)),
+                              Text('2.0×', style: TextStyles.caption(context).copyWith(fontSize: 11)),
                             ],
                           ),
                         ],
@@ -275,21 +242,9 @@ class SettingsAssistantScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Voix neuronales Microsoft', style: TextStyle(
-                                      fontFamily: FontFamily.sans,
-                                      fontSize: 15,
-                                      color: context.ac.ink,
-                                    )),
-                                    Text('Indépendantes des voix installées sur le téléphone.', style: TextStyle(
-                                      fontFamily: FontFamily.sans,
-                                      fontSize: 12,
-                                      color: context.ac.muted,
-                                    )),
-                                    Text('Ajoute 2–5 s de délai avant la lecture.', style: TextStyle(
-                                      fontFamily: FontFamily.sans,
-                                      fontSize: 12,
-                                      color: context.ac.infoAccent,
-                                    )),
+                                    Text('Voix neuronales Microsoft', style: TextStyles.body(context).copyWith(fontSize: 15)),
+                                    Text('Indépendantes des voix installées sur le téléphone.', style: TextStyles.caption(context)),
+                                    Text('Ajoute 2–5 s de délai avant la lecture.', style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.infoAccent)),
                                   ],
                                 ),
                               ),
@@ -302,11 +257,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                           ),
                           if (settings.useCloudTts) ...[
                             const Divider(height: 28),
-                            Text('Choisir une voix', style: TextStyle(
-                              fontFamily: FontFamily.geoMedium,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                            )),
+                            Text('Choisir une voix', style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: context.ac.muted)),
                             const SizedBox(height: Spacing.sm),
                             ..._buildVoiceList(context, settings, primary),
                           ],
@@ -341,13 +292,7 @@ class SettingsAssistantScreen extends StatelessWidget {
     groups.forEach((lang, voices) {
       widgets.add(Padding(
         padding: const EdgeInsets.only(top: Spacing.sm, bottom: 4),
-        child: Text(lang, style: TextStyle(
-          fontFamily: FontFamily.sans,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: context.ac.muted,
-          letterSpacing: 0.5,
-        )),
+        child: Text(lang, style: TextStyles.caption(context).copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.5)),
       ));
       for (final voice in voices) {
         final id = voice['id']!;
@@ -446,11 +391,7 @@ class _TopicsPicker extends StatelessWidget {
                   Icon(Icons.check, size: 13, color: primary),
                   const SizedBox(width: 4),
                 ],
-                Text(topic, style: TextStyle(
-                  fontFamily: FontFamily.geoMedium,
-                  fontSize: 12,
-                  color: isSelected ? primary : context.ac.midTone,
-                )),
+                Text(topic, style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: isSelected ? primary : context.ac.midTone)),
               ],
             ),
           ),
@@ -498,12 +439,7 @@ class _VoiceModeDescription extends StatelessWidget {
             Icon(icon, size: 16, color: primary),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(desc, style: TextStyle(
-                fontFamily: FontFamily.sans,
-                fontSize: 12,
-                color: context.ac.ink,
-                height: 1.5,
-              )),
+              child: Text(desc, style: TextStyles.body(context).copyWith(fontSize: 12)),
             ),
           ],
         ),
@@ -574,12 +510,7 @@ class _VoiceTileState extends State<_VoiceTile> {
                 children: [
                   Text(
                     '${widget.voice['name']}  $gender',
-                    style: TextStyle(
-                      fontFamily: FontFamily.sans,
-                      fontSize: 14,
-                      color: widget.selected ? context.ac.ink : context.ac.midTone,
-                      fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal,
-                    ),
+                    style: TextStyles.body(context).copyWith(color: widget.selected ? context.ac.ink : context.ac.midTone, fontWeight: widget.selected ? FontWeight.w600 : FontWeight.normal),
                   ),
                   if (widget.voice['note'] == 'grave') ...[
                     const SizedBox(width: 6),
@@ -589,12 +520,7 @@ class _VoiceTileState extends State<_VoiceTile> {
                         color: widget.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: Text('grave', style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 10,
-                        color: widget.primary,
-                        fontWeight: FontWeight.w600,
-                      )),
+                      child: Text('grave', style: TextStyles.body(context).copyWith(fontSize: 10, color: widget.primary, fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ],

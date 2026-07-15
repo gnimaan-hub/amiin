@@ -99,12 +99,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
                           Expanded(
                             child: Text(
                               'Ces informations permettent à Amiin de personnaliser ses réponses à votre situation.',
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 13,
-                                color: context.ac.ink,
-                                height: 1.5,
-                              ),
+                              style: TextStyles.body(context).copyWith(fontSize: 13),
                             ),
                           ),
                         ],
@@ -160,10 +155,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
                 height: 52,
                 child: FilledButton(
                   onPressed: _save,
-                  child: Text('Enregistrer', style: TextStyle(
-                    fontFamily: FontFamily.geoBold,
-                    fontSize: 16,
-                  )),
+                  child: Text('Enregistrer', style: TextStyles.screenTitle(context).copyWith(fontSize: 16)),
                 ),
               ),
             ),
@@ -175,12 +167,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
 
   Widget _label(String text) => Padding(
     padding: const EdgeInsets.only(bottom: Spacing.xs),
-    child: Text(text, style: TextStyle(
-      fontFamily: FontFamily.geoBold,
-      fontSize: 10,
-      letterSpacing: 1.2,
-      color: context.ac.muted,
-    )),
+    child: Text(text, style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
   );
 
   Widget _field(String label, TextEditingController ctrl,
@@ -192,7 +179,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
         hintText: hint,
         filled: true,
         fillColor: context.ac.surface,
-        hintStyle: TextStyle(color: context.ac.muted, fontFamily: FontFamily.sans),
+        hintStyle: TextStyles.bodyMuted(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           borderSide: BorderSide(color: context.ac.border),
@@ -207,7 +194,7 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 13),
       ),
-      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink),
+      style: TextStyles.body(context).copyWith(fontSize: 15),
     );
   }
 }
@@ -237,20 +224,14 @@ class _BirthYearPicker extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(Spacing.lg),
-                  child: Text('Année de naissance', style: TextStyle(
-                    fontFamily: FontFamily.geoBold, fontSize: 16, color: context.ac.ink,
-                  )),
+                  child: Text('Année de naissance', style: TextStyles.screenTitle(context).copyWith(fontSize: 16)),
                 ),
                 SizedBox(
                   height: 220,
                   child: ListView.builder(
                     itemCount: years.length,
                     itemBuilder: (_, i) => ListTile(
-                      title: Text('${years[i]}', style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        color: years[i] == value ? Theme.of(context).colorScheme.primary : context.ac.ink,
-                        fontWeight: years[i] == value ? FontWeight.bold : FontWeight.normal,
-                      )),
+                      title: Text('${years[i]}', style: TextStyles.body(context).copyWith(color: years[i] == value ? Theme.of(context).colorScheme.primary : context.ac.ink, fontWeight: years[i] == value ? FontWeight.bold : FontWeight.normal)),
                       trailing: years[i] == value
                           ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
                           : null,
@@ -283,11 +264,7 @@ class _BirthYearPicker extends StatelessWidget {
             Expanded(
               child: Text(
                 value != null ? '$value' : 'Sélectionner…',
-                style: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 15,
-                  color: value != null ? context.ac.ink : context.ac.muted,
-                ),
+                style: TextStyles.body(context).copyWith(fontSize: 15, color: value != null ? context.ac.ink : context.ac.muted),
               ),
             ),
             Icon(Icons.expand_more, color: context.ac.muted, size: 20),
@@ -332,11 +309,7 @@ class _EmploymentPicker extends StatelessWidget {
                 width: selected ? 1.5 : 1,
               ),
             ),
-            child: Text(opt.$2, style: TextStyle(
-              fontFamily: FontFamily.geoMedium,
-              fontSize: 13,
-              color: selected ? primary : context.ac.midTone,
-            )),
+            child: Text(opt.$2, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: selected ? primary : context.ac.midTone)),
           ),
         );
       }).toList(),

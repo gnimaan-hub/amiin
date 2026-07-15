@@ -18,12 +18,7 @@ class SettingsSection extends StatelessWidget {
       padding: const EdgeInsets.only(top: Spacing.lg, bottom: Spacing.xs),
       child: Text(
         title.toUpperCase(),
-        style: TextStyle(
-          fontFamily: FontFamily.geoBold,
-          fontSize: 10,
-          letterSpacing: 1.2,
-          color: context.ac.muted,
-        ),
+        style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold),
       ),
     );
   }
@@ -95,21 +90,13 @@ class SettingRow extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      fontFamily: FontFamily.sans,
-                      fontSize: 15,
-                      color: labelColor,
-                    ),
+                    style: TextStyles.body(context).copyWith(fontSize: 15, color: labelColor),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 12,
-                        color: context.ac.muted,
-                      ),
+                      style: TextStyles.caption(context),
                     ),
                   ],
                 ],
@@ -118,11 +105,7 @@ class SettingRow extends StatelessWidget {
             if (value != null)
               Text(
                 value!,
-                style: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 13,
-                  color: context.ac.muted,
-                ),
+                style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
               ),
             if (toggle)
               Switch(
@@ -201,11 +184,7 @@ class ChoiceSelector extends StatelessWidget {
               child: Text(
                 labels[i],
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: FontFamily.geoMedium,
-                  fontSize: 12,
-                  color: selected ? Colors.white : context.ac.midTone,
-                ),
+                style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: selected ? Colors.white : context.ac.midTone),
               ),
             ),
           ),

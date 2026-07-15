@@ -509,12 +509,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     children: [
                       Text(
                         'Amiin',
-                        style: TextStyle(
-                          fontFamily: FontFamily.geoBold,
-                          fontSize: 15,
-                          letterSpacing: 0.3,
-                          color: ac.onHeader,
-                        ),
+                        style: TextStyles.cardTitle(context).copyWith(fontSize: 15, color: ac.onHeader, letterSpacing: 0.3, fontFamily: FontFamily.geoBold),
                       ),
                       _buildHeaderStatus(chat, ac),
                     ],
@@ -550,11 +545,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         if (!connectivityService.isOnline) {
           return Text(
             'Hors ligne',
-            style: TextStyle(
-              fontFamily: FontFamily.sans,
-              fontSize: 11,
-              color: context.ac.alertColor,
-            ),
+            style: TextStyles.body(context).copyWith(fontSize: 11, color: context.ac.alertColor),
           );
         }
         if (chat.isBusy) {
@@ -566,11 +557,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           ? chat.streamStatus
                           : 'Recherche…')
                     : 'Rédige…',
-                style: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 11,
-                  color: ac.secretariatAccent,
-                ),
+                style: TextStyles.body(context).copyWith(fontSize: 11, color: ac.secretariatAccent),
               ),
               const SizedBox(width: 4),
               AnimatedBuilder(
@@ -579,11 +566,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   final count = ((_dotsAnimation.value * 3).floor() % 3) + 1;
                   return Text(
                     '.' * count,
-                    style: TextStyle(
-                      fontFamily: FontFamily.sans,
-                      fontSize: 14,
-                      color: ac.secretariatAccent,
-                    ),
+                    style: TextStyles.body(context).copyWith(color: ac.secretariatAccent),
                   );
                 },
               ),
@@ -596,13 +579,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               : _isSpeaking
               ? 'Parle…'
               : 'En ligne',
-          style: TextStyle(
-            fontFamily: FontFamily.sans,
-            fontSize: 11,
-            color: _isListening
+          style: TextStyles.body(context).copyWith(fontSize: 11, color: _isListening
                 ? context.ac.secretariatAccentMid
-                : ac.onHeader.withValues(alpha: 0.4),
-          ),
+                : ac.onHeader.withValues(alpha: 0.4)),
         );
       },
     );
@@ -639,11 +618,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
                 child: Text(
                   DateFormat('EEEE d MMMM', 'fr').format(msg.timestamp),
-                  style: TextStyle(
-                    fontFamily: FontFamily.geoMedium,
-                    fontSize: 11,
-                    color: ac.muted,
-                  ),
+                  style: TextStyles.sectionLabel(context).copyWith(fontSize: 11, fontFamily: FontFamily.geoMedium),
                 ),
               ),
             ),
@@ -691,12 +666,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         MarkdownBody(
                           data: msg.content,
                           styleSheet: MarkdownStyleSheet(
-                            p: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 14,
-                              color: isUser ? context.ac.onAccent : ac.ink,
-                              height: 1.6,
-                            ),
+                            p: TextStyles.body(context).copyWith(color: isUser ? context.ac.onAccent : ac.ink, height: 1.6),
                             code: TextStyle(
                               fontFamily: FontFamily.mono,
                               fontSize: 12,
@@ -727,11 +697,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 ),
                                 child: Text(
                                   ChatController.actionLabel(action.name),
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.geoBold,
-                                    fontSize: 11,
-                                    color: ac.secretariatAccent,
-                                  ),
+                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: ac.secretariatAccent, fontFamily: FontFamily.geoBold),
                                 ),
                               ),
                             ),
@@ -780,11 +746,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             children: [
               Text(
                 DateFormat('HH:mm').format(msg.timestamp),
-                style: TextStyle(
-                  fontFamily: FontFamily.mono,
-                  fontSize: 10,
-                  color: ac.muted,
-                ),
+                style: TextStyles.sourceRef(context),
               ),
               if (!isUser && msg.content.isNotEmpty) ...[
                 const SizedBox(width: Spacing.sm),
@@ -853,11 +815,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.only(left: 44, bottom: 6),
       child: Text(
         parts.join(' '),
-        style: TextStyle(
-          fontFamily: FontFamily.mono,
-          fontSize: 10,
-          color: ac.muted.withValues(alpha: 0.6),
-        ),
+        style: TextStyles.sourceRef(context).copyWith(color: ac.muted.withValues(alpha: 0.6)),
       ),
     );
   }
@@ -894,11 +852,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 hintText: _isListening
                     ? 'En écoute… tapez à nouveau le micro pour arrêter'
                     : 'Écrivez votre question…',
-                hintStyle: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: 14,
-                  color: ac.muted,
-                ),
+                hintStyle: TextStyles.bodyMuted(context),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                   borderSide: BorderSide.none,
@@ -922,13 +876,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     if (currentLength < 900 || maxLength == null) return null;
                     return Text(
                       '$currentLength / $maxLength',
-                      style: TextStyle(
-                        fontFamily: FontFamily.mono,
-                        fontSize: 10,
-                        color: currentLength >= maxLength
+                      style: TextStyles.sourceRef(context).copyWith(color: currentLength >= maxLength
                             ? context.ac.alertColor
-                            : ac.muted,
-                      ),
+                            : ac.muted),
                     );
                   },
             ),
@@ -1047,7 +997,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               leading: Icon(Icons.copy_outlined, color: ac.secretariatAccent),
               title: Text(
                 'Copier',
-                style: TextStyle(fontFamily: FontFamily.geoMedium),
+                style: TextStyles.cardTitle(context),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -1063,7 +1013,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
                 title: Text(
                   'Écouter',
-                  style: TextStyle(fontFamily: FontFamily.geoMedium),
+                  style: TextStyles.cardTitle(context),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1078,7 +1028,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
                 title: Text(
                   'Retenter',
-                  style: TextStyle(fontFamily: FontFamily.geoMedium),
+                  style: TextStyles.cardTitle(context),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1105,12 +1055,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             const SizedBox(height: Spacing.lg),
             Text(
               'Bonjour — je suis Amiin',
-              style: TextStyle(
-                fontFamily: FontFamily.geoBold,
-                fontSize: 20,
-                color: ac.ink,
-                letterSpacing: -0.3,
-              ),
+              style: TextStyles.screenTitle(context).copyWith(fontSize: 20, letterSpacing: -0.3),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
@@ -1152,11 +1097,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           Flexible(
                             child: Text(
                               q,
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 13,
-                                color: ac.ink,
-                              ),
+                              style: TextStyles.body(context).copyWith(fontSize: 13),
                             ),
                           ),
                         ],
@@ -1189,11 +1130,7 @@ class _AvatarA extends StatelessWidget {
       child: Center(
         child: Text(
           'A',
-          style: TextStyle(
-            fontFamily: FontFamily.geoBold,
-            fontSize: 12,
-            color: context.ac.onAccent,
-          ),
+          style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: context.ac.onAccent, fontFamily: FontFamily.geoBold),
         ),
       ),
     );

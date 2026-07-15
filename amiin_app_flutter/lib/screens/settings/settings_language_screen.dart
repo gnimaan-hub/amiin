@@ -187,11 +187,7 @@ class _LangOption extends StatelessWidget {
             Text(flag, style: const TextStyle(fontSize: 24)),
             const SizedBox(width: Spacing.md),
             Expanded(
-              child: Text(label, style: TextStyle(
-                fontFamily: FontFamily.sans,
-                fontSize: 15,
-                color: context.ac.ink,
-              )),
+              child: Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
             ),
             if (selected)
               Icon(Icons.check_circle, color: primary, size: 20)
@@ -230,11 +226,7 @@ class _CurrencyOption extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Text(symbol, style: TextStyle(
-                  fontFamily: FontFamily.geoBold,
-                  fontSize: 16,
-                  color: selected ? primary : context.ac.midTone,
-                )),
+                child: Text(symbol, style: TextStyles.screenTitle(context).copyWith(fontSize: 16, color: selected ? primary : context.ac.midTone)),
               ),
             ),
             const SizedBox(width: Spacing.md),
@@ -243,8 +235,8 @@ class _CurrencyOption extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink)),
-                  Text(code, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted)),
+                  Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
+                  Text(code, style: TextStyles.caption(context).copyWith(fontSize: 11)),
                 ],
               ),
             ),
@@ -282,8 +274,8 @@ class _FormatOption extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink)),
-                  Text(subtitle, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.muted)),
+                  Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
+                  Text(subtitle, style: TextStyles.caption(context)),
                 ],
               ),
             ),

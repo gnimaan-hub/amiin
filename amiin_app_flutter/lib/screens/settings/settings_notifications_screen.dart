@@ -121,11 +121,7 @@ class SettingsNotificationsScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Aucune notification pendant ces heures',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: context.ac.muted,
-                            ),
+                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                           ),
                           const SizedBox(height: Spacing.md),
                           Row(
@@ -139,7 +135,7 @@ class SettingsNotificationsScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: Spacing.md),
-                              Text('—', style: TextStyle(color: context.ac.muted, fontFamily: FontFamily.sans)),
+                              Text('—', style: TextStyles.bodyMuted(context)),
                               const SizedBox(width: Spacing.md),
                               Expanded(
                                 child: _TimeButton(
@@ -210,10 +206,10 @@ class _TimeButton extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(label, style: TextStyle(fontSize: 11, color: context.ac.muted, fontFamily: FontFamily.sans)),
+            Text(label, style: TextStyles.caption(context).copyWith(fontSize: 11)),
             const SizedBox(height: 4),
             Text('${hour.toString().padLeft(2, '0')}:00',
-                style: TextStyle(fontSize: 18, fontFamily: FontFamily.geoBold, color: primary)),
+                style: TextStyles.screenTitle(context).copyWith(color: primary)),
           ],
         ),
       ),

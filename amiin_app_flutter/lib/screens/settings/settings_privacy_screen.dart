@@ -54,12 +54,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Cette option influe sur la longueur des réponses. Activez-la pour des démarches ou sujets juridiques.',
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 12,
-                                color: context.ac.muted,
-                                height: 1.4,
-                              ),
+                              style: TextStyles.caption(context).copyWith(height: 1.4),
                             ),
                           ),
                         ],

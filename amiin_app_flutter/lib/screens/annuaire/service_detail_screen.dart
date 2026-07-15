@@ -105,11 +105,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.name, style: TextStyle(
-                      fontFamily: FontFamily.geo,
-                      fontSize: 24,
-                      color: context.ac.ink,
-                    )),
+                    Text(s.name, style: TextStyles.cardTitle(context).copyWith(fontSize: 24, fontFamily: FontFamily.geo)),
                     const SizedBox(height: 4),
                     Wrap(
                       spacing: 6,
@@ -128,12 +124,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Contact', style: TextStyle(
-                            fontFamily: FontFamily.geoBold,
-                            fontSize: 10,
-                            letterSpacing: 1.2,
-                            color: context.ac.muted,
-                          )),
+                          Text('Contact', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                           const SizedBox(height: 8),
                           if (s.phone != null) ...[
                             _contactRow('ðŸ“ž', s.phone!, () => _launchUrl('tel:${s.phone}')),
@@ -154,18 +145,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Adresse', style: TextStyle(
-                            fontFamily: FontFamily.geoBold,
-                            fontSize: 10,
-                            letterSpacing: 1.2,
-                            color: context.ac.muted,
-                          )),
+                          Text('Adresse', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                           const SizedBox(height: 8),
-                          Text('${s.address.street}\n${s.address.district}, ${s.address.city}', style: TextStyle(
-                            fontFamily: FontFamily.sans,
-                            fontSize: 14,
-                            color: context.ac.midTone,
-                          )),
+                          Text('${s.address.street}\n${s.address.district}, ${s.address.city}', style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                           if (s.address.coordinates != null)
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
@@ -189,18 +171,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Horaires', style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 10,
-                              letterSpacing: 1.2,
-                              color: context.ac.muted,
-                            )),
+                            Text('Horaires', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                             const SizedBox(height: 8),
-                            Text(s.hours!, style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 14,
-                              color: context.ac.midTone,
-                            )),
+                            Text(s.hours!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                           ],
                         ),
                       ),
@@ -211,19 +184,9 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ã€ propos', style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 10,
-                              letterSpacing: 1.2,
-                              color: context.ac.muted,
-                            )),
+                            Text('Ã€ propos', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                             const SizedBox(height: 8),
-                            Text(s.description!, style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 14,
-                              color: context.ac.midTone,
-                              height: 1.5,
-                            )),
+                            Text(s.description!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                           ],
                         ),
                       ),
@@ -245,11 +208,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         children: [
           Text(icon, style: const TextStyle(fontSize: 15)),
           const SizedBox(width: Spacing.sm),
-          Expanded(child: Text(text, style: TextStyle(
-            fontFamily: FontFamily.sans,
-            fontSize: 14,
-            color: context.ac.infoAccent,
-          ))),
+          Expanded(child: Text(text, style: TextStyles.body(context).copyWith(color: context.ac.infoAccent))),
         ],
       ),
     );
@@ -262,11 +221,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           borderRadius: BorderRadius.circular(RadiusAmiin.xl),
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
-        child: Text(label, style: TextStyle(
-          fontFamily: FontFamily.geoMedium,
-          fontSize: 11,
-          color: color,
-        )),
+        child: Text(label, style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: color)),
       );
 
 }

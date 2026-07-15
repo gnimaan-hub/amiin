@@ -227,11 +227,7 @@ class _UserCard extends StatelessWidget {
               backgroundColor: primary,
               child: Text(
                 initials,
-                style: TextStyle(
-                  fontFamily: FontFamily.geoBold,
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
+                style: TextStyles.screenTitle(context).copyWith(color: Colors.white),
               ),
             ),
             const SizedBox(width: Spacing.md),
@@ -239,17 +235,9 @@ class _UserCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: TextStyle(
-                    fontFamily: FontFamily.geoBold,
-                    fontSize: 16,
-                    color: context.ac.ink,
-                  )),
+                  Text(name, style: TextStyles.screenTitle(context).copyWith(fontSize: 16)),
                   const SizedBox(height: 2),
-                  Text('Modifier mon profil', style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 13,
-                    color: primary,
-                  )),
+                  Text('Modifier mon profil', style: TextStyles.body(context).copyWith(fontSize: 13, color: primary)),
                 ],
               ),
             ),
