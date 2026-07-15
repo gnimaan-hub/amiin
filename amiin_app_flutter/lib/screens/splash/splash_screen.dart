@@ -128,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Votre assistant national',
+                              'Votre secrétaire personnel',
                               style: TextStyle(
                                 fontFamily: FontFamily.sans,
                                 fontWeight: FontWeight.w300,
