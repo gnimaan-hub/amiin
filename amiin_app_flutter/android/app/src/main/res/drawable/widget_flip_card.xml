@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carte de la zone rotative (RDV ⇄ démarches ⇄ taux) : surface translucide
+     arrondie pour matérialiser chaque page qui défile. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/widget_flip_bg" />
+    <corners android:radius="14dp" />
+    <stroke android:width="0.6dp" android:color="@color/widget_hair" />
+</shape>

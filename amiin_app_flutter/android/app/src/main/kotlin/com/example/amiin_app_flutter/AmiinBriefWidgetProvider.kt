@@ -4,8 +4,14 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Typeface
 import android.net.Uri
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import org.json.JSONArray
@@ -15,15 +21,16 @@ import java.util.Calendar
 import java.util.Locale
 
 /**
- * Widget « Aujourd'hui » v2 : météo, prochaine prière, taux de change,
- * rendez-vous du jour (ou prochain de la semaine), démarches en cours,
- * et raccourcis chat (texte / vocal).
+ * Widget « Aujourd'hui » v3 — compact 4×2 :
+ *   fixe    : température héros + chip prochaine prière
+ *   rotatif : ViewFlipper 5 s — RDV ⇄ démarches ⇄ taux €/$ (chaque page
+ *             est tappable vers l'écran correspondant de l'app)
+ *   fixe    : barre « Poser une question » + micro → chat (vocal pour le micro)
  *
  * Aucun appel réseau ici : les données sont écrites par l'app (widget_bridge)
  * ou par la tâche WorkManager horaire. Le provider recalcule à chaque
- * rafraîchissement d'affichage (~30 min) ce qui dépend de l'heure courante :
- * la prochaine prière et le rendez-vous à montrer — ainsi un RDV passé
- * disparaît tout seul, même sans nouvelle donnée.
+ * rafraîchissement (~30 min) ce qui dépend de l'heure : prochaine prière et
+ * RDV pertinent — un RDV passé disparaît donc tout seul.
  */
 class AmiinBriefWidgetProvider : AppWidgetProvider() {
 
@@ -37,53 +44,57 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.amiin_brief_widget)
 
-            // ── Rangée 1 : météo / prière / taux ──
+            // ── Zone fixe : météo héros + prière ──
             views.setTextViewText(
                 R.id.widget_weather_value, data.getString("widget_weather_value", "—"))
             views.setTextViewText(
                 R.id.widget_weather_label, data.getString("widget_weather_label", "Météo"))
 
-            val (prayerTime, prayerName) = nextPrayer(data)
-            views.setTextViewText(R.id.widget_prayer_value, prayerTime)
-            views.setTextViewText(R.id.widget_prayer_label, prayerName)
+            val (prayerName, prayerTime) = nextPrayer(data)
+            views.setTextViewText(R.id.widget_prayer_chip, "🕌 $prayerName · $prayerTime")
 
+            // ── Zone rotative ──
+            views.setTextViewText(R.id.widget_event_line, eventLine(context, data))
+            views.setTextViewText(R.id.widget_demarche_line, demarcheLine(context, data))
             views.setTextViewText(
-                R.id.widget_fx_value, data.getString("widget_fx_value", "—"))
-            views.setTextViewText(
-                R.id.widget_fx_label, data.getString("widget_fx_label", "Taux"))
-
-            views.setTextViewText(
-                R.id.widget_updated_at, data.getString("widget_updated_at", ""))
-
-            // ── Rangée 2 : rendez-vous ──
-            views.setTextViewText(R.id.widget_event_line, eventLine(data))
-
-            // ── Rangée 3 : démarches ──
-            views.setTextViewText(R.id.widget_demarche_line, demarcheLine(data))
+                R.id.widget_fx_line,
+                data.getString("widget_fx_line", "💱  Taux du jour indisponible"))
 
             // ── Taps ──
-            views.setOnClickPendingIntent(
-                R.id.widget_root,
-                HomeWidgetLaunchIntent.getActivity(
-                    context, MainActivity::class.java, Uri.parse("amiin://home")))
-            views.setOnClickPendingIntent(
-                R.id.widget_ask_pill,
-                HomeWidgetLaunchIntent.getActivity(
-                    context, MainActivity::class.java, Uri.parse("amiin://chat")))
-            views.setOnClickPendingIntent(
-                R.id.widget_mic_button,
-                HomeWidgetLaunchIntent.getActivity(
-                    context, MainActivity::class.java, Uri.parse("amiin://chat?voice=1")))
+            fun launch(uri: String) = HomeWidgetLaunchIntent.getActivity(
+                context, MainActivity::class.java, Uri.parse(uri))
+
+            views.setOnClickPendingIntent(R.id.widget_root, launch("amiin://home"))
+            views.setOnClickPendingIntent(R.id.widget_event_line, launch("amiin://agenda"))
+            views.setOnClickPendingIntent(R.id.widget_demarche_line, launch("amiin://demarches"))
+            views.setOnClickPendingIntent(R.id.widget_fx_line, launch("amiin://home"))
+            views.setOnClickPendingIntent(R.id.widget_ask_pill, launch("amiin://chat"))
+            views.setOnClickPendingIntent(R.id.widget_mic_button, launch("amiin://chat?voice=1"))
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    /** "prefix" normal + "strong" coloré et gras + "rest" normal. */
+    private fun accentLine(
+        prefix: String, strong: String, rest: String, color: Int,
+    ): CharSequence {
+        val sb = SpannableStringBuilder(prefix)
+        val start = sb.length
+        sb.append(strong)
+        sb.setSpan(ForegroundColorSpan(color), start, sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(StyleSpan(Typeface.BOLD), start, sb.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append(rest)
+        return sb
     }
 
     // ── Prochaine prière (calculée à l'affichage) ─────────────────────────────
 
     private fun nextPrayer(data: SharedPreferences): Pair<String, String> {
         val raw = data.getString("widget_prayers_json", "") ?: ""
-        if (raw.isEmpty()) return Pair("—", "Prière")
+        if (raw.isEmpty()) return Pair("Prière", "—")
         return try {
             val json = JSONObject(raw)
             val order = listOf(
@@ -97,18 +108,18 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
                 val parts = time.split(":")
                 if (parts.size != 2) continue
                 val minutes = (parts[0].toIntOrNull() ?: 0) * 60 + (parts[1].toIntOrNull() ?: 0)
-                if (minutes > nowMinutes) return Pair(time, label)
+                if (minutes > nowMinutes) return Pair(label, time)
             }
             // Après l'Isha → Fajr (du lendemain)
-            Pair(json.optString("fajr", "—"), "Fajr")
+            Pair("Fajr", json.optString("fajr", "—"))
         } catch (e: Exception) {
-            Pair("—", "Prière")
+            Pair("Prière", "—")
         }
     }
 
     // ── Rendez-vous : celui du jour à venir, sinon le prochain de la semaine ──
 
-    private fun eventLine(data: SharedPreferences): String {
+    private fun eventLine(context: Context, data: SharedPreferences): CharSequence {
         val raw = data.getString("widget_events_json", "") ?: ""
         if (raw.isEmpty()) return "📅  Aucun rendez-vous à venir"
         return try {
@@ -144,7 +155,8 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
                 val days = arrayOf("dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam.")
                 "${days[chosen.get(Calendar.DAY_OF_WEEK) - 1]} $hm"
             }
-            "📅  $prefix · $bestTitle"
+            accentLine("📅  ", prefix,
+                " · $bestTitle", ContextCompat.getColor(context, R.color.widget_secretariat))
         } catch (e: Exception) {
             "📅  Aucun rendez-vous à venir"
         }
@@ -152,7 +164,7 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
 
     // ── Démarches en cours ────────────────────────────────────────────────────
 
-    private fun demarcheLine(data: SharedPreferences): String {
+    private fun demarcheLine(context: Context, data: SharedPreferences): CharSequence {
         val raw = data.getString("widget_demarches_json", "") ?: ""
         if (raw.isEmpty()) return "📋  Aucune démarche en cours"
         return try {
@@ -162,12 +174,10 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
             val title = first.optString("title", "")
             val step = first.optInt("step", 0)
             val total = first.optInt("total", 0)
-            val progress = if (total > 0) " ($step/$total)" else ""
-            if (list.length() == 1) {
-                "📋  $title$progress"
-            } else {
-                "📋  ${list.length()} en cours · $title$progress"
-            }
+            val ocre = ContextCompat.getColor(context, R.color.widget_accent)
+            val strong = if (total > 0) "$step/$total" else "en cours"
+            val prefix = if (list.length() > 1) "📋  ${list.length()} en cours · " else "📋  "
+            accentLine(prefix, strong, "  $title", ocre)
         } catch (e: Exception) {
             "📋  Aucune démarche en cours"
         }

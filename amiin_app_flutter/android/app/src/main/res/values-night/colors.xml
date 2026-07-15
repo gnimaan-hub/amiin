@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Widget « Aujourd'hui » en mode sombre — mêmes noms que values/colors.xml,
-         résolus automatiquement par Android selon le thème système. -->
-    <color name="widget_bg">#1C2E52</color>
+    <!-- Widget « Aujourd'hui » v5 en mode sombre — mêmes noms que
+         values/colors.xml, résolus automatiquement par Android selon le thème.
+         Dégradé un peu plus profond pour se fondre dans un écran d'accueil sombre. -->
+
+    <!-- Dégradé de la carte -->
+    <color name="widget_card_start">#176B6B</color>
+    <color name="widget_card_mid">#144B50</color>
+    <color name="widget_card_end">#0E1830</color>
+
+    <!-- Texte -->
     <color name="widget_ink">#F2EFE9</color>
-    <color name="widget_muted">#8090B0</color>
-    <color name="widget_accent">#DEA844</color>
-    <color name="widget_border">#2A3A5A</color>
-    <color name="widget_pill_bg">#162038</color>
-    <color name="widget_mic">#1E8A8A</color>
+    <color name="widget_muted">#93BAB7</color>
+    <color name="widget_gold">#E6AE47</color>
+    <color name="widget_accent">#E6AE47</color>
+    <color name="widget_secretariat">#7FE7E4</color>
+
+    <!-- Surfaces translucides -->
+    <color name="widget_hair">#2EFFFFFF</color>
+    <color name="widget_sheen">#1CFFFFFF</color>
+    <color name="widget_flip_bg">#18FFFFFF</color>
+    <color name="widget_pill_bg">#14FFFFFF</color>
+
+    <!-- Chip prière -->
+    <color name="widget_chip_bg">#2EE6AE47</color>
+    <color name="widget_chip_text">#FFE7BE</color>
+
+    <!-- Bouton vocal -->
+    <color name="widget_voice_bg">#2E7FE7E4</color>
+    <color name="widget_voice_icon">#CFF6F4</color>
 </resources>

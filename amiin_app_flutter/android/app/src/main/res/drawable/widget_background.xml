@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/widget_bg" />
-    <corners android:radius="16dp" />
-    <stroke android:width="1dp" android:color="@color/widget_border" />
-</shape>
+<!-- Fond de la carte widget : dégradé de marque (turquoise → encre nuit)
+     + reflet lumineux venant du haut pour un rendu « verre » moderne. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Dégradé principal diagonal -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="305"
+                android:startColor="@color/widget_card_start"
+                android:centerColor="@color/widget_card_mid"
+                android:endColor="@color/widget_card_end" />
+            <corners android:radius="22dp" />
+            <stroke android:width="1dp" android:color="@color/widget_hair" />
+        </shape>
+    </item>
+
+    <!-- Reflet supérieur (haut lumineux → transparent) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="@color/widget_sheen"
+                android:endColor="#00FFFFFF" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -102,16 +102,36 @@ class WidgetBridge {
     HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
   }
 
+  static Uri? _lastUri;
+  static DateTime _lastUriAt = DateTime.fromMillisecondsSinceEpoch(0);
+
   static void _handleWidgetUri(Uri? uri) {
     if (uri == null) return;
+    // Au lancement à froid, la même URI arrive deux fois (valeur initiale +
+    // flux). Sans dédup : double navigation et double toggle du micro
+    // (qui démarrerait puis s'arrêterait aussitôt).
+    final now = DateTime.now();
+    if (uri.toString() == _lastUri.toString() &&
+        now.difference(_lastUriAt) < const Duration(seconds: 2)) {
+      return;
+    }
+    _lastUri = uri;
+    _lastUriAt = now;
+
     final target = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
-    if (target != 'chat') return; // amiin://home → comportement par défaut
+    const routes = {
+      'chat': '/chat',
+      'agenda': '/agenda',
+      'demarches': '/demarches',
+    };
+    final route = routes[target];
+    if (route == null) return; // amiin://home → comportement par défaut
 
     // Lancement à froid : attendre que le premier frame soit rendu avant de
     // naviguer, sinon GoRouter n'est pas encore attaché.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      appRouter.go('/chat');
-      if (uri.queryParameters['voice'] == '1') {
+      appRouter.go(route);
+      if (target == 'chat' && uri.queryParameters['voice'] == '1') {
         // Laisse le temps au ChatScreen de monter et d'attacher son listener.
         Future.delayed(const Duration(milliseconds: 400), () {
           chatListenRequest.value++;
@@ -122,12 +142,25 @@ class WidgetBridge {
 
   // ── Brief (météo / prières / taux) ──────────────────────────────────────────
 
+  /// Emoji correspondant au code d'icône OpenWeatherMap (01d, 10n, …).
+  static String _weatherEmoji(String icon) {
+    if (icon.startsWith('01')) return '☀️';
+    if (icon.startsWith('02')) return '🌤️';
+    if (icon.startsWith('03') || icon.startsWith('04')) return '☁️';
+    if (icon.startsWith('09') || icon.startsWith('10')) return '🌧️';
+    if (icon.startsWith('11')) return '⛈️';
+    if (icon.startsWith('13')) return '❄️';
+    if (icon.startsWith('50')) return '🌫️';
+    return '🌡️';
+  }
+
   /// Écrit les données du brief dans le stockage du widget. Utilisé par
   /// l'app (via pushBrief) et par la tâche de fond.
   static Future<void> writeBriefData(HomeBrief b) async {
     final weather = b.weather;
     await HomeWidget.saveWidgetData<String>(
-        'widget_weather_value', weather != null ? '${weather.temp}°' : '—');
+        'widget_weather_value',
+        weather != null ? '${_weatherEmoji(weather.icon)} ${weather.temp}°' : '—');
     await HomeWidget.saveWidgetData<String>(
         'widget_weather_label', weather?.desc ?? 'Météo');
 
@@ -140,19 +173,16 @@ class WidgetBridge {
     final fx = b.fx;
     if (fx != null) {
       final eur = fx.eurFdj;
-      await HomeWidget.saveWidgetData<String>('widget_fx_value',
-          eur != null ? '${eur.round()} FDJ' : '${fx.usdFdj.round()} FDJ');
+      final parts = <String>[
+        if (eur != null) '1 € = ${eur.round()} FDJ',
+        '1 \$ = ${fx.usdFdj.round()} FDJ',
+      ];
       await HomeWidget.saveWidgetData<String>(
-          'widget_fx_label', eur != null ? '1 euro' : '1 dollar');
+          'widget_fx_line', '💱  ${parts.join('  ·  ')}');
     } else {
-      await HomeWidget.saveWidgetData<String>('widget_fx_value', '—');
-      await HomeWidget.saveWidgetData<String>('widget_fx_label', 'Taux');
+      await HomeWidget.saveWidgetData<String>(
+          'widget_fx_line', '💱  Taux du jour indisponible');
     }
-
-    final now = DateTime.now();
-    final hh = now.hour.toString().padLeft(2, '0');
-    final mm = now.minute.toString().padLeft(2, '0');
-    await HomeWidget.saveWidgetData<String>('widget_updated_at', '$hh:$mm');
   }
 
   /// Pousse le brief et rafraîchit le widget. Best-effort, jamais bloquant.
