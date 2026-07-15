@@ -625,6 +625,24 @@ def _build_preferences_fragment(prefs: dict) -> str:
     if line:
         lines.append(line)
 
+    # Langue de réponse — consigne PRIORITAIRE et explicite. Sans cela, le modèle
+    # reste en français (SYSTEM_PROMPT_BASE est 100 % en français) même quand
+    # l'utilisateur choisit une autre langue dans l'app.
+    lang_map = {
+        "so": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en somali (Soomaali), "
+              "quelle que soit la langue de la question ou du contexte fourni. "
+              "Tu maîtrises parfaitement le somali. N'emploie le français sous aucun prétexte "
+              "et ne dis jamais que tu ne peux répondre qu'en français.",
+        "ar": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en arabe standard moderne, "
+              "quelle que soit la langue de la question ou du contexte fourni. "
+              "N'emploie le français sous aucun prétexte.",
+        "en": "LANGUAGE RULE (ABSOLUTE): always reply ONLY in English, regardless of the language "
+              "of the question or of the provided context. Never use French under any circumstance.",
+    }
+    line = lang_map.get(prefs.get("ai_language", "fr"), "")
+    if line:
+        lines.append(line)
+
     if not lines:
         return ""
 
