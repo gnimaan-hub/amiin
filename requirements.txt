@@ -23,6 +23,7 @@ qdrant-client==1.9.1
 requests==2.33.1
 python-dotenv==1.2.2
 python-dateutil==2.9.0.post0
+python-multipart==0.0.20        # requis par FastAPI pour l'upload de fichiers (STT)
 
 # ── BASE DE DONNÉES (nouveau) ─────────────────────────────────────
 psycopg2-binary==2.9.10        # driver PostgreSQL

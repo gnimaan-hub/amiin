@@ -53,6 +53,16 @@ class SettingsService extends ChangeNotifier {
   String get ttsVoice => _get('tts_voice', 'fr-FR-DeniseNeural');
   set ttsVoice(String v) => _set('tts_voice', v);
 
+  /// Voix effectivement utilisée pour la synthèse : force une voix somali
+  /// quand la langue de réponse est le somali (les voix fr/en ne prononcent
+  /// pas correctement le somali), sauf si l'utilisateur a déjà choisi une
+  /// voix so-*.
+  String get effectiveTtsVoice {
+    final v = ttsVoice;
+    if (aiLanguage == 'so' && !v.startsWith('so-')) return 'so-SO-UbaxNeural';
+    return v;
+  }
+
   bool get proactiveSuggestions => _get('proactive_suggestions', true);
   set proactiveSuggestions(bool v) => _set('proactive_suggestions', v);
 

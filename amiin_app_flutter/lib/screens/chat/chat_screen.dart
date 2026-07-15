@@ -17,6 +17,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../services/cloud_tts_service.dart';
+import '../../services/cloud_stt_service.dart';
 import '../../services/settings_service.dart';
 
 import '../../theme/spacing.dart';
@@ -52,6 +53,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late stt.SpeechToText _speech;
   bool _isListening = false;
   bool _speechAvailable = false;
+
+  /// STT cloud (Groq Whisper) — utilisé quand la langue n'est pas reconnue par
+  /// le moteur natif (somali). Transcription en cours après l'arrêt du micro.
+  bool _isTranscribing = false;
 
   bool _dictated = false;
 
@@ -210,6 +215,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     HapticFeedback.lightImpact();
     if (_isSpeaking) await _stopSpeaking();
 
+    // Langue non gérée par le moteur natif (somali) → STT cloud (Groq Whisper).
+    if (settingsService.aiLanguage == 'so') {
+      await _toggleCloudRecording();
+      return;
+    }
+
     if (_isListening) {
       await _speech.stop();
       setState(() => _isListening = false);
@@ -247,6 +258,48 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       pauseFor: const Duration(seconds: 10),
       localeId: 'fr_FR',
     );
+  }
+
+  /// Enregistrement + transcription cloud (Groq Whisper) pour le somali.
+  /// 1er tap : démarre l'enregistrement. 2e tap : arrête, transcrit, remplit
+  /// le champ de saisie avec le texte reconnu.
+  Future<void> _toggleCloudRecording() async {
+    if (_isTranscribing) return;
+
+    if (cloudSttService.isRecording) {
+      setState(() {
+        _isListening = false;
+        _isTranscribing = true;
+      });
+      try {
+        final text = await cloudSttService.stopAndTranscribe(lang: 'so');
+        if (!mounted) return;
+        if (text.isNotEmpty) {
+          _dictated = true;
+          _controller.text = text;
+        } else {
+          AmiinToast.show(context, 'Aucune parole détectée.', success: false);
+        }
+      } catch (e) {
+        if (mounted) {
+          AmiinToast.show(context, 'Transcription impossible. Réessayez.',
+              success: false);
+        }
+      } finally {
+        if (mounted) setState(() => _isTranscribing = false);
+      }
+      return;
+    }
+
+    try {
+      await cloudSttService.start();
+      if (mounted) setState(() => _isListening = true);
+    } catch (_) {
+      if (mounted) {
+        AmiinToast.show(context, 'Permission microphone refusée.',
+            success: false);
+      }
+    }
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
@@ -294,7 +347,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         _speakingMsgId = msgId;
       });
 
-    if (settingsService.useCloudTts) {
+    // Le somali n'a pas de voix locale flutter_tts → cloud obligatoire.
+    final useCloud = settingsService.useCloudTts || settingsService.aiLanguage == 'so';
+    if (useCloud) {
       // Moteur cloud Edge TTS — haute qualité, indépendant des voix système.
       // En cas d'erreur réseau, bascule automatiquement sur flutter_tts.
       try {
@@ -315,7 +370,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _stopSpeaking() async {
     _liveTtsActive = false;
-    if (settingsService.useCloudTts) {
+    if (settingsService.useCloudTts || settingsService.aiLanguage == 'so') {
       await cloudTtsService.stop();
     } else {
       await _flutterTts.stop();
@@ -361,7 +416,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     // Voix en direct (cloud uniquement) : la session démarre AVANT la
     // réponse — la 1re phrase sera parlée pendant que le reste streame.
-    final liveTts = wantAutoRead && settingsService.useCloudTts;
+    final liveTts = wantAutoRead &&
+        (settingsService.useCloudTts || settingsService.aiLanguage == 'so');
     if (liveTts) {
       _liveTtsActive = true;
       cloudTtsService.beginSession(cleaner: _cleanTextForTts);
@@ -910,13 +966,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             ),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      color: _isListening
-                          ? context.ac.onAccent
-                          : context.ac.secretariatAccent,
-                      size: 20,
-                    ),
+                    child: _isTranscribing
+                        ? SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: context.ac.secretariatAccent,
+                            ),
+                          )
+                        : Icon(
+                            _isListening ? Icons.mic : Icons.mic_none,
+                            color: _isListening
+                                ? context.ac.onAccent
+                                : context.ac.secretariatAccent,
+                            size: 20,
+                          ),
                   ),
                 ),
               ),

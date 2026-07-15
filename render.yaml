@@ -18,6 +18,8 @@ services:
         sync: false
       - key: OWM_API_KEY
         sync: false
+      - key: GROQ_API_KEY        # STT Whisper (Groq, gratuit) — reconnaissance vocale somali
+        sync: false
       - key: DATABASE_URL          # ← NOUVEAU
         sync: false
       - key: JWT_SECRET_KEY        # OBLIGATOIRE — l'API refuse de démarrer sans (openssl rand -hex 32)

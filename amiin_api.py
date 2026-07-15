@@ -21,7 +21,7 @@ from contextlib import asynccontextmanager
 
 import edge_tts
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, File, UploadFile, Form
 from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -1528,6 +1528,9 @@ _TTS_VOICES = [
     {"id": "en-US-JennyNeural",             "name": "Jenny",    "lang": "en-US", "gender": "F"},
     {"id": "en-US-GuyNeural",               "name": "Guy",      "lang": "en-US", "gender": "M"},
     {"id": "en-GB-SoniaNeural",             "name": "Sonia",    "lang": "en-GB", "gender": "F"},
+    # Somali
+    {"id": "so-SO-UbaxNeural",              "name": "Ubax",     "lang": "so-SO", "gender": "F"},
+    {"id": "so-SO-MuuseNeural",             "name": "Muuse",    "lang": "so-SO", "gender": "M"},
 ]
 
 class TTSRequest(BaseModel):
@@ -1555,7 +1558,9 @@ async def text_to_speech(req: TTSRequest):
     voice = req.voice if req.voice in valid_ids else "fr-FR-DeniseNeural"
 
     try:
-        processed_text = _fix_tts_pronunciation(req.text)
+        # Les règles de prononciation sont franco-centrées (ex: FDJ → "francs
+        # djiboutiens") : on ne les applique qu'aux voix françaises.
+        processed_text = _fix_tts_pronunciation(req.text) if voice.startswith("fr") else req.text
         communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
         buf = io.BytesIO()
         async for chunk in communicate.stream():
@@ -1574,6 +1579,59 @@ async def text_to_speech(req: TTSRequest):
         media_type="audio/mpeg",
         headers={"Content-Disposition": "inline; filename=speech.mp3"},
     )
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STT — reconnaissance vocale (Groq Whisper large-v3, gratuit, gère le somali)
+# ══════════════════════════════════════════════════════════════════════════════
+
+GROQ_STT_URL   = "https://api.groq.com/openai/v1/audio/transcriptions"
+GROQ_STT_MODEL = "whisper-large-v3"
+# Langues exposées à l'app (le reste tombe en auto-détection Whisper).
+_STT_LANGS = {"so", "fr", "en", "ar"}
+# Garde-fou taille : les fichiers Groq gratuits sont limités ; on refuse au-delà.
+_STT_MAX_BYTES = 25 * 1024 * 1024   # 25 Mo
+
+def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) -> str:
+    """Appel bloquant à Groq Whisper — exécuté dans un thread par l'endpoint."""
+    key = _load_env_key("GROQ_API_KEY")
+    if not key:
+        raise HTTPException(
+            status_code=503,
+            detail="STT indisponible : GROQ_API_KEY absente côté serveur.",
+        )
+    data = {"model": GROQ_STT_MODEL, "response_format": "json"}
+    if lang in _STT_LANGS:
+        data["language"] = lang
+    try:
+        resp = _requests.post(
+            GROQ_STT_URL,
+            headers={"Authorization": f"Bearer {key}"},
+            files={"file": (filename or "audio.m4a", audio, content_type or "audio/m4a")},
+            data=data,
+            timeout=60,
+        )
+    except _requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"STT réseau : {e}")
+    if resp.status_code != 200:
+        logging.error(f"[STT] Groq {resp.status_code} — {resp.text[:300]}")
+        raise HTTPException(status_code=502, detail=f"STT Groq {resp.status_code}")
+    return (resp.json() or {}).get("text", "").strip()
+
+@app.post("/v1/stt", dependencies=[Depends(tts_user)])
+async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so")):
+    """
+    Transcrit un fichier audio en texte via Groq Whisper large-v3.
+    Champ multipart `file` (audio) + `lang` (code ISO : so, fr, en, ar).
+    """
+    audio = await file.read()
+    if not audio:
+        raise HTTPException(status_code=400, detail="fichier audio vide")
+    if len(audio) > _STT_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="fichier audio trop volumineux")
+    text = await asyncio.to_thread(
+        _groq_transcribe, audio, file.filename, file.content_type, (lang or "so").lower()
+    )
+    return {"text": text}
 
 # ══════════════════════════════════════════════════════════════════════════════
 

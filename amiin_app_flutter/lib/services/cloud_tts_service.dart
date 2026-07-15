@@ -101,7 +101,7 @@ class CloudTtsService {
   Future<Uint8List> _fetch(String chunk, String rate, CancelToken token) async {
     final response = await api.post<List<int>>(
       '/tts',
-      data: {'text': chunk, 'voice': settingsService.ttsVoice, 'rate': rate},
+      data: {'text': chunk, 'voice': settingsService.effectiveTtsVoice, 'rate': rate},
       options: Options(responseType: ResponseType.bytes),
       cancelToken: token,
     );
