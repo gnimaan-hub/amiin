@@ -2,16 +2,34 @@
 <resources>
     <color name="launch_bg">#2C2114</color>
 
-    <!-- Widget « Aujourd'hui » — palette Djibouti (theme/colors.dart).
-         Variante sombre dans values-night/colors.xml, mêmes noms. -->
-    <color name="widget_bg">#FFFFFF</color>
-    <color name="widget_ink">#14213D</color>
-    <color name="widget_muted">#7A8BA8</color>
-    <color name="widget_accent">#C8902F</color>
-    <color name="widget_border">#D0D5E2</color>
-    <color name="widget_pill_bg">#F2EFE9</color>
-    <color name="widget_mic">#1E8A8A</color>
-    <color name="widget_chip_bg">#CCEBEB</color>
-    <color name="widget_chip_text">#135E5E</color>
-    <color name="widget_secretariat">#1E8A8A</color>
+    <!-- Widget « Aujourd'hui » v5 — carte de marque Amiin.
+         Fond dégradé turquoise → encre nuit, texte clair.
+         Variante sombre (un peu plus profonde) dans values-night/colors.xml,
+         mêmes noms : Android bascule automatiquement selon le thème système. -->
+
+    <!-- Dégradé de la carte -->
+    <color name="widget_card_start">#1E8A8A</color>   <!-- turquoise Tadjourah -->
+    <color name="widget_card_mid">#1A5E63</color>
+    <color name="widget_card_end">#14213D</color>     <!-- encre nuit -->
+
+    <!-- Texte (clair sur carte foncée) -->
+    <color name="widget_ink">#FFFFFF</color>          <!-- texte principal -->
+    <color name="widget_muted">#AFD2CF</color>        <!-- texte secondaire -->
+    <color name="widget_gold">#F3B94E</color>         <!-- or des dunes (accent) -->
+    <color name="widget_accent">#F3B94E</color>       <!-- démarches (or) -->
+    <color name="widget_secretariat">#7FE7E4</color>  <!-- RDV (turquoise clair) -->
+
+    <!-- Surfaces translucides (effets de fond modernes) -->
+    <color name="widget_hair">#33FFFFFF</color>       <!-- filet / bordure -->
+    <color name="widget_sheen">#26FFFFFF</color>      <!-- reflet supérieur -->
+    <color name="widget_flip_bg">#1FFFFFFF</color>    <!-- carte rotative -->
+    <color name="widget_pill_bg">#1AFFFFFF</color>    <!-- pilule question -->
+
+    <!-- Chip prochaine prière (or discret) -->
+    <color name="widget_chip_bg">#33F3B94E</color>
+    <color name="widget_chip_text">#FFE7BE</color>
+
+    <!-- Bouton vocal (repris du chat : cercle turquoise doux) -->
+    <color name="widget_voice_bg">#2E7FE7E4</color>
+    <color name="widget_voice_icon">#CFF6F4</color>
 </resources>

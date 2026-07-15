@@ -51,7 +51,7 @@ class AmiinBriefWidgetProvider : AppWidgetProvider() {
                 R.id.widget_weather_label, data.getString("widget_weather_label", "Météo"))
 
             val (prayerName, prayerTime) = nextPrayer(data)
-            views.setTextViewText(R.id.widget_prayer_chip, "$prayerName · $prayerTime")
+            views.setTextViewText(R.id.widget_prayer_chip, "🕌 $prayerName · $prayerTime")
 
             // ── Zone rotative ──
             views.setTextViewText(R.id.widget_event_line, eventLine(context, data))
