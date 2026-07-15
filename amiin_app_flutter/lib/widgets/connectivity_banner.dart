@@ -25,11 +25,7 @@ class ConnectivityBanner extends StatelessWidget {
                     : Center(
                         child: Text(
                           'Pas de connexion internet',
-                          style: TextStyle(
-                            fontFamily: FontFamily.geoMedium,
-                            fontSize: 12,
-                            color: context.ac.onAccent,
-                          ),
+                          style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: context.ac.onAccent),
                         ),
                       ),
               );

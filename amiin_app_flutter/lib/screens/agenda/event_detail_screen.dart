@@ -163,12 +163,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         Expanded(
                           child: Text(
                             _event!.title,
-                            style: TextStyle(
-                              fontFamily: FontFamily.geo,
-                              fontSize: 24,
-                              color: context.ac.ink,
-                              height: 1.2,
-                            ),
+                            style: TextStyles.cardTitle(context).copyWith(fontSize: 24, height: 1.2, fontFamily: FontFamily.geo),
                           ),
                         ),
                         if (_event!.createdByAgent == true)
@@ -201,22 +196,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           children: [
                             Text(
                               'Description',
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoBold,
-                                fontSize: 10,
-                                letterSpacing: 1.2,
-                                color: context.ac.muted,
-                              ),
+                              style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               _event!.description!,
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 14,
-                                color: context.ac.midTone,
-                                height: 1.5,
-                              ),
+                              style: TextStyles.body(context).copyWith(color: context.ac.midTone),
                             ),
                           ],
                         ),
@@ -231,22 +216,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           children: [
                             Text(
                               'Contexte Amiin',
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoBold,
-                                fontSize: 10,
-                                letterSpacing: 1.2,
-                                color: context.ac.secretariatAccentDark,
-                              ),
+                              style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccentDark, letterSpacing: 1.2, fontFamily: FontFamily.geoBold),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               _event!.agentContext!,
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 13,
-                                color: context.ac.secretariatAccentDark,
-                                height: 1.5,
-                              ),
+                              style: TextStyles.body(context).copyWith(fontSize: 13, color: context.ac.secretariatAccentDark),
                             ),
                           ],
                         ),
@@ -270,11 +245,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              fontFamily: FontFamily.sans,
-              fontSize: 14,
-              color: context.ac.ink,
-            ),
+            style: TextStyles.body(context),
           ),
         ),
       ],

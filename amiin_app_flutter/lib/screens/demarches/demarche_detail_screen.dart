@@ -100,28 +100,19 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                           ),
                           child: Text(
                             isInfo ? 'Fiche d\'information' : 'Démarche administrative',
-                            style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 10,
-                              color: isInfo ? context.ac.infoAccent : context.ac.success,
-                            ),
+                            style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: isInfo ? context.ac.infoAccent : context.ac.success, fontFamily: FontFamily.geoBold),
                           ),
                         ),
                         const SizedBox(width: Spacing.sm),
                         Text(
                           '${d.category.icon} ${d.category.label}',
-                          style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+                          style: TextStyles.caption(context).copyWith(fontSize: 11),
                         ),
                       ],
                     ),
                     const SizedBox(height: Spacing.sm),
                     // Titre
-                    Text(d.title, style: TextStyle(
-                      fontFamily: FontFamily.geo,
-                      fontSize: 22,
-                      color: context.ac.ink,
-                      height: 1.3,
-                    )),
+                    Text(d.title, style: TextStyles.cardTitle(context).copyWith(fontSize: 22, height: 1.3, fontFamily: FontFamily.geo)),
                     const SizedBox(height: Spacing.sm),
 
                     // Métadonnées
@@ -145,9 +136,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                       _section(
                         icon: Icons.info_outline,
                         title: 'Description',
-                        child: Text(d.summary, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
-                        )),
+                        child: Text(d.summary, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                       ),
 
                     // Bénéficiaires
@@ -155,9 +144,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                       _section(
                         icon: Icons.people_outline,
                         title: 'Qui peut faire cette démarche ?',
-                        child: Text(d.beneficiaires!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
-                        )),
+                        child: Text(d.beneficiaires!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                       ),
 
                     // Conditions
@@ -165,9 +152,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                       _section(
                         icon: Icons.check_circle_outline,
                         title: 'Conditions requises',
-                        child: Text(d.conditions!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
-                        )),
+                        child: Text(d.conditions!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                       ),
 
                     // Documents
@@ -187,9 +172,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                                     color: context.ac.surface2,
                                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                                   ),
-                                  child: Text('Cas : $cas', style: TextStyle(
-                                    fontFamily: FontFamily.geoBold, fontSize: 11, color: context.ac.midTone,
-                                  )),
+                                  child: Text('Cas : $cas', style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: context.ac.midTone, fontFamily: FontFamily.geoBold)),
                                 ),
                                 const SizedBox(height: 6),
                               ],
@@ -220,9 +203,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                       _section(
                         icon: Icons.emoji_events_outlined,
                         title: 'Résultat attendu',
-                        child: Text(d.resultat!, style: TextStyle(
-                          fontFamily: FontFamily.sans, fontSize: 14, color: context.ac.midTone, height: 1.5,
-                        )),
+                        child: Text(d.resultat!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                       ),
 
                     // Organisme
@@ -277,9 +258,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           Row(children: [
             Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.adresse!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
-            ))),
+            Expanded(child: Text(org.adresse!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: 4),
         ],
@@ -287,9 +266,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           Row(children: [
             Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.horaires!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
-            ))),
+            Expanded(child: Text(org.horaires!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: Spacing.sm),
         ],
@@ -299,16 +276,14 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             child: Divider(height: 1, color: context.ac.border),
           ),
           Row(children: [
-            Expanded(child: Text(lieux[i].nom, style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.ink,
-            ))),
+            Expanded(child: Text(lieux[i].nom, style: TextStyles.cardTitle(context).copyWith(fontSize: 12, fontFamily: FontFamily.geoBold))),
             TextButton(
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
                 padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+                textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12),
                 minimumSize: Size.zero,
               ),
               child: const Text('Annuaire'),
@@ -330,12 +305,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               children: [
                 Icon(icon, size: 14, color: context.ac.muted),
                 const SizedBox(width: 6),
-                Text(title.toUpperCase(), style: TextStyle(
-                  fontFamily: FontFamily.geoBold,
-                  fontSize: 10,
-                  letterSpacing: 1.2,
-                  color: context.ac.muted,
-                )),
+                Text(title.toUpperCase(), style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
               ],
             ),
             const SizedBox(height: 10),
@@ -360,9 +330,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
         children: [
           Text(icon, style: const TextStyle(fontSize: 12)),
           const SizedBox(width: 4),
-          Flexible(child: Text(truncated, style: TextStyle(
-            fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
-          ))),
+          Flexible(child: Text(truncated, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
         ],
       ),
     );
@@ -377,9 +345,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           margin: const EdgeInsets.only(top: 6, right: 8),
           decoration: BoxDecoration(color: context.ac.infoAccent, shape: BoxShape.circle),
         ),
-        Expanded(child: Text(name, style: TextStyle(
-          fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.ink, height: 1.4,
-        ))),
+        Expanded(child: Text(name, style: TextStyles.body(context).copyWith(fontSize: 13, height: 1.4))),
       ],
     );
   }
@@ -395,9 +361,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               Container(
                 width: 28, height: 28,
                 decoration: BoxDecoration(color: context.ac.infoAccent, shape: BoxShape.circle),
-                child: Center(child: Text('${step.order}', style: TextStyle(
-                  fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.onAccent,
-                ))),
+                child: Center(child: Text('${step.order}', style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: context.ac.onAccent, fontFamily: FontFamily.geoBold))),
               ),
               if (!isLast) Container(width: 2, height: 36, color: context.ac.border),
             ],
@@ -410,14 +374,10 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(step.title, style: TextStyle(
-                  fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink,
-                )),
+                Text(step.title, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold)),
                 if (step.title != step.description) ...[
                   const SizedBox(height: 3),
-                  Text(step.description, style: TextStyle(
-                    fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone, height: 1.4,
-                  )),
+                  Text(step.description, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone, height: 1.4)),
                 ],
               ],
             ),
@@ -431,15 +391,13 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink)),
+        Text(org.nom, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold)),
         if (org.adresse != null && org.adresse!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Row(children: [
             Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.adresse!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
-            ))),
+            Expanded(child: Text(org.adresse!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
         ],
         if (org.horaires != null && org.horaires!.isNotEmpty) ...[
@@ -447,9 +405,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
           Row(children: [
             Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.horaires!, style: TextStyle(
-              fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone,
-            ))),
+            Expanded(child: Text(org.horaires!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
         ],
         if (org.contact != null && org.contact!.isNotEmpty) ...[
@@ -466,9 +422,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             child: Row(children: [
               Icon(Icons.contact_mail_outlined, size: 13, color: context.ac.infoAccent),
               const SizedBox(width: 4),
-              Expanded(child: Text(org.contact!, style: TextStyle(
-                fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.infoAccent,
-              ))),
+              Expanded(child: Text(org.contact!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.infoAccent))),
             ]),
           ),
         ],
@@ -480,7 +434,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
             foregroundColor: context.ac.infoAccent,
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+            textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12),
           ),
           onPressed: () => _openInAnnuaire(org),
         ),

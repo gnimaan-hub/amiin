@@ -226,10 +226,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         backgroundColor: Colors.white,
                         selectedColor: cat.color,
                         checkmarkColor: Colors.white,
-                        labelStyle: TextStyle(
-                          color: _category == cat.category ? Colors.white : context.ac.midTone,
-                          fontFamily: FontFamily.geoMedium,
-                        ),
+                        labelStyle: TextStyles.cardTitle(context).copyWith(color: _category == cat.category ? Colors.white : context.ac.midTone),
                       )).toList(),
                     )),
                     const SizedBox(height: Spacing.lg),
@@ -242,10 +239,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         onSelected: (_) => setState(() => _reminder = rem.value),
                         backgroundColor: Colors.white,
                         selectedColor: context.ac.secretariatAccent,
-                        labelStyle: TextStyle(
-                          color: _reminder == rem.value ? Colors.white : context.ac.midTone,
-                          fontFamily: FontFamily.geoMedium,
-                        ),
+                        labelStyle: TextStyles.cardTitle(context).copyWith(color: _reminder == rem.value ? Colors.white : context.ac.midTone),
                       )).toList(),
                     )),
                     const SizedBox(height: Spacing.xl),
@@ -272,12 +266,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontFamily: FontFamily.geoBold,
-            fontSize: 10,
-            letterSpacing: 1.2,
-            color: context.ac.muted,
-          ),
+          style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold),
         ),
         const SizedBox(height: 6),
         child,

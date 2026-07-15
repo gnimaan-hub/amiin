@@ -77,20 +77,12 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: TextStyle(
-                  fontFamily: FontFamily.sans,
-                  fontSize: FontSize.base,
-                  color: context.ac.muted,
-                ),
+                hintStyle: TextStyles.bodyMuted(context),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
-              style: TextStyle(
-                fontFamily: FontFamily.sans,
-                fontSize: FontSize.base,
-                color: context.ac.ink,
-              ),
+              style: TextStyles.body(context),
             ),
           ),
           if (widget.value.isNotEmpty && widget.onClear != null)

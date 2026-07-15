@@ -42,12 +42,7 @@ class SettingsBillingScreen extends StatelessWidget {
                                   color: primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                                 ),
-                                child: Text('GRATUIT', style: TextStyle(
-                                  fontFamily: FontFamily.geoBold,
-                                  fontSize: 11,
-                                  letterSpacing: 0.8,
-                                  color: primary,
-                                )),
+                                child: Text('GRATUIT', style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: primary, letterSpacing: 0.8, fontFamily: FontFamily.geoBold)),
                               ),
                               const Spacer(),
                               Icon(Icons.star_outline, color: primary, size: 20),
@@ -58,11 +53,7 @@ class SettingsBillingScreen extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Text(
                               'Plan Amiin Gratuit',
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoBold,
-                                fontSize: 18,
-                                color: context.ac.ink,
-                              ),
+                              style: TextStyles.screenTitle(context),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -70,11 +61,7 @@ class SettingsBillingScreen extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Text(
                               'Accès aux fonctionnalités essentielles',
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 13,
-                                color: context.ac.muted,
-                              ),
+                              style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),

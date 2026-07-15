@@ -41,10 +41,7 @@ class SettingsTextScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text('A', style: TextStyle(
-                                fontSize: 12, color: ac.muted,
-                                fontFamily: FontFamily.sans,
-                              )),
+                              Text('A', style: TextStyles.caption(context)),
                               Expanded(
                                 child: Slider(
                                   value: settings.textScale,
@@ -55,20 +52,13 @@ class SettingsTextScreen extends StatelessWidget {
                                       settingsService.textScale = (v * 10).round() / 10,
                                 ),
                               ),
-                              Text('A', style: TextStyle(
-                                fontSize: 22, color: ac.ink,
-                                fontFamily: FontFamily.sans,
-                              )),
+                              Text('A', style: TextStyles.body(context).copyWith(fontSize: 22)),
                             ],
                           ),
                           Center(
                             child: Text(
                               _textScaleLabel(settings.textScale),
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoMedium,
-                                fontSize: 12,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                              style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: Theme.of(context).colorScheme.primary),
                             ),
                           ),
                           const SizedBox(height: Spacing.sm),
@@ -81,12 +71,7 @@ class SettingsTextScreen extends StatelessWidget {
                             ),
                             child: Text(
                               'Aperçu : Amiin vous aide avec vos démarches administratives à Djibouti.',
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 14,
-                                color: ac.ink,
-                                height: 1.5,
-                              ),
+                              style: TextStyles.body(context),
                             ),
                           ),
                         ],
@@ -203,11 +188,7 @@ class _FontOption extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   )),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 12,
-                    color: ac.muted,
-                  )),
+                  Text(subtitle, style: TextStyles.caption(context)),
                   const SizedBox(height: 4),
                   Text('Aa Bb Cc — 0 1 2 3', style: TextStyle(
                     fontFamily: fontFamily,
@@ -260,16 +241,8 @@ class _AnimOption extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 15,
-                    color: ac.ink,
-                  )),
-                  Text(subtitle, style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 12,
-                    color: ac.muted,
-                  )),
+                  Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
+                  Text(subtitle, style: TextStyles.caption(context)),
                 ],
               ),
             ),

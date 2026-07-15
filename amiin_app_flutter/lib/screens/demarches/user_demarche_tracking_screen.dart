@@ -216,7 +216,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                     decoration: BoxDecoration(color: context.ac.surface2, borderRadius: BorderRadius.circular(4)),
-                                    child: Text(cas, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 10, color: context.ac.midTone)),
+                                    child: Text(cas, style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.midTone, fontFamily: FontFamily.geoBold)),
                                   ),
                                   const SizedBox(height: 4),
                                 ],
@@ -272,9 +272,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                             children: [
                               Text('✓', style: TextStyle(fontSize: 18, color: context.ac.success)),
                               const SizedBox(width: Spacing.sm),
-                              Text('Démarche terminée', style: TextStyle(
-                                fontFamily: FontFamily.geoBold, fontSize: 15, color: context.ac.success,
-                              )),
+                              Text('Démarche terminée', style: TextStyles.cardTitle(context).copyWith(fontSize: 15, color: context.ac.success, fontFamily: FontFamily.geoBold)),
                             ],
                           ),
                         ),
@@ -313,9 +311,9 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                 ud.status == DemarcheStatus.terminee
                     ? 'Démarche terminée ✓'
                     : 'En cours — ${ud.completedSteps} sur ${ud.totalSteps} étapes',
-                style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink),
+                style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold),
               )),
-              Text('$pct %', style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 14, color: context.ac.infoAccent)),
+              Text('$pct %', style: TextStyles.cardTitle(context).copyWith(color: context.ac.infoAccent, fontFamily: FontFamily.geoBold)),
             ],
           ),
           const SizedBox(height: 8),
@@ -332,7 +330,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             const SizedBox(height: 6),
             Text(
               '${ud.demarche.category.icon} ${ud.demarche.category.label}',
-              style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+              style: TextStyles.caption(context).copyWith(fontSize: 11),
             ),
           ],
         ],
@@ -383,10 +381,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                       ),
                       child: Center(child: isDone
                         ? const Icon(Icons.check, color: Colors.white, size: 18)
-                        : Text('${step.order}', style: TextStyle(
-                            fontFamily: FontFamily.geoBold, fontSize: 13,
-                            color: context.ac.midTone,
-                          )),
+                        : Text('${step.order}', style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: context.ac.midTone, fontFamily: FontFamily.geoBold)),
                       ),
                     ),
                   ),
@@ -412,7 +407,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     'Validé le ${_formatDate(st.completedAt!)}',
-                                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+                                    style: TextStyles.caption(context).copyWith(fontSize: 11),
                                   ),
                                 ] else if (st.agendaEventId != null) ...[
                                   const SizedBox(height: 2),
@@ -446,32 +441,27 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                   children: [
                     // Description complète
                     if (step.title != step.description)
-                      Text(step.description, style: TextStyle(
-                        fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.midTone, height: 1.5,
-                      )),
+                      Text(step.description, style: TextStyles.body(context).copyWith(fontSize: 13, color: context.ac.midTone)),
                     if (step.lieu != null) ...[
                       const SizedBox(height: 8),
                       Row(children: [
                         Icon(Icons.location_on_outlined, size: 14, color: context.ac.muted),
                         const SizedBox(width: 4),
-                        Text(step.lieu!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone)),
+                        Text(step.lieu!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone)),
                       ]),
                     ],
 
                     const SizedBox(height: Spacing.md),
 
                     // Note pour cette étape
-                    Text('Ma note', style: TextStyle(
-                      fontFamily: FontFamily.geoBold, fontSize: 11,
-                      letterSpacing: 0.8, color: context.ac.muted,
-                    )),
+                    Text('Ma note', style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: context.ac.muted, letterSpacing: 0.8, fontFamily: FontFamily.geoBold)),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _noteControllers[step.order],
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText: 'Numéro de dossier, remarques, observations…',
-                        hintStyle: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.muted),
+                        hintStyle: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                         filled: true,
                         fillColor: context.ac.background,
                         border: OutlineInputBorder(
@@ -484,7 +474,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         ),
                         contentPadding: const EdgeInsets.all(10),
                       ),
-                      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.ink),
+                      style: TextStyles.body(context).copyWith(fontSize: 13),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -492,7 +482,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.save_outlined, size: 15),
                           label: const Text('Enregistrer'),
-                          style: TextButton.styleFrom(foregroundColor: context.ac.midTone, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.midTone, textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12)),
                           onPressed: () => _saveStepNote(step.order),
                         ),
                         const Spacer(),
@@ -500,7 +490,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.notifications_outlined, size: 15),
                           label: const Text('Rappel'),
-                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12)),
                           onPressed: () => _setStepReminder(step.order),
                         ),
                         const SizedBox(width: 4),
@@ -508,7 +498,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
                         TextButton.icon(
                           icon: const Icon(Icons.calendar_today_outlined, size: 15),
                           label: const Text('RDV'),
-                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12)),
+                          style: TextButton.styleFrom(foregroundColor: context.ac.infoAccent, textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12)),
                           onPressed: () => _scheduleStepEvent(step.order),
                         ),
                       ],
@@ -534,9 +524,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             Row(children: [
               Icon(icon, size: 14, color: context.ac.muted),
               const SizedBox(width: 6),
-              Text(title.toUpperCase(), style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: context.ac.muted,
-              )),
+              Text(title.toUpperCase(), style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
             ]),
             const SizedBox(height: 10),
             child,
@@ -546,9 +534,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     );
   }
 
-  Widget _sectionHeader(String title) => Text(title, style: TextStyle(
-    fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink,
-  ));
+  Widget _sectionHeader(String title) => Text(title, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold));
 
   Future<void> _toggleDocCheck(String docName) async {
     if (_ud == null) return;
@@ -630,7 +616,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           Row(children: [
             Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
+            Expanded(child: Text(org.adresse!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: 4),
         ],
@@ -638,7 +624,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           Row(children: [
             Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
             const SizedBox(width: 4),
-            Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
+            Expanded(child: Text(org.horaires!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
           ]),
           const SizedBox(height: Spacing.sm),
         ],
@@ -648,16 +634,14 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
             child: Divider(height: 1, color: context.ac.border),
           ),
           Row(children: [
-            Expanded(child: Text(lieux[i].nom, style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 12, color: context.ac.ink,
-            ))),
+            Expanded(child: Text(lieux[i].nom, style: TextStyles.cardTitle(context).copyWith(fontSize: 12, fontFamily: FontFamily.geoBold))),
             TextButton(
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
                 padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
+                textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 12),
                 minimumSize: Size.zero,
               ),
               child: const Text('Annuaire'),
@@ -680,7 +664,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: context.ac.muted),
         const SizedBox(width: 5),
-        Flexible(child: Text(truncated, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
+        Flexible(child: Text(truncated, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
       ]),
     );
   }
@@ -688,13 +672,13 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
   Widget _organismeCard(DemarcheOrganisme org) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(org.nom, style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 13, color: context.ac.ink)),
+      Text(org.nom, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold)),
       if (org.adresse != null && org.adresse!.isNotEmpty) ...[
         const SizedBox(height: 5),
         Row(children: [
           Icon(Icons.location_on_outlined, size: 13, color: context.ac.muted),
           const SizedBox(width: 4),
-          Expanded(child: Text(org.adresse!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
+          Expanded(child: Text(org.adresse!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
         ]),
       ],
       if (org.horaires != null && org.horaires!.isNotEmpty) ...[
@@ -702,7 +686,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         Row(children: [
           Icon(Icons.schedule_outlined, size: 13, color: context.ac.muted),
           const SizedBox(width: 4),
-          Expanded(child: Text(org.horaires!, style: TextStyle(fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.midTone))),
+          Expanded(child: Text(org.horaires!, style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.midTone))),
         ]),
       ],
       const SizedBox(height: Spacing.sm),
@@ -712,7 +696,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         label: const Text('Voir dans l\'annuaire'),
         style: TextButton.styleFrom(
           foregroundColor: context.ac.infoAccent,
-          textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 13),
+          textStyle: TextStyles.cardTitle(context).copyWith(fontSize: 13),
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
@@ -729,19 +713,17 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
           Row(children: [
             Icon(Icons.sticky_note_2_outlined, size: 14, color: context.ac.muted),
             const SizedBox(width: 6),
-            Text('NOTES GÉNÉRALES', style: TextStyle(
-              fontFamily: FontFamily.geoBold, fontSize: 10, letterSpacing: 1.2, color: context.ac.muted,
-            )),
+            Text('NOTES GÉNÉRALES', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
           ]),
           const SizedBox(height: 10),
           Text(ud.notes?.isNotEmpty == true ? ud.notes! : 'Aucune note. Appuyez pour ajouter.',
-            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 13, color: context.ac.muted, fontStyle: FontStyle.italic)),
+            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13, fontStyle: FontStyle.italic)),
           const SizedBox(height: 6),
           TextButton.icon(
             icon: const Icon(Icons.edit_outlined, size: 14),
             label: const Text('Modifier les notes'),
             style: TextButton.styleFrom(foregroundColor: context.ac.midTone, padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              textStyle: TextStyle(fontFamily: FontFamily.sans, fontSize: 12)),
+              textStyle: TextStyles.body(context).copyWith(fontSize: 12)),
             onPressed: () => _editGlobalNotes(ud),
           ),
         ],

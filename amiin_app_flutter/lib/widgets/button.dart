@@ -58,11 +58,7 @@ class AmiinButton extends StatelessWidget {
                 if (icon != null) ...[icon!, const SizedBox(width: 6)],
                 Text(
                   label,
-                  style: TextStyle(
-                    fontFamily: FontFamily.geoBold,
-                    fontSize: sizeConfig.font,
-                    letterSpacing: 0.1,
-                  ),
+                  style: TextStyles.cardTitle(context).copyWith(letterSpacing: 0.1, fontFamily: FontFamily.geoBold),
                 ),
               ],
             ),

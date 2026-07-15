@@ -58,23 +58,14 @@ class ChatNoteCard extends StatelessWidget {
                 children: [
                   Text(
                     isUpdate ? 'Note mise à jour' : 'Note créée',
-                    style: TextStyle(
-                      fontFamily: FontFamily.geoBold,
-                      fontSize: 10,
-                      color: context.ac.secretariatAccentDark,
-                      letterSpacing: 0.4,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccentDark, letterSpacing: 0.4, fontFamily: FontFamily.geoBold),
                   ),
                   const SizedBox(height: 1),
                   Text(
                     noteTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: FontFamily.geoMedium,
-                      fontSize: 13,
-                      color: context.ac.ink,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 13),
                   ),
                   if (noteContent.isNotEmpty) ...[
                     const SizedBox(height: 1),
@@ -82,12 +73,7 @@ class ChatNoteCard extends StatelessWidget {
                       noteContent,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 11,
-                        color: context.ac.muted,
-                        height: 1.4,
-                      ),
+                      style: TextStyles.caption(context).copyWith(fontSize: 11, height: 1.4),
                     ),
                   ],
                 ],
@@ -166,32 +152,19 @@ class ChatEventCard extends StatelessWidget {
                 children: [
                   Text(
                     isUpdate ? 'Événement mis à jour' : 'Événement créé',
-                    style: TextStyle(
-                      fontFamily: FontFamily.geoBold,
-                      fontSize: 10,
-                      color: context.ac.secretariatAccent,
-                      letterSpacing: 0.4,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccent, letterSpacing: 0.4, fontFamily: FontFamily.geoBold),
                   ),
                   const SizedBox(height: 1),
                   Text(
                     eventTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: FontFamily.geoMedium,
-                      fontSize: 13,
-                      color: context.ac.ink,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 13),
                   ),
                   const SizedBox(height: 1),
                   Text(
                     _formattedDate,
-                    style: TextStyle(
-                      fontFamily: FontFamily.sans,
-                      fontSize: 11,
-                      color: context.ac.muted,
-                    ),
+                    style: TextStyles.caption(context).copyWith(fontSize: 11),
                   ),
                 ],
               ),
@@ -247,12 +220,7 @@ class ChatDeleteConfirm extends StatelessWidget {
                   descriptions.length == 1
                       ? 'Amiin souhaite supprimer : ${descriptions.first}'
                       : 'Amiin souhaite supprimer :\n${descriptions.map((d) => '• $d').join('\n')}',
-                  style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 13,
-                    color: context.ac.ink,
-                    height: 1.4,
-                  ),
+                  style: TextStyles.body(context).copyWith(fontSize: 13, height: 1.4),
                 ),
               ),
             ],
@@ -306,12 +274,7 @@ class ChatNoteSuggestion extends StatelessWidget {
               Expanded(
                 child: Text(
                   suggestionText,
-                  style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 13,
-                    color: context.ac.ink,
-                    height: 1.4,
-                  ),
+                  style: TextStyles.body(context).copyWith(fontSize: 13, height: 1.4),
                 ),
               ),
             ],
@@ -357,11 +320,7 @@ class _SuggestionBtn extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
           child: Text(
             label,
-            style: TextStyle(
-              fontFamily: FontFamily.geoMedium,
-              fontSize: 12,
-              color: primary ? context.ac.onAccent : context.ac.muted,
-            ),
+            style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: primary ? context.ac.onAccent : context.ac.muted),
           ),
         ),
       ),

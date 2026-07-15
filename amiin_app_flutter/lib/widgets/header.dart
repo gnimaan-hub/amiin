@@ -71,13 +71,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                       children: [
                         Text(
                           title,
-                          style: TextStyle(
-                            fontFamily: FontFamily.geo,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            letterSpacing: -0.2,
-                            color: textColor,
-                          ),
+                          style: TextStyles.cardTitle(context).copyWith(fontSize: 16, color: textColor, fontWeight: FontWeight.w600, letterSpacing: -0.2, fontFamily: FontFamily.geo),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -85,11 +79,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                           const SizedBox(height: 1),
                           Text(
                             subtitle!,
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 11,
-                              color: subColor,
-                            ),
+                            style: TextStyles.body(context).copyWith(fontSize: 11, color: subColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

@@ -251,11 +251,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: FontFamily.geo,
-                        fontSize: 16,
-                        color: context.ac.ink,
-                      ),
+                      style: TextStyles.cardTitle(context).copyWith(fontSize: 16, fontFamily: FontFamily.geo),
                     ),
                   ),
                   IconButton(
@@ -277,12 +273,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                           child: Text(
                             d,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 10,
-                              color: context.ac.muted,
-                              letterSpacing: 0.5,
-                            ),
+                            style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 0.5, fontFamily: FontFamily.geoBold),
                           ),
                         ))
                     .toList(),
@@ -315,27 +306,18 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                 Text(
                                   ['LU', 'MA', 'ME', 'JE', 'VE', 'SA', 'DI']
                                       [day.weekday - 1],
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.geoBold,
-                                    fontSize: 10,
-                                    letterSpacing: 0.5,
-                                    color: _isSameDay(day, _selectedDay)
+                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: _isSameDay(day, _selectedDay)
                                         ? context.ac.onAccent.withValues(alpha: 0.8)
-                                        : context.ac.muted,
-                                  ),
+                                        : context.ac.muted, letterSpacing: 0.5, fontFamily: FontFamily.geoBold),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   day.day.toString(),
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.geoMedium,
-                                    fontSize: 15,
-                                    color: _isSameDay(day, _selectedDay)
+                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 15, color: _isSameDay(day, _selectedDay)
                                         ? context.ac.onAccent
                                         : _isToday(day)
                                             ? context.ac.secretariatAccent
-                                            : context.ac.ink,
-                                  ),
+                                            : context.ac.ink),
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
@@ -393,15 +375,11 @@ class _AgendaScreenState extends State<AgendaScreen> {
                           children: [
                             Text(
                               day.day.toString(),
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoMedium,
-                                fontSize: 13,
-                                color: _isSameDay(day, _selectedDay)
+                              style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: _isSameDay(day, _selectedDay)
                                     ? context.ac.onAccent
                                     : _isToday(day)
                                         ? context.ac.secretariatAccent
-                                        : context.ac.ink,
-                              ),
+                                        : context.ac.ink),
                             ),
                             if (_eventsForDay(day).isNotEmpty)
                               Row(
@@ -456,11 +434,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     _isToday(_selectedDay)
                         ? "Aujourd'hui"
                         : DateFormat('EEEE d MMMM', 'fr').format(_selectedDay),
-                    style: TextStyle(
-                      fontFamily: FontFamily.geo,
-                      fontSize: 16,
-                      color: context.ac.ink,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 16, fontFamily: FontFamily.geo),
                   ),
                   // Bouton Créer à côté de la date sélectionnée
                   ElevatedButton.icon(
@@ -491,11 +465,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                 child: Center(
                   child: Text(
                     'Aucun événement ce jour.',
-                    style: TextStyle(
-                      fontFamily: FontFamily.sans,
-                      fontSize: 13,
-                      color: context.ac.muted,
-                    ),
+                    style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                   ),
                 ),
               ),
@@ -583,29 +553,17 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                 children: [
                                   Text(
                                     ev.title,
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.geoMedium,
-                                      fontSize: 14,
-                                      color: context.ac.ink,
-                                    ),
+                                    style: TextStyles.cardTitle(context),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     '${DateFormat('HH:mm').format(start)} – ${DateFormat('HH:mm').format(end)}',
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.sans,
-                                      fontSize: 12,
-                                      color: context.ac.muted,
-                                    ),
+                                    style: TextStyles.caption(context),
                                   ),
                                   if (ev.location != null)
                                     Text(
                                       ev.location!,
-                                      style: TextStyle(
-                                        fontFamily: FontFamily.sans,
-                                        fontSize: 12,
-                                        color: context.ac.muted,
-                                      ),
+                                      style: TextStyles.caption(context),
                                     ),
                                 ],
                               ),
@@ -619,11 +577,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                 ),
                                 child: Text(
                                   'Amiin',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.geoBold,
-                                    fontSize: 10,
-                                    color: context.ac.secretariatAccentDark,
-                                  ),
+                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccentDark, fontFamily: FontFamily.geoBold),
                                 ),
                               ),
                           ],

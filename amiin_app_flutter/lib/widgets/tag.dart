@@ -29,12 +29,7 @@ class AmiinTag extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontFamily: FontFamily.geoBold,
-          fontSize: 10,
-          letterSpacing: 0.3,
-          color: config.text,
-        ),
+        style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: config.text, letterSpacing: 0.3, fontFamily: FontFamily.geoBold),
       ),
     );
   }

@@ -48,11 +48,7 @@ class EmptyState extends StatelessWidget {
               ),
             Text(
               title,
-              style: TextStyle(
-                fontFamily: FontFamily.geo,
-                fontSize: 18,
-                color: context.ac.ink,
-              ),
+              style: TextStyles.cardTitle(context).copyWith(fontSize: 18, fontFamily: FontFamily.geo),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null)
@@ -60,12 +56,7 @@ class EmptyState extends StatelessWidget {
                 padding: const EdgeInsets.only(top: Spacing.sm),
                 child: Text(
                   subtitle!,
-                  style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: FontSize.base,
-                    color: context.ac.muted,
-                    height: LineHeight.normal,
-                  ),
+                  style: TextStyles.bodyMuted(context).copyWith(height: LineHeight.normal),
                   textAlign: TextAlign.center,
                 ),
               ),

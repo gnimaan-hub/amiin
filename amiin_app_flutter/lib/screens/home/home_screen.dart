@@ -135,12 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Text(
                               'Amiin',
-                              style: TextStyle(
-                                fontFamily: FontFamily.geoBold,
-                                fontSize: 18,
-                                letterSpacing: 0.5,
-                                color: ac.onHeader,
-                              ),
+                              style: TextStyles.screenTitle(context).copyWith(color: ac.onHeader, letterSpacing: 0.5),
                             ),
                           ),
                           _HeaderIconButton(
@@ -200,13 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 'Parler à Amiin',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.geo,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                  letterSpacing: 0.5,
-                                  color: ac.onHeader.withValues(alpha: 0.45),
-                                ),
+                                style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: ac.onHeader.withValues(alpha: 0.45), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontFamily: FontFamily.geo),
                               ),
                             ],
                           ),
@@ -230,11 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             'Écrivez votre question…',
-                            style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 13,
-                              color: ac.onHeader.withValues(alpha: 0.30),
-                            ),
+                            style: TextStyles.body(context).copyWith(fontSize: 13, color: ac.onHeader.withValues(alpha: 0.30)),
                           ),
                         ),
                       ),
@@ -305,17 +290,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(ev.title, style: TextStyle(
-                                    fontFamily: FontFamily.geoMedium,
-                                    fontSize: 14,
-                                    color: ac.ink,
-                                  )),
+                                  Text(ev.title, style: TextStyles.cardTitle(context)),
                                   const SizedBox(height: 2),
-                                  Text(_formatEventDate(ev.startDate), style: TextStyle(
-                                    fontFamily: FontFamily.sans,
-                                    fontSize: 12,
-                                    color: ac.muted,
-                                  )),
+                                  Text(_formatEventDate(ev.startDate), style: TextStyles.caption(context)),
                                 ],
                               ),
                             ),
@@ -346,22 +323,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(note.title, style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 14,
-                              color: ac.ink,
-                            )),
+                            Text(note.title, style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold)),
                             const SizedBox(height: 4),
                             Text(
                               note.content,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontFamily: FontFamily.sans,
-                                fontSize: 13,
-                                color: ac.muted,
-                                height: 1.5,
-                              ),
+                              style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                             ),
                           ],
                         ),
@@ -423,13 +391,7 @@ class _SectionLabel extends StatelessWidget {
             decoration: BoxDecoration(color: modeColor, borderRadius: BorderRadius.circular(2))),
         Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontFamily: FontFamily.geo,
-            fontWeight: FontWeight.w600,
-            fontSize: 10,
-            letterSpacing: 1.2,
-            color: context.ac.muted,
-          ),
+          style: TextStyles.sectionLabel(context).copyWith(letterSpacing: 1.2),
         ),
         const Spacer(),
         if (action != null)
@@ -440,11 +402,7 @@ class _SectionLabel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: Spacing.xs),
               child: Text(
                 action!.label,
-                style: TextStyle(
-                  fontFamily: FontFamily.geoMedium,
-                  fontSize: 12,
-                  color: modeColor,
-                ),
+                style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: modeColor),
               ),
             ),
           ),
@@ -498,11 +456,7 @@ class _QuickTilesGrid extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       tile.label,
-                      style: TextStyle(
-                        fontFamily: FontFamily.geoBold,
-                        fontSize: 13,
-                        color: tile.text,
-                      ),
+                      style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: tile.text, fontFamily: FontFamily.geoBold),
                     ),
                   ],
                 ),
@@ -528,12 +482,7 @@ class _AgentBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
         border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
-      child: Text('Amiin', style: TextStyle(
-        fontFamily: FontFamily.geoBold,
-        fontSize: 10,
-        letterSpacing: 0.5,
-        color: color,
-      )),
+      child: Text('Amiin', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: color, letterSpacing: 0.5, fontFamily: FontFamily.geoBold)),
     );
   }
 }
@@ -631,19 +580,11 @@ class _BriefTile extends StatelessWidget {
               Text(value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: FontFamily.geoBold,
-                    fontSize: 14,
-                    color: ac.ink,
-                  )),
+                  style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold)),
               Text(label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: FontFamily.sans,
-                    fontSize: 10,
-                    color: ac.muted,
-                  )),
+                  style: TextStyles.caption(context).copyWith(fontSize: 10)),
             ],
           ),
         ),

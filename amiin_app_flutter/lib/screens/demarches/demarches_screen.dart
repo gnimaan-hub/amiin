@@ -169,11 +169,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                           children: [
                             Text(cat.icon, style: const TextStyle(fontSize: 12)),
                             const SizedBox(width: 4),
-                            Text(cat.label, style: TextStyle(
-                              fontFamily: FontFamily.geoMedium,
-                              fontSize: 12,
-                              color: selected ? context.ac.onAccent : context.ac.midTone,
-                            )),
+                            Text(cat.label, style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: selected ? context.ac.onAccent : context.ac.midTone)),
                           ],
                         ),
                       ),
@@ -216,11 +212,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: FontFamily.geoMedium,
-              fontSize: 13,
-              color: isActive ? context.ac.infoAccent : context.ac.muted,
-            ),
+            style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: isActive ? context.ac.infoAccent : context.ac.muted),
           ),
         ),
       ),
@@ -271,11 +263,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
           children: [
             Text(cat.icon, style: const TextStyle(fontSize: 16)),
             const SizedBox(width: Spacing.sm),
-            Text(cat.label, style: TextStyle(
-              fontFamily: FontFamily.geoBold,
-              fontSize: 13,
-              color: context.ac.ink,
-            )),
+            Text(cat.label, style: TextStyles.cardTitle(context).copyWith(fontSize: 13, fontFamily: FontFamily.geoBold)),
             const SizedBox(width: Spacing.sm),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -283,9 +271,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 color: context.ac.surface2,
                 borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
-              child: Text('${items.length}', style: TextStyle(
-                fontFamily: FontFamily.geoBold, fontSize: 10, color: context.ac.midTone,
-              )),
+              child: Text('${items.length}', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.midTone, fontFamily: FontFamily.geoBold)),
             ),
           ],
         ),
@@ -325,24 +311,14 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       Text(d.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: FontFamily.geoBold,
-                          fontSize: 14,
-                          color: context.ac.ink,
-                          height: 1.3,
-                        ),
+                        style: TextStyles.cardTitle(context).copyWith(height: 1.3, fontFamily: FontFamily.geoBold),
                       ),
                       if (d.summary.isNotEmpty) ...[
                         const SizedBox(height: 3),
                         Text(d.summary,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: FontFamily.sans,
-                            fontSize: 12,
-                            color: context.ac.muted,
-                            height: 1.4,
-                          ),
+                          style: TextStyles.caption(context).copyWith(height: 1.4),
                         ),
                       ],
                     ],
@@ -357,11 +333,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                   ),
                   child: Text(
                     isInfo ? 'Info' : 'Démarche',
-                    style: TextStyle(
-                      fontFamily: FontFamily.geoBold,
-                      fontSize: 10,
-                      color: isInfo ? context.ac.infoAccent : context.ac.success,
-                    ),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: isInfo ? context.ac.infoAccent : context.ac.success, fontFamily: FontFamily.geoBold),
                   ),
                 ),
               ],
@@ -397,7 +369,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
         Flexible(
           child: Text(
             label,
-            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+            style: TextStyles.caption(context).copyWith(fontSize: 11),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -476,9 +448,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(ud.demarche.title, style: TextStyle(
-                        fontFamily: FontFamily.geoBold, fontSize: 14, color: context.ac.ink,
-                      )),
+                      child: Text(ud.demarche.title, style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold)),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
@@ -486,16 +456,12 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                         color: _statusBgColor(ud.status),
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                       ),
-                      child: Text(_statusLabel(ud.status), style: TextStyle(
-                        fontFamily: FontFamily.geoBold, fontSize: 11, color: _statusColor(ud.status),
-                      )),
+                      child: Text(_statusLabel(ud.status), style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: _statusColor(ud.status), fontFamily: FontFamily.geoBold)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(ud.demarche.category.label, style: TextStyle(
-                  fontFamily: FontFamily.sans, fontSize: 12, color: context.ac.muted,
-                )),
+                Text(ud.demarche.category.label, style: TextStyles.caption(context)),
                 if (ud.totalSteps > 0) ...[
                   const SizedBox(height: 10),
                   Row(
@@ -516,7 +482,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       const SizedBox(width: Spacing.sm),
                       Text(
                         '${ud.completedSteps}/${ud.totalSteps}',
-                        style: TextStyle(fontFamily: FontFamily.geoBold, fontSize: 11, color: context.ac.midTone),
+                        style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: context.ac.midTone, fontFamily: FontFamily.geoBold),
                       ),
                     ],
                   ),
@@ -525,7 +491,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                     ud.status == DemarcheStatus.terminee
                         ? 'Terminée ✓'
                         : 'Étape ${ud.currentStep} sur ${ud.totalSteps}',
-                    style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+                    style: TextStyles.caption(context).copyWith(fontSize: 11),
                   ),
                 ],
               ],

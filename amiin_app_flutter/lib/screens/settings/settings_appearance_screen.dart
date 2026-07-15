@@ -32,12 +32,7 @@ class SettingsAppearanceScreen extends StatelessWidget {
                     const SettingsSection('Thème graphique'),
                     Text(
                       'Le thème s\'applique immédiatement sur toute l\'application.',
-                      style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 13,
-                        color: context.ac.muted,
-                        height: 1.5,
-                      ),
+                      style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
                     ),
                     const SizedBox(height: Spacing.md),
                     _ThemePicker(current: settings.themeVariant),
@@ -132,11 +127,7 @@ class _ThemePicker extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      Text(v.label, style: TextStyle(
-                        fontFamily: FontFamily.geoBold,
-                        fontSize: 12,
-                        color: c.onHeader,
-                      )),
+                      Text(v.label, style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: c.onHeader, fontFamily: FontFamily.geoBold)),
                     ],
                   ),
                 ),

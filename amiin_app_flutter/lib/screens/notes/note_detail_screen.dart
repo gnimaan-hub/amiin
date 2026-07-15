@@ -87,7 +87,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                   children: [
                     TextField(
                       controller: _titleController,
-                      style: TextStyle(fontFamily: FontFamily.geo, fontSize: 22, color: context.ac.ink),
+                      style: TextStyles.cardTitle(context).copyWith(fontSize: 22, fontFamily: FontFamily.geo),
                       decoration: InputDecoration(
                         hintText: 'Titre',
                         border: UnderlineInputBorder(borderSide: BorderSide(color: context.ac.border)),
@@ -98,19 +98,14 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                     TextField(
                       controller: _contentController,
                       maxLines: null,
-                      style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink, height: 1.5),
+                      style: TextStyles.body(context).copyWith(fontSize: 15),
                       decoration: const InputDecoration(
                         hintText: 'Écrivez votre note ici…',
                         border: InputBorder.none,
                       ),
                     ),
                     const SizedBox(height: Spacing.lg),
-                    Text('Tags', style: TextStyle(
-                      fontFamily: FontFamily.geoBold,
-                      fontSize: 10,
-                      letterSpacing: 1.2,
-                      color: context.ac.muted,
-                    )),
+                    Text('Tags', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: Spacing.sm,
@@ -289,28 +284,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       ? [
                           TextField(
                             controller: _titleController,
-                            style: TextStyle(fontFamily: FontFamily.geo, fontSize: 22, color: context.ac.ink),
+                            style: TextStyles.cardTitle(context).copyWith(fontSize: 22, fontFamily: FontFamily.geo),
                             decoration: const InputDecoration(border: InputBorder.none),
                           ),
                           const SizedBox(height: Spacing.md),
                           TextField(
                             controller: _contentController,
                             maxLines: null,
-                            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink, height: 1.5),
+                            style: TextStyles.body(context).copyWith(fontSize: 15),
                             decoration: const InputDecoration(border: InputBorder.none),
                           ),
                         ]
                       : [
-                          Text(_note!.title, style: TextStyle(
-                            fontFamily: FontFamily.geo,
-                            fontSize: 24,
-                            color: context.ac.ink,
-                            height: 1.2,
-                          )),
+                          Text(_note!.title, style: TextStyles.cardTitle(context).copyWith(fontSize: 24, height: 1.2, fontFamily: FontFamily.geo)),
                           const SizedBox(height: 8),
                           Text(
                             'Modifié le ${DateFormat('d MMMM yyyy', 'fr').format(DateTime.parse(_note!.updatedAt))}${_note!.createdByAgent == true ? ' · Créé par Amiin' : ''}',
-                            style: TextStyle(fontFamily: FontFamily.sans, fontSize: 11, color: context.ac.muted),
+                            style: TextStyles.caption(context).copyWith(fontSize: 11),
                           ),
                           const SizedBox(height: 12),
                           if (_note!.tags.isNotEmpty)
@@ -320,12 +310,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                               children: _note!.tags.map((t) => AmiinTag(label: t)).toList(),
                             ),
                           const SizedBox(height: Spacing.lg),
-                          Text(_note!.content, style: TextStyle(
-                            fontFamily: FontFamily.sans,
-                            fontSize: 15,
-                            color: context.ac.ink,
-                            height: 1.5,
-                          )),
+                          Text(_note!.content, style: TextStyles.body(context).copyWith(fontSize: 15)),
                           if (_note!.agentContext != null) ...[
                             const SizedBox(height: Spacing.lg),
                             Container(
@@ -337,19 +322,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Contexte Amiin', style: TextStyle(
-                                    fontFamily: FontFamily.geoBold,
-                                    fontSize: 10,
-                                    letterSpacing: 1.2,
-                                    color: context.ac.secretariatAccentDark,
-                                  )),
+                                  Text('Contexte Amiin', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.secretariatAccentDark, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                                   const SizedBox(height: 6),
-                                  Text(_note!.agentContext!, style: TextStyle(
-                                    fontFamily: FontFamily.sans,
-                                    fontSize: 13,
-                                    color: context.ac.secretariatAccentDark,
-                                    height: 1.4,
-                                  )),
+                                  Text(_note!.agentContext!, style: TextStyles.body(context).copyWith(fontSize: 13, color: context.ac.secretariatAccentDark, height: 1.4)),
                                 ],
                               ),
                             ),

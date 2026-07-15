@@ -444,25 +444,16 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                           Text(s.name,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontFamily: FontFamily.geoBold,
-                                  fontSize: 14,
-                                  color: context.ac.ink)),
+                              style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold)),
                           if (s.sousCategorie.isNotEmpty)
                             Text(s.sousCategorie,
-                                style: TextStyle(
-                                    fontFamily: FontFamily.sans,
-                                    fontSize: 11,
-                                    color: context.ac.muted)),
+                                style: TextStyles.caption(context).copyWith(fontSize: 11)),
                         ],
                       ),
                     ),
                     if (s.distanceKm != null)
                       Text('${s.distanceKm!.toStringAsFixed(1)} km',
-                          style: TextStyle(
-                              fontFamily: FontFamily.geoBold,
-                              fontSize: 11,
-                              color: context.ac.infoAccent)),
+                          style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: context.ac.infoAccent, fontFamily: FontFamily.geoBold)),
                   ],
                 ),
                 if (s.address.street.isNotEmpty ||
@@ -483,10 +474,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                               .join(', '),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontFamily: FontFamily.sans,
-                              fontSize: 12,
-                              color: context.ac.muted),
+                          style: TextStyles.caption(context),
                         ),
                       ),
                     ],
@@ -495,10 +483,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                 if (s.phone != null && s.phone!.isNotEmpty) ...[
                   const SizedBox(height: 3),
                   Text(s.phone!,
-                      style: TextStyle(
-                          fontFamily: FontFamily.sans,
-                          fontSize: 12,
-                          color: context.ac.infoAccent)),
+                      style: TextStyles.body(context).copyWith(fontSize: 12, color: context.ac.infoAccent)),
                 ],
               ],
             ),
@@ -549,16 +534,9 @@ class _CategoryTile extends StatelessWidget {
                 Text(label,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        fontFamily: FontFamily.geoBold,
-                        fontSize: 12,
-                        color: color,
-                        height: 1.2)),
+                    style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: color, height: 1.2, fontFamily: FontFamily.geoBold)),
                 Text('$count entrées',
-                    style: TextStyle(
-                        fontFamily: FontFamily.sans,
-                        fontSize: 10,
-                        color: color.withValues(alpha: 0.7))),
+                    style: TextStyles.body(context).copyWith(fontSize: 10, color: color.withValues(alpha: 0.7))),
               ],
             ),
           ],
@@ -594,10 +572,7 @@ class _FilterChip extends StatelessWidget {
           border: Border.all(color: selected ? c : context.ac.border),
         ),
         child: Text(label,
-            style: TextStyle(
-                fontFamily: FontFamily.geoMedium,
-                fontSize: 11,
-                color: selected ? context.ac.onAccent : context.ac.midTone)),
+            style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: selected ? context.ac.onAccent : context.ac.midTone)),
       ),
     );
   }
@@ -628,10 +603,7 @@ class _NearbyButton extends StatelessWidget {
                 color: active ? context.ac.infoAccentDark : context.ac.muted),
             const SizedBox(width: 4),
             Text('Proche',
-                style: TextStyle(
-                    fontFamily: FontFamily.geoMedium,
-                    fontSize: 12,
-                    color: active ? context.ac.infoAccentDark : context.ac.muted)),
+                style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: active ? context.ac.infoAccentDark : context.ac.muted)),
           ],
         ),
       ),
