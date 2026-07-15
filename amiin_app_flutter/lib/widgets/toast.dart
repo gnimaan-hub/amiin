@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/spacing.dart';
 import '../theme/themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -89,9 +90,9 @@ class _ToastWidgetState extends State<_ToastWidget>
           child: Center(
             child: Container(
               constraints: const BoxConstraints(maxWidth: 320),
-              margin: const EdgeInsets.symmetric(horizontal: 24),
+              margin: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 10),
               decoration: BoxDecoration(
                 color: widget.success
                     ? context.ac.success

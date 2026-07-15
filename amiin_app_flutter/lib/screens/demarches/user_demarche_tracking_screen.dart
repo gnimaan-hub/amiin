@@ -9,6 +9,8 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
+import '../../widgets/toast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../theme/themes.dart';
@@ -53,7 +55,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       if (mounted) setState(() { _ud = ud; _loading = false; });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Démarche introuvable.')));
+        AmiinToast.show(context, 'Démarche introuvable.');
         context.pop();
       }
     }
@@ -80,7 +82,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     if (ctrl == null) return;
     await demarchesService.addStepNote(widget.userDemarcheId, stepOrder, ctrl.text);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Note enregistrée.')));
+      AmiinToast.show(context, 'Note enregistrée.');
     }
   }
 
@@ -93,7 +95,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       await demarchesService.setStepAgendaEvent(widget.userDemarcheId, stepOrder, result);
       final updated = await demarchesService.getUserDemarche(widget.userDemarcheId);
       if (mounted) setState(() => _ud = updated);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rendez-vous ajouté à l\'agenda.')));
+      if (mounted) AmiinToast.show(context, 'Rendez-vous ajouté à l\'agenda.');
     }
   }
 
@@ -109,9 +111,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       scheduledAt: picked,
     );
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}')),
-      );
+      AmiinToast.show(context, 'Rappel fixé le ${DateFormat('dd/MM/yyyy à HH:mm', 'fr').format(picked)}');
     }
   }
 
@@ -169,7 +169,8 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       body: SafeArea(
         child: Column(
           children: [
-            AmiinHeader(title: d.title, back: true, rightAction: IconButton(
+            AmiinHeader(
+              mode: AmiinMode.info,title: d.title, back: true, rightAction: IconButton(
               icon: Icon(Icons.more_vert, color: context.ac.midTone),
               onPressed: _showMenu,
             )),
@@ -654,7 +655,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
                 minimumSize: Size.zero,
@@ -780,9 +781,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     if (results.isNotEmpty) {
       context.go('/annuaire/${results.first.id}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
-      );
+      AmiinToast.show(context, '« ${org.nom} » introuvable dans l\'annuaire.');
       context.go('/annuaire');
     }
   }

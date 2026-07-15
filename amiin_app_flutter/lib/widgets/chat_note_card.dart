@@ -43,7 +43,7 @@ class ChatNoteCard extends StatelessWidget {
               height: 34,
               decoration: BoxDecoration(
                 color: context.ac.secretariatAccent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_note_outlined : Icons.note_outlined,
@@ -151,7 +151,7 @@ class ChatEventCard extends StatelessWidget {
               height: 34,
               decoration: BoxDecoration(
                 color: context.ac.secretariatAccent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
               child: Icon(
                 isUpdate ? Icons.edit_calendar_outlined : Icons.event_outlined,
@@ -354,7 +354,7 @@ class _SuggestionBtn extends StatelessWidget {
         onTap: onTap,
         customBorder: const StadiumBorder(),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 6),
           child: Text(
             label,
             style: TextStyle(

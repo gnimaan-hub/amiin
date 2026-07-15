@@ -1,6 +1,7 @@
 // ─── DemarcheDetailScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../theme/themes.dart';
@@ -37,9 +38,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
       if (mounted) setState(() { _demarche = d; _loading = false; });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossible de charger cette démarche.')),
-        );
+        AmiinToast.show(context, 'Impossible de charger cette démarche.');
         setState(() => _loading = false);
       }
     }
@@ -50,14 +49,12 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     try {
       final ud = await demarchesService.startDemarche(widget.demarcheId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Démarche démarrée — retrouvez-la dans « Mes démarches ».')),
-        );
+        AmiinToast.show(context, 'Démarche démarrée — retrouvez-la dans « Mes démarches ».');
         context.pushReplacement('/demarches/user/${ud.id}');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))));
+        AmiinToast.show(context, e.toString().replaceAll('Exception: ', ''));
       }
     } finally {
       if (mounted) setState(() => _starting = false);
@@ -96,7 +93,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
                           decoration: BoxDecoration(
                             color: isInfo ? context.ac.infoAccentLight : context.ac.successLight,
                             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -185,7 +182,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                               if (cas != null) ...[
                                 const SizedBox(height: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                                   decoration: BoxDecoration(
                                     color: context.ac.surface2,
                                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -263,9 +260,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
     if (results.isNotEmpty) {
       context.go('/annuaire/${results.first.id}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('« ${org.nom} » introuvable dans l\'annuaire.')),
-      );
+      AmiinToast.show(context, '« ${org.nom} » introuvable dans l\'annuaire.');
       context.go('/annuaire');
     }
   }
@@ -311,7 +306,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
                 minimumSize: Size.zero,
@@ -354,7 +349,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
   Widget _metaChip(String icon, String label) {
     final truncated = label.length > 50 ? '${label.substring(0, 47)}…' : label;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
       decoration: BoxDecoration(
         color: context.ac.surface,
         border: Border.all(color: context.ac.border),

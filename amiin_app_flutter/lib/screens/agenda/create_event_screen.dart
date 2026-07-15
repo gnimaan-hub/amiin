@@ -1,6 +1,8 @@
 // ─── CreateEventScreen (création + édition) ─────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
+import '../../widgets/toast.dart';
 import 'package:intl/intl.dart';
 import '../../theme/colors.dart';
 import '../../theme/themes.dart';
@@ -110,18 +112,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Future<void> _save() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le titre est requis.', success: false);
       return;
     }
     if (!_endDate.isAfter(_startDate)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('La date de fin doit être après la date de début.'),
-          backgroundColor: context.ac.secretariatAccent,
-        ),
-      );
+      AmiinToast.show(context, 'La date de fin doit être après la date de début.', success: false);
       return;
     }
     setState(() => _loading = true);
@@ -138,9 +133,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           'reminder': _reminder,
         });
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Événement modifié'), backgroundColor: context.ac.success),
-          );
+          AmiinToast.show(context, 'Événement modifié');
         }
       } else {
         // Création
@@ -154,17 +147,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           reminder: _reminder,
         ));
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Événement créé'), backgroundColor: context.ac.success),
-          );
+          AmiinToast.show(context, 'Événement créé');
         }
       }
       if (mounted) { Navigator.pop(context); }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur : ${e.toString()}'), backgroundColor: context.ac.secretariatAccent),
-        );
+        AmiinToast.show(context, 'Erreur : ${e.toString()}', success: false);
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -180,6 +169,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: isEditing ? 'Modifier événement' : 'Nouvel événement',
               back: true,
             ),

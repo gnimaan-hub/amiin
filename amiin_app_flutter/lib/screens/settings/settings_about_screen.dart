@@ -1,6 +1,7 @@
 // ─── SettingsAboutScreen ── À propos & Support ────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -40,7 +41,7 @@ class SettingsAboutScreen extends StatelessWidget {
                             height: 72,
                             decoration: BoxDecoration(
                               color: primary,
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                             ),
                             child: Center(
                               child: Text('A', style: TextStyle(
@@ -53,7 +54,7 @@ class SettingsAboutScreen extends StatelessWidget {
                           const SizedBox(height: Spacing.md),
                           Text('Amiin', style: TextStyle(
                             fontFamily: FontFamily.geo,
-                            fontSize: 26,
+                            fontSize: FontSize.xxl,
                             color: primary,
                             letterSpacing: 2,
                           )),
@@ -265,9 +266,7 @@ class SettingsAboutScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Rapport envoyé — merci !')),
-              );
+              AmiinToast.show(context, 'Rapport envoyé — merci !');
             },
             child: const Text('Envoyer'),
           ),

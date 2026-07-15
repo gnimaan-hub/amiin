@@ -194,18 +194,18 @@ class _SettingsProfileScreenState extends State<SettingsProfileScreen> {
         fillColor: context.ac.surface,
         hintStyle: TextStyle(color: context.ac.muted, fontFamily: FontFamily.sans),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           borderSide: BorderSide(color: context.ac.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           borderSide: BorderSide(color: context.ac.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 13),
       ),
       style: TextStyle(fontFamily: FontFamily.sans, fontSize: 15, color: context.ac.ink),
     );
@@ -236,7 +236,7 @@ class _BirthYearPicker extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(Spacing.lg),
                   child: Text('Année de naissance', style: TextStyle(
                     fontFamily: FontFamily.geoBold, fontSize: 16, color: context.ac.ink,
                   )),
@@ -272,10 +272,10 @@ class _BirthYearPicker extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 13),
         decoration: BoxDecoration(
           color: context.ac.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           border: Border.all(color: context.ac.border),
         ),
         child: Row(
@@ -323,10 +323,10 @@ class _EmploymentPicker extends StatelessWidget {
         return GestureDetector(
           onTap: () => onChanged(opt.$1),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 9),
             decoration: BoxDecoration(
               color: selected ? primary.withValues(alpha: 0.1) : context.ac.surface,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(RadiusAmiin.full),
               border: Border.all(
                 color: selected ? primary : context.ac.border,
                 width: selected ? 1.5 : 1,
@@ -343,5 +343,4 @@ class _EmploymentPicker extends StatelessWidget {
     );
   }
 }
-
 

@@ -81,7 +81,7 @@ class _ThemePicker extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(RadiusAmiin.lg),
               border: Border.all(
                 color: selected ? c.primary : Colors.transparent,
                 width: 2.5,
@@ -98,7 +98,7 @@ class _ThemePicker extends StatelessWidget {
                     height: 28,
                     decoration: BoxDecoration(
                       color: c.background,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

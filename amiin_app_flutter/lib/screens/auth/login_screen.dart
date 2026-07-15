@@ -1,6 +1,7 @@
 // ─── LoginScreen ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../theme/spacing.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../../theme/colors.dart';
@@ -56,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: ColorsAmiin.encreNuit,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: Spacing.xxxl),
           child: Form(
             key: _formKey,
             child: Column(
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: FontFamily.geo,
-                    fontSize: 26,
+                    fontSize: FontSize.xxl,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                     color: ColorsAmiin.onDark,
@@ -178,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: ColorsAmiin.onDark,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(RadiusAmiin.lg),
                       side: BorderSide(
                         color: ColorsAmiin.onDark.withValues(alpha: 0.18),
                       ),

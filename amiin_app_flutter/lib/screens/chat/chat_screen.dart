@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -630,7 +631,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: Spacing.md,
-                  vertical: 4,
+                  vertical: Spacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: ac.surface2,
@@ -781,7 +782,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 DateFormat('HH:mm').format(msg.timestamp),
                 style: TextStyle(
                   fontFamily: FontFamily.mono,
-                  fontSize: 9,
+                  fontSize: 10,
                   color: ac.muted,
                 ),
               ),
@@ -791,7 +792,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   onTap: () => _speakingMsgId == msg.id
                       ? _stopSpeaking()
                       : _speak(msg.content, msgId: msg.id),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(RadiusAmiin.md),
                   child: Padding(
                     padding: const EdgeInsets.all(3),
                     child: Icon(
@@ -854,7 +855,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         parts.join(' '),
         style: TextStyle(
           fontFamily: FontFamily.mono,
-          fontSize: 9,
+          fontSize: 10,
           color: ac.muted.withValues(alpha: 0.6),
         ),
       ),
@@ -1006,7 +1007,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     width: 42,
                     height: 42,
                     child: Center(
-                      child: SvgPicture.string(_sendSvg, width: 18, height: 18),
+                      child: SvgPicture.string(AmiinSvgIcons.send, width: 18, height: 18),
                     ),
                   ),
                 ),
@@ -1129,12 +1130,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Material(
                   color: ac.surface,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
                     side: BorderSide(color: ac.border),
                   ),
                   child: InkWell(
                     onTap: () => _sendMessage(q),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: Spacing.lg,
@@ -1171,12 +1172,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  static const String _sendSvg = '''
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M22 2L11 13" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  ''';
 }
 
 // ── Avatar Amiin ───────────────────────────────────────────────────────────────
@@ -1258,7 +1253,7 @@ class _ThinkingBubbleState extends State<_ThinkingBubble>
   Widget build(BuildContext context) {
     final ac = context.ac;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: Spacing.md),
       decoration: BoxDecoration(
         color: ac.surface,
         borderRadius: const BorderRadius.only(

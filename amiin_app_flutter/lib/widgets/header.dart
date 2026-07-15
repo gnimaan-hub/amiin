@@ -1,6 +1,7 @@
 // ─── AmiinHeader ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../theme/spacing.dart';
 import '../theme/typography.dart';
 import '../theme/themes.dart';
 import 'horizon_line.dart';
@@ -43,7 +44,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
         children: [
           SizedBox(height: paddingTop + 8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
             child: SizedBox(
               height: 44,
               child: Row(
@@ -73,7 +74,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                           style: TextStyle(
                             fontFamily: FontFamily.geo,
                             fontWeight: FontWeight.w600,
-                            fontSize: 17,
+                            fontSize: 16,
                             letterSpacing: -0.2,
                             color: textColor,
                           ),

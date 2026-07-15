@@ -79,7 +79,7 @@ class SettingRow extends StatelessWidget {
                 color: destructive
                     ? Colors.red.withValues(alpha: 0.08)
                     : primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(RadiusAmiin.sm),
               ),
               child: Icon(
                 icon,
@@ -196,7 +196,7 @@ class ChoiceSelector extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
                 color: selected ? primary : context.ac.surface2,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(RadiusAmiin.md),
               ),
               child: Text(
                 labels[i],

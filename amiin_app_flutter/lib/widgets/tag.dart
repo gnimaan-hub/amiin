@@ -7,7 +7,6 @@ import '../theme/typography.dart';
 
 enum TagVariant { default_, turquoise, ocre, success, alert }
 
-
 class AmiinTag extends StatelessWidget {
   final String label;
   final TagVariant variant;

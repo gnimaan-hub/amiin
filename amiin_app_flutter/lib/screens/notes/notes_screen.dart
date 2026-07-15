@@ -3,6 +3,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -123,9 +125,10 @@ class _NotesScreenState extends State<NotesScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Notes',
               rightAction: IconButton(
-                icon: SvgPicture.string(_plusSvg, width: 22, height: 22),
+                icon: SvgPicture.string(AmiinSvgIcons.plusSvg2, width: 22, height: 22),
                 onPressed: () =>
                     context.push('/notes/create').then((_) => _loadData()),
               ),
@@ -183,7 +186,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 background: Container(
                                   decoration: BoxDecoration(
                                     color: context.ac.alertColor,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(RadiusAmiin.lg),
                                   ),
                                   alignment: Alignment.centerRight,
                                   padding: const EdgeInsets.only(right: 20),
@@ -359,11 +362,5 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  static const String _plusSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 4v14M4 11h14" stroke="#B85530" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  ''';
 }
-
 

@@ -41,7 +41,7 @@ class AmiinButton extends StatelessWidget {
         disabledBackgroundColor: config.bg.withValues(alpha: 0.4),
         disabledForegroundColor: config.text.withValues(alpha: 0.4),
         side: BorderSide(color: config.border),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusAmiin.md)),
         elevation: 0,
         padding: EdgeInsets.symmetric(horizontal: sizeConfig.px),
         minimumSize: fullWidth ? Size(double.infinity, sizeConfig.height) : Size(0, sizeConfig.height),

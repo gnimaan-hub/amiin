@@ -1,6 +1,9 @@
 // ─── NoteDetailScreen & CreateNoteScreen ─────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
+import '../../widgets/toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +28,6 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   final _tagInputController = TextEditingController();
   final List<String> _tags = [];
 
-
   void _addTag() {
     final t = _tagInputController.text.trim().toLowerCase();
     if (t.isNotEmpty && !_tags.contains(t)) {
@@ -40,15 +42,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
 
   Future<void> _save() async {
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le titre est requis.', success: false);
       return;
     }
     if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le contenu ne peut pas être vide.', success: false);
       return;
     }
     try {
@@ -60,7 +58,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        AmiinToast.show(context, e.toString());
       }
     }
   }
@@ -73,10 +71,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Nouvelle note',
               back: true,
               rightAction: IconButton(
-                icon: SvgPicture.string(_checkSvg, width: 22, height: 22),
+                icon: SvgPicture.string(AmiinSvgIcons.check, width: 22, height: 22),
                 onPressed: _save,
               ),
             ),
@@ -156,11 +155,6 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
     );
   }
 
-  static const String _checkSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 12l5 5 9-10" stroke="#B85530" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  ''';
 }
 
 // ── Écran de détail / modification ───────────────────────────────────────────
@@ -208,7 +202,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible de charger la note.')));
+        AmiinToast.show(context, 'Impossible de charger la note.');
         setState(() => _loading = false);
       }
     }
@@ -217,15 +211,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _save() async {
     if (_note == null) return;
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le titre est requis.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le titre est requis.', success: false);
       return;
     }
     if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Le contenu ne peut pas être vide.'), backgroundColor: context.ac.secretariatAccent),
-      );
+      AmiinToast.show(context, 'Le contenu ne peut pas être vide.', success: false);
       return;
     }
     try {
@@ -241,7 +231,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        AmiinToast.show(context, e.toString());
       }
     }
   }
@@ -277,15 +267,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: _editing ? 'Modifier' : 'Note',
               back: true,
               rightAction: _editing
                   ? IconButton(
-                      icon: SvgPicture.string(_checkSvg, width: 22, height: 22),
+                      icon: SvgPicture.string(AmiinSvgIcons.check, width: 22, height: 22),
                       onPressed: _save,
                     )
                   : IconButton(
-                      icon: SvgPicture.string(_editSvg, width: 20, height: 20),
+                      icon: SvgPicture.string(AmiinSvgIcons.edit, width: 20, height: 20),
                       onPressed: () => setState(() => _editing = true),
                     ),
             ),
@@ -380,15 +371,5 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  static const String _checkSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 12l5 5 9-10" stroke="#B85530" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  ''';
-  static const String _editSvg = '''
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 2l4 4-10 10H4v-4L14 2z" stroke="#B85530" stroke-width="1.6" stroke-linejoin="round"/>
-    </svg>
-  ''';
 }
 

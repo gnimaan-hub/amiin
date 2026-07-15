@@ -74,10 +74,10 @@ class SettingsTextScreen extends StatelessWidget {
                           const SizedBox(height: Spacing.sm),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(Spacing.md),
                             decoration: BoxDecoration(
                               color: ac.background,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(RadiusAmiin.md),
                             ),
                             child: Text(
                               'Aperçu : Amiin vous aide avec vos démarches administratives à Djibouti.',

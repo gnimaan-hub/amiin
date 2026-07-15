@@ -1,6 +1,9 @@
 ﻿// â”€â”€â”€ ServiceDetailScreen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
+import '../../widgets/toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,7 +45,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible de charger le service')));
+      AmiinToast.show(context, 'Impossible de charger le service');
       setState(() => _loading = false);
     }
   }
@@ -61,7 +64,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       if (!mounted) return;
     } else {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible dâ€™ouvrir le lien')));
+      AmiinToast.show(context, 'Impossible dâ€™ouvrir le lien');
     }
   }
 
@@ -80,11 +83,12 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.info,
               title: 'Service',
               back: true,
               rightAction: IconButton(
                 icon: SvgPicture.string(
-                  _heartSvg,
+                  AmiinSvgIcons.heart,
                   width: 22,
                   height: 22,
                   colorFilter: ColorFilter.mode(
@@ -252,10 +256,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   Widget _tagChip(String label, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(RadiusAmiin.xl),
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Text(label, style: TextStyle(
@@ -265,9 +269,4 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         )),
       );
 
-  static const String _heartSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 19S3 13 3 7.5A5 5 0 0111 4a5 5 0 018 3.5C19 13 11 19 11 19z" stroke="currentColor" stroke-width="1.6" fill="none"/>
-    </svg>
-  ''';
 }

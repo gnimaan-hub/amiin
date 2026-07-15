@@ -1,6 +1,8 @@
 // ─── EventDetailScreen ───────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
+import '../../widgets/toast.dart';
 import 'package:intl/intl.dart';
 import './create_event_screen.dart';
 import '../../theme/themes.dart';
@@ -41,9 +43,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossible de charger l’événement.')),
-        );
+        AmiinToast.show(context, 'Impossible de charger l’événement.');
         setState(() => _loading = false);
       }
     }
@@ -69,16 +69,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       try {
         await agendaService.deleteEvent(widget.eventId);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Événement supprimé'), backgroundColor: context.ac.success),
-          );
+          AmiinToast.show(context, 'Événement supprimé');
           Navigator.pop(context); // retour à l'agenda
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur lors de la suppression : $e'), backgroundColor: context.ac.secretariatAccent),
-          );
+          AmiinToast.show(context, 'Erreur lors de la suppression : $e', success: false);
         }
       }
     }
@@ -133,6 +129,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Événement',
               back: true,
               rightAction: SizedBox(

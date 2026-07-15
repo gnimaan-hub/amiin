@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
@@ -122,7 +123,8 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const AmiinHeader(title: 'Démarches'),
+            const AmiinHeader(
+              mode: AmiinMode.info,title: 'Démarches'),
             // Onglets Catalogue / Mes démarches
             Container(
               color: context.ac.surface,
@@ -204,7 +206,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _tabIndex = index),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.md),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(
               color: isActive ? context.ac.infoAccent : Colors.transparent,
@@ -479,7 +481,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       )),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
                       decoration: BoxDecoration(
                         color: _statusBgColor(ud.status),
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),

@@ -1,6 +1,7 @@
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -193,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Center(
-                                  child: SvgPicture.string(_micSvg, width: 22, height: 26),
+                                  child: SvgPicture.string(AmiinSvgIcons.mic, width: 22, height: 26),
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -378,13 +379,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  static const String _micSvg = '''
-    <svg width="22" height="26" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="1" width="10" height="16" rx="5" stroke="white" stroke-width="2"/>
-      <path d="M3 15a10 10 0 0020 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      <path d="M13 25v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  ''';
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
@@ -443,7 +437,7 @@ class _SectionLabel extends StatelessWidget {
             onTap: action!.onTap,
             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: Spacing.xs),
               child: Text(
                 action!.label,
                 style: TextStyle(
@@ -487,10 +481,10 @@ class _QuickTilesGrid extends StatelessWidget {
       children: tiles.map((tile) {
         return Material(
           color: tile.bg,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
           child: InkWell(
             onTap: () => context.go('/${tile.tab}'),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(RadiusAmiin.md),
             child: SizedBox(
               width: w,
               child: Padding(
@@ -536,7 +530,7 @@ class _AgentBadge extends StatelessWidget {
       ),
       child: Text('Amiin', style: TextStyle(
         fontFamily: FontFamily.geoBold,
-        fontSize: 9,
+        fontSize: 10,
         letterSpacing: 0.5,
         color: color,
       )),
@@ -647,7 +641,7 @@ class _BriefTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: FontFamily.sans,
-                    fontSize: 10.5,
+                    fontSize: 10,
                     color: ac.muted,
                   )),
             ],

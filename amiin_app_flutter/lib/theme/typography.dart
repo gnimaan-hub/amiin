@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'colors.dart';
+import 'themes.dart';
 
 class FontFamily {
   // Géométrique sobre — titres, labels, navigation
@@ -56,54 +56,70 @@ class LetterSpacing {
 }
 
 class TextStyles {
-  static TextStyle screenTitle(BuildContext context) => GoogleFonts.inter(
-        fontWeight: FontWeight.w600,
-        fontSize: FontSize.xl,
-        color: ColorsAmiin.ink,
+  // ── Styles nommés, theme-aware (context.ac) ─────────────────────────────
+  // Règle de la refonte : les écrans utilisent CES styles (copyWith au besoin
+  // pour la couleur d'accent), plus de TextStyle artisanal.
+
+  /// Grand titre d'écran héros (accueil, auth).
+  static TextStyle displayTitle(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.geoBold,
+        fontSize: FontSize.xxl,
+        color: context.ac.ink,
+        letterSpacing: LetterSpacing.tight,
+        height: LineHeight.tight,
+      );
+
+  /// Titre d'écran standard (headers).
+  static TextStyle screenTitle(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.geoBold,
+        fontSize: FontSize.lg,
+        color: context.ac.ink,
         letterSpacing: LetterSpacing.tight,
       );
 
-  static TextStyle sectionTitle(BuildContext context) => GoogleFonts.inter(
+  /// Label de section en capitales (ACCÈS RAPIDE, AUJOURD'HUI…).
+  static TextStyle sectionLabel(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.geo,
         fontWeight: FontWeight.w600,
-        fontSize: FontSize.md,
-        color: ColorsAmiin.ink,
-        letterSpacing: LetterSpacing.tight,
-      );
-
-  static TextStyle body(BuildContext context) => GoogleFonts.dmSans(
-        fontWeight: FontWeight.w400,
-        fontSize: FontSize.base,
-        color: ColorsAmiin.ink,
-        height: LineHeight.normal,
-      );
-
-  static TextStyle bodyMuted(BuildContext context) => GoogleFonts.dmSans(
-        fontWeight: FontWeight.w400,
-        fontSize: FontSize.base,
-        color: ColorsAmiin.muted,
-        height: LineHeight.normal,
-      );
-
-  static TextStyle label(BuildContext context) => GoogleFonts.inter(
-        fontWeight: FontWeight.w500,
         fontSize: FontSize.xs,
-        color: ColorsAmiin.muted,
-        letterSpacing: LetterSpacing.wider,
+        color: context.ac.muted,
+        letterSpacing: LetterSpacing.widest * 0.6,
       );
 
-  static TextStyle caption(BuildContext context) => GoogleFonts.dmSans(
-        fontWeight: FontWeight.w400,
+  /// Titre d'une carte ou d'un élément de liste.
+  static TextStyle cardTitle(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.geoMedium,
+        fontSize: FontSize.base,
+        color: context.ac.ink,
+      );
+
+  /// Corps de texte.
+  static TextStyle body(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.sans,
+        fontSize: FontSize.base,
+        color: context.ac.ink,
+        height: LineHeight.normal,
+      );
+
+  /// Corps atténué (sous-titres, descriptions).
+  static TextStyle bodyMuted(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.sans,
+        fontSize: FontSize.base,
+        color: context.ac.muted,
+        height: LineHeight.normal,
+      );
+
+  /// Métadonnées, horodatages, légendes.
+  static TextStyle caption(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.sans,
         fontSize: FontSize.sm,
-        color: ColorsAmiin.muted,
+        color: context.ac.muted,
       );
 
-  // Pour les sources et références — signal visuel "donnée vérifiable"
-  static TextStyle sourceRef(BuildContext context) => GoogleFonts.spaceMono(
-        fontWeight: FontWeight.w400,
+  /// Sources et références vérifiables (mono).
+  static TextStyle sourceRef(BuildContext context) => TextStyle(
+        fontFamily: FontFamily.mono,
         fontSize: FontSize.xs,
-        color: ColorsAmiin.muted,
+        color: context.ac.muted,
       );
-
-  @Deprecated('Use screenTitle')
-  static TextStyle tagline(BuildContext context) => screenTitle(context);
 }

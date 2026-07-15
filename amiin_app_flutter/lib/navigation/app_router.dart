@@ -52,6 +52,35 @@ Color _horizonColor(BuildContext context, int index) {
   return context.ac.muted;
 }
 
+
+// ── Transitions de pages de la marque ─────────────────────────────────────────
+// Sous-écrans (détail, création, réglages) : glissement montant + fondu,
+// 260 ms, courbe décélérée — le même langage de mouvement que le widget
+// d'accueil et les toasts.
+
+CustomTransitionPage<T> _amiinPage<T>(GoRouterState state, Widget child) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 260),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved =
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.04),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   refreshListenable: authService,
@@ -148,17 +177,17 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'create',
                   name: 'createEvent',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final date = state.uri.queryParameters['date'];
-                    return CreateEventScreen(initialDate: date);
+                    return _amiinPage(state, CreateEventScreen(initialDate: date));
                   },
                 ),
                 GoRoute(
                   path: 'event/:eventId',
                   name: 'eventDetail',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final eventId = state.pathParameters['eventId']!;
-                    return EventDetailScreen(eventId: eventId);
+                    return _amiinPage(state, EventDetailScreen(eventId: eventId));
                   },
                 ),
               ],
@@ -176,14 +205,15 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'create',
                   name: 'createNote',
-                  builder: (context, state) => const CreateNoteScreen(),
+                  pageBuilder: (context, state) =>
+                      _amiinPage(state, const CreateNoteScreen()),
                 ),
                 GoRoute(
                   path: ':noteId',
                   name: 'noteDetail',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final noteId = state.pathParameters['noteId']!;
-                    return NoteDetailScreen(noteId: noteId);
+                    return _amiinPage(state, NoteDetailScreen(noteId: noteId));
                   },
                 ),
               ],
@@ -201,9 +231,9 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: ':serviceId',
                   name: 'serviceDetail',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final serviceId = state.pathParameters['serviceId']!;
-                    return ServiceDetailScreen(serviceId: serviceId);
+                    return _amiinPage(state, ServiceDetailScreen(serviceId: serviceId));
                   },
                 ),
               ],
@@ -221,17 +251,17 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: 'user/:userDemarcheId',
                   name: 'userDemarche',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final userDemarcheId = state.pathParameters['userDemarcheId']!;
-                    return UserDemarcheTrackingScreen(userDemarcheId: userDemarcheId);
+                    return _amiinPage(state, UserDemarcheTrackingScreen(userDemarcheId: userDemarcheId));
                   },
                 ),
                 GoRoute(
                   path: ':demarcheId',
                   name: 'demarcheDetail',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final demarcheId = state.pathParameters['demarcheId']!;
-                    return DemarcheDetailScreen(demarcheId: demarcheId);
+                    return _amiinPage(state, DemarcheDetailScreen(demarcheId: demarcheId));
                   },
                 ),
               ],
@@ -243,19 +273,20 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       name: 'settings',
-      builder: (context, state) => const SettingsScreen(),
+      pageBuilder: (context, state) =>
+          _amiinPage(state, const SettingsScreen()),
       routes: [
-        GoRoute(path: 'profile',       name: 'settingsProfile',       builder: (c, s) => const SettingsProfileScreen()),
-        GoRoute(path: 'account',       name: 'settingsAccount',       builder: (c, s) => const SettingsAccountScreen()),
-        GoRoute(path: 'security',      name: 'settingsSecurity',      builder: (c, s) => const SettingsSecurityScreen()),
-        GoRoute(path: 'assistant',     name: 'settingsAssistant',     builder: (c, s) => const SettingsAssistantScreen()),
-        GoRoute(path: 'appearance',    name: 'settingsAppearance',    builder: (c, s) => const SettingsAppearanceScreen()),
-        GoRoute(path: 'text',          name: 'settingsText',          builder: (c, s) => const SettingsTextScreen()),
-        GoRoute(path: 'notifications', name: 'settingsNotifications', builder: (c, s) => const SettingsNotificationsScreen()),
-        GoRoute(path: 'language',      name: 'settingsLanguage',      builder: (c, s) => const SettingsLanguageScreen()),
-        GoRoute(path: 'privacy',       name: 'settingsPrivacy',       builder: (c, s) => const SettingsPrivacyScreen()),
-        GoRoute(path: 'billing',       name: 'settingsBilling',       builder: (c, s) => const SettingsBillingScreen()),
-        GoRoute(path: 'about',         name: 'settingsAbout',         builder: (c, s) => const SettingsAboutScreen()),
+        GoRoute(path: 'profile',       name: 'settingsProfile',       pageBuilder: (c, s) => _amiinPage(s, const SettingsProfileScreen())),
+        GoRoute(path: 'account',       name: 'settingsAccount',       pageBuilder: (c, s) => _amiinPage(s, const SettingsAccountScreen())),
+        GoRoute(path: 'security',      name: 'settingsSecurity',      pageBuilder: (c, s) => _amiinPage(s, const SettingsSecurityScreen())),
+        GoRoute(path: 'assistant',     name: 'settingsAssistant',     pageBuilder: (c, s) => _amiinPage(s, const SettingsAssistantScreen())),
+        GoRoute(path: 'appearance',    name: 'settingsAppearance',    pageBuilder: (c, s) => _amiinPage(s, const SettingsAppearanceScreen())),
+        GoRoute(path: 'text',          name: 'settingsText',          pageBuilder: (c, s) => _amiinPage(s, const SettingsTextScreen())),
+        GoRoute(path: 'notifications', name: 'settingsNotifications', pageBuilder: (c, s) => _amiinPage(s, const SettingsNotificationsScreen())),
+        GoRoute(path: 'language',      name: 'settingsLanguage',      pageBuilder: (c, s) => _amiinPage(s, const SettingsLanguageScreen())),
+        GoRoute(path: 'privacy',       name: 'settingsPrivacy',       pageBuilder: (c, s) => _amiinPage(s, const SettingsPrivacyScreen())),
+        GoRoute(path: 'billing',       name: 'settingsBilling',       pageBuilder: (c, s) => _amiinPage(s, const SettingsBillingScreen())),
+        GoRoute(path: 'about',         name: 'settingsAbout',         pageBuilder: (c, s) => _amiinPage(s, const SettingsAboutScreen())),
       ],
     ),
   ],

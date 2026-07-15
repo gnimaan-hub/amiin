@@ -1,6 +1,7 @@
 // ─── SettingsBillingScreen ────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/toast.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -36,10 +37,10 @@ class SettingsBillingScreen extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: Spacing.xs),
                                 decoration: BoxDecoration(
                                   color: primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                                 ),
                                 child: Text('GRATUIT', style: TextStyle(
                                   fontFamily: FontFamily.geoBold,
@@ -82,7 +83,7 @@ class SettingsBillingScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 13),
                             decoration: BoxDecoration(
                               color: primary,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(RadiusAmiin.lg),
                             ),
                             child: const Text(
                               'Passer à Amiin Pro — Bientôt disponible',
@@ -157,9 +158,7 @@ class SettingsBillingScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fonctionnalité bientôt disponible')),
-              );
+              AmiinToast.show(context, 'Fonctionnalité bientôt disponible');
             },
             child: const Text('Appliquer'),
           ),

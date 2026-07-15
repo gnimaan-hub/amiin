@@ -23,7 +23,6 @@ class RadiusAmiin {
   static const double full = 9999.0;
 }
 
-
 class ShadowAmiin {
   static List<BoxShadow> get sm => [
         BoxShadow(
