@@ -96,7 +96,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
                           decoration: BoxDecoration(
                             color: isInfo ? context.ac.infoAccentLight : context.ac.successLight,
                             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -185,7 +185,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
                               if (cas != null) ...[
                                 const SizedBox(height: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                                   decoration: BoxDecoration(
                                     color: context.ac.surface2,
                                     borderRadius: BorderRadius.circular(RadiusAmiin.sm),
@@ -311,7 +311,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
                 minimumSize: Size.zero,
@@ -354,7 +354,7 @@ class _DemarcheDetailScreenState extends State<DemarcheDetailScreen> {
   Widget _metaChip(String icon, String label) {
     final truncated = label.length > 50 ? '${label.substring(0, 47)}…' : label;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
       decoration: BoxDecoration(
         color: context.ac.surface,
         border: Border.all(color: context.ac.border),

@@ -204,7 +204,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _tabIndex = index),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.md),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(
               color: isActive ? context.ac.infoAccent : Colors.transparent,
@@ -479,7 +479,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                       )),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
                       decoration: BoxDecoration(
                         color: _statusBgColor(ud.status),
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),

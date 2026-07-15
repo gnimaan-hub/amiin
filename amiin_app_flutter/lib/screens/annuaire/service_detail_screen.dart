@@ -252,10 +252,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   Widget _tagChip(String label, Color color) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(RadiusAmiin.xl),
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Text(label, style: TextStyle(

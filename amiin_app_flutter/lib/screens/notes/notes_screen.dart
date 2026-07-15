@@ -183,7 +183,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 background: Container(
                                   decoration: BoxDecoration(
                                     color: context.ac.alertColor,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(RadiusAmiin.lg),
                                   ),
                                   alignment: Alignment.centerRight,
                                   padding: const EdgeInsets.only(right: 20),

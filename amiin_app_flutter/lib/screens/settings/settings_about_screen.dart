@@ -40,7 +40,7 @@ class SettingsAboutScreen extends StatelessWidget {
                             height: 72,
                             decoration: BoxDecoration(
                               color: primary,
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                             ),
                             child: Center(
                               child: Text('A', style: TextStyle(
@@ -53,7 +53,7 @@ class SettingsAboutScreen extends StatelessWidget {
                           const SizedBox(height: Spacing.md),
                           Text('Amiin', style: TextStyle(
                             fontFamily: FontFamily.geo,
-                            fontSize: 26,
+                            fontSize: FontSize.xxl,
                             color: primary,
                             letterSpacing: 2,
                           )),

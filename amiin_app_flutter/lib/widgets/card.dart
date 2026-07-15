@@ -48,7 +48,7 @@ class AmiinCard extends StatelessWidget {
     Widget content = Container(
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(RadiusAmiin.lg),
         border: accentBorderColor != null
             ? Border(left: BorderSide(color: accentBorderColor, width: 3))
             : Border.all(color: ac.border),
@@ -61,10 +61,10 @@ class AmiinCard extends StatelessWidget {
     if (onTap != null) {
       return Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(RadiusAmiin.lg),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           child: content,
         ),
       );

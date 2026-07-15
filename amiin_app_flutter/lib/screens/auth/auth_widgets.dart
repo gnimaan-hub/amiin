@@ -1,6 +1,7 @@
 // ─── Widgets partagés entre LoginScreen et RegisterScreen ────────────────────
 
 import 'package:flutter/material.dart';
+import '../../theme/spacing.dart';
 import '../../theme/colors.dart';
 import '../../theme/typography.dart';
 
@@ -30,7 +31,7 @@ class AuthDarkField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(12);
+    final borderRadius = BorderRadius.circular(RadiusAmiin.lg);
     final baseBorder = OutlineInputBorder(
       borderRadius: borderRadius,
       borderSide: BorderSide(color: ColorsAmiin.onDark.withValues(alpha: 0.15)),
@@ -76,7 +77,7 @@ class AuthDarkField extends StatelessWidget {
         focusedBorder: focusBorder,
         errorBorder: errorBorder,
         focusedErrorBorder: errorBorder,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 14),
         suffixIcon: suffixIcon,
         errorStyle: TextStyle(
           fontFamily: FontFamily.sans,
@@ -111,7 +112,7 @@ class AuthPrimaryButton extends StatelessWidget {
           foregroundColor: ColorsAmiin.onTurquoise,
           disabledBackgroundColor: ColorsAmiin.turquoise.withValues(alpha: 0.5),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusAmiin.lg)),
         ),
         child: loading
             ? const SizedBox(
@@ -145,7 +146,7 @@ class AuthErrorBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: ColorsAmiin.corail.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(RadiusAmiin.md),
         border: Border.all(color: ColorsAmiin.corail.withValues(alpha: 0.4)),
       ),
       child: Row(

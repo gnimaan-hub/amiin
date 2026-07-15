@@ -217,7 +217,7 @@ class _UserCard extends StatelessWidget {
         padding: const EdgeInsets.all(Spacing.lg),
         decoration: BoxDecoration(
           color: context.ac.surface,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
           border: Border.all(color: context.ac.border),
         ),
         child: Row(

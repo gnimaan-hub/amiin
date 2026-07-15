@@ -443,7 +443,7 @@ class _SectionLabel extends StatelessWidget {
             onTap: action!.onTap,
             borderRadius: BorderRadius.circular(RadiusAmiin.sm),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: Spacing.xs),
               child: Text(
                 action!.label,
                 style: TextStyle(
@@ -487,10 +487,10 @@ class _QuickTilesGrid extends StatelessWidget {
       children: tiles.map((tile) {
         return Material(
           color: tile.bg,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
           child: InkWell(
             onTap: () => context.go('/${tile.tab}'),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(RadiusAmiin.md),
             child: SizedBox(
               width: w,
               child: Padding(
@@ -536,7 +536,7 @@ class _AgentBadge extends StatelessWidget {
       ),
       child: Text('Amiin', style: TextStyle(
         fontFamily: FontFamily.geoBold,
-        fontSize: 9,
+        fontSize: 10,
         letterSpacing: 0.5,
         color: color,
       )),
@@ -647,7 +647,7 @@ class _BriefTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: FontFamily.sans,
-                    fontSize: 10.5,
+                    fontSize: 10,
                     color: ac.muted,
                   )),
             ],

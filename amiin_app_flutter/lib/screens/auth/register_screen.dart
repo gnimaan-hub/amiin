@@ -1,6 +1,7 @@
 // ─── RegisterScreen ───────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../theme/spacing.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import '../../theme/colors.dart';
@@ -62,7 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: ColorsAmiin.encreNuit,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: Spacing.xxxl),
           child: Form(
             key: _formKey,
             child: Column(
@@ -200,7 +201,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () => context.go('/login'),
                     style: TextButton.styleFrom(
                       foregroundColor: ColorsAmiin.turquoiseMid,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 6),
                     ),
                     child: Text(
                       'J\'ai déjà un compte',

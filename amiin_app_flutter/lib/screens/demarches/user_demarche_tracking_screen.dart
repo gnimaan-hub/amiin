@@ -654,7 +654,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
               onPressed: () => _openInAnnuaire(lieux[i]),
               style: TextButton.styleFrom(
                 foregroundColor: context.ac.infoAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 textStyle: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 12),
                 minimumSize: Size.zero,

@@ -630,7 +630,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: Spacing.md,
-                  vertical: 4,
+                  vertical: Spacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: ac.surface2,
@@ -781,7 +781,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 DateFormat('HH:mm').format(msg.timestamp),
                 style: TextStyle(
                   fontFamily: FontFamily.mono,
-                  fontSize: 9,
+                  fontSize: 10,
                   color: ac.muted,
                 ),
               ),
@@ -791,7 +791,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   onTap: () => _speakingMsgId == msg.id
                       ? _stopSpeaking()
                       : _speak(msg.content, msgId: msg.id),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(RadiusAmiin.md),
                   child: Padding(
                     padding: const EdgeInsets.all(3),
                     child: Icon(
@@ -854,7 +854,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         parts.join(' '),
         style: TextStyle(
           fontFamily: FontFamily.mono,
-          fontSize: 9,
+          fontSize: 10,
           color: ac.muted.withValues(alpha: 0.6),
         ),
       ),
@@ -1129,12 +1129,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Material(
                   color: ac.surface,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
                     side: BorderSide(color: ac.border),
                   ),
                   child: InkWell(
                     onTap: () => _sendMessage(q),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: Spacing.lg,
@@ -1258,7 +1258,7 @@ class _ThinkingBubbleState extends State<_ThinkingBubble>
   Widget build(BuildContext context) {
     final ac = context.ac;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: Spacing.md),
       decoration: BoxDecoration(
         color: ac.surface,
         borderRadius: const BorderRadius.only(

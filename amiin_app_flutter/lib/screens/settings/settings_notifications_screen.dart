@@ -202,10 +202,10 @@ class _TimeButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: Spacing.md, horizontal: Spacing.lg),
         decoration: BoxDecoration(
           color: context.ac.background,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
           border: Border.all(color: context.ac.border),
         ),
         child: Column(

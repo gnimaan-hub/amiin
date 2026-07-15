@@ -431,7 +431,7 @@ class _TopicsPicker extends StatelessWidget {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 7),
             decoration: BoxDecoration(
               color: isSelected ? primary.withValues(alpha: 0.12) : context.ac.background,
               borderRadius: BorderRadius.circular(RadiusAmiin.full),
@@ -488,10 +488,10 @@ class _VoiceModeDescription extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       child: Container(
         key: ValueKey(mode),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 10),
         decoration: BoxDecoration(
           color: primary.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(RadiusAmiin.md),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,9 +559,9 @@ class _VoiceTileState extends State<_VoiceTile> {
     final gender = widget.voice['gender'] == 'F' ? '♀' : '♂';
     return InkWell(
       onTap: widget.onSelect,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(RadiusAmiin.sm),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: Spacing.xs),
         child: Row(
           children: [
             Icon(

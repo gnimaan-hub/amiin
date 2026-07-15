@@ -64,7 +64,7 @@ class SkeletonCard extends StatelessWidget {
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
         color: context.ac.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(RadiusAmiin.lg),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,

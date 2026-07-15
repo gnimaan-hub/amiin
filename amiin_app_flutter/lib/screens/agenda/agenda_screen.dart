@@ -256,7 +256,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: FontFamily.geo,
-                        fontSize: 17,
+                        fontSize: 16,
                         color: context.ac.ink,
                       ),
                     ),
@@ -304,7 +304,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                           onTap: () => setState(() => _selectedDay = day),
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 2),
-                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                             decoration: BoxDecoration(
                               color: _isSameDay(day, _selectedDay)
                                   ? context.ac.secretariatAccent
@@ -320,7 +320,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                       [day.weekday - 1],
                                   style: TextStyle(
                                     fontFamily: FontFamily.geoBold,
-                                    fontSize: 9,
+                                    fontSize: 10,
                                     letterSpacing: 0.5,
                                     color: _isSameDay(day, _selectedDay)
                                         ? context.ac.onAccent.withValues(alpha: 0.8)
@@ -477,7 +477,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: context.ac.secretariatAccent,
                       foregroundColor: context.ac.onAccent,
-                      padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(RadiusAmiin.sm),
                       ),
@@ -511,14 +511,14 @@ class _AgendaScreenState extends State<AgendaScreen> {
                   final start = DateTime.parse(ev.startDate);
                   final end = DateTime.parse(ev.endDate);
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: Spacing.xl, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: Spacing.xl, vertical: Spacing.xs),
                     child: Dismissible(
                       key: ValueKey(ev.id),
                       direction: DismissDirection.endToStart,
                       background: Container(
                         decoration: BoxDecoration(
                           color: context.ac.alertColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(RadiusAmiin.lg),
                         ),
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
