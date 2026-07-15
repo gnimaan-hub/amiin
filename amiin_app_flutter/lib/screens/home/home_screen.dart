@@ -1,6 +1,7 @@
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -193,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Center(
-                                  child: SvgPicture.string(_micSvg, width: 22, height: 26),
+                                  child: SvgPicture.string(AmiinSvgIcons.mic, width: 22, height: 26),
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -378,13 +379,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  static const String _micSvg = '''
-    <svg width="22" height="26" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="1" width="10" height="16" rx="5" stroke="white" stroke-width="2"/>
-      <path d="M3 15a10 10 0 0020 0" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      <path d="M13 25v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  ''';
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────

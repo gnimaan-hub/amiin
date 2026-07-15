@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
@@ -122,7 +123,8 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const AmiinHeader(title: 'Démarches'),
+            const AmiinHeader(
+              mode: AmiinMode.info,title: 'Démarches'),
             // Onglets Catalogue / Mes démarches
             Container(
               color: context.ac.surface,

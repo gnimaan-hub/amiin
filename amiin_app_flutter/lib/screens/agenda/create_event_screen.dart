@@ -1,6 +1,7 @@
 // ─── CreateEventScreen (création + édition) ─────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
 import '../../widgets/toast.dart';
 import 'package:intl/intl.dart';
 import '../../theme/colors.dart';
@@ -168,6 +169,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: isEditing ? 'Modifier événement' : 'Nouvel événement',
               back: true,
             ),

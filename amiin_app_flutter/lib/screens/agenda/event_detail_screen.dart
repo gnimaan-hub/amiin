@@ -1,6 +1,7 @@
 // ─── EventDetailScreen ───────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
 import '../../widgets/toast.dart';
 import 'package:intl/intl.dart';
 import './create_event_screen.dart';
@@ -128,6 +129,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Événement',
               back: true,
               rightAction: SizedBox(

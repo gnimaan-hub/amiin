@@ -1,6 +1,8 @@
 // ─── NoteDetailScreen & CreateNoteScreen ─────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
 import '../../widgets/toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +27,6 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   final _contentController = TextEditingController();
   final _tagInputController = TextEditingController();
   final List<String> _tags = [];
-
 
   void _addTag() {
     final t = _tagInputController.text.trim().toLowerCase();
@@ -70,10 +71,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Nouvelle note',
               back: true,
               rightAction: IconButton(
-                icon: SvgPicture.string(_checkSvg, width: 22, height: 22),
+                icon: SvgPicture.string(AmiinSvgIcons.check, width: 22, height: 22),
                 onPressed: _save,
               ),
             ),
@@ -153,11 +155,6 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
     );
   }
 
-  static const String _checkSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 12l5 5 9-10" stroke="#B85530" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  ''';
 }
 
 // ── Écran de détail / modification ───────────────────────────────────────────
@@ -270,15 +267,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: _editing ? 'Modifier' : 'Note',
               back: true,
               rightAction: _editing
                   ? IconButton(
-                      icon: SvgPicture.string(_checkSvg, width: 22, height: 22),
+                      icon: SvgPicture.string(AmiinSvgIcons.check, width: 22, height: 22),
                       onPressed: _save,
                     )
                   : IconButton(
-                      icon: SvgPicture.string(_editSvg, width: 20, height: 20),
+                      icon: SvgPicture.string(AmiinSvgIcons.edit, width: 20, height: 20),
                       onPressed: () => setState(() => _editing = true),
                     ),
             ),
@@ -373,15 +371,5 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  static const String _checkSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 12l5 5 9-10" stroke="#B85530" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  ''';
-  static const String _editSvg = '''
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 2l4 4-10 10H4v-4L14 2z" stroke="#B85530" stroke-width="1.6" stroke-linejoin="round"/>
-    </svg>
-  ''';
 }
 

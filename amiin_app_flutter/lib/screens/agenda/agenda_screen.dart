@@ -1,6 +1,8 @@
 // ─── AgendaScreen (avec bouton Créer sous le calendrier) ────────────────────
 
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -222,9 +224,10 @@ class _AgendaScreenState extends State<AgendaScreen> {
         child: Column(
           children: [
             AmiinHeader(
+              mode: AmiinMode.secretariat,
               title: 'Agenda',
               rightAction: IconButton(
-                icon: SvgPicture.string(_plusSvg, width: 22, height: 22),
+                icon: SvgPicture.string(AmiinSvgIcons.plus, width: 22, height: 22),
                 onPressed: () async {
                   await context.push('/agenda/create');
                   _refreshEvents();
@@ -239,7 +242,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: SvgPicture.string(_chevronLeftSvg, width: 20, height: 20),
+                    icon: SvgPicture.string(AmiinSvgIcons.chevronLeft, width: 20, height: 20),
                     onPressed: _goToPrevious,
                   ),
                   Expanded(
@@ -256,7 +259,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: SvgPicture.string(_chevronRightSvg, width: 20, height: 20),
+                    icon: SvgPicture.string(AmiinSvgIcons.chevronRight, width: 20, height: 20),
                     onPressed: _goToNext,
                   ),
                 ],
@@ -642,21 +645,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
       a.year == b.year && a.month == b.month && a.day == b.day;
   bool _isToday(DateTime d) => _isSameDay(d, DateTime.now());
 
-  static const String _plusSvg = '''
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 4v14M4 11h14" stroke="#1E8A8A" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  ''';
-  static const String _chevronLeftSvg = '''
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M13 4L7 10l6 6" stroke="#7A6A5E" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-  ''';
-  static const String _chevronRightSvg = '''
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M7 4l6 6-6 6" stroke="#7A6A5E" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-  ''';
 }
 
 // ── Bascule Mois / Semaine ────────────────────────────────────────────────────

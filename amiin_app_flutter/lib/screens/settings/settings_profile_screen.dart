@@ -344,4 +344,3 @@ class _EmploymentPicker extends StatelessWidget {
   }
 }
 
-

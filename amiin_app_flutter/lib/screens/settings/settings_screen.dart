@@ -261,4 +261,3 @@ class _UserCard extends StatelessWidget {
   }
 }
 
-

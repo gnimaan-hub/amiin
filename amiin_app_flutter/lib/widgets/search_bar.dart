@@ -1,6 +1,7 @@
 // ─── SearchBar ───────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/themes.dart';
 import '../theme/spacing.dart';
@@ -65,7 +66,7 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
       child: Row(
         children: [
           SvgPicture.string(
-            _searchIconSvg,
+            AmiinSvgIcons.searchIcon,
             width: 18,
             height: 18,
             colorFilter: ColorFilter.mode(context.ac.muted, BlendMode.srcIn),
@@ -95,7 +96,7 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
           if (widget.value.isNotEmpty && widget.onClear != null)
             IconButton(
               icon: SvgPicture.string(
-                _clearIconSvg,
+                AmiinSvgIcons.clearIcon,
                 width: 16,
                 height: 16,
               ),
@@ -112,17 +113,4 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
     );
   }
 
-  static const String _searchIconSvg = '''
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/>
-      <path d="M13 13l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-  ''';
-
-  static const String _clearIconSvg = '''
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="7" fill="#DDD5C5"/>
-      <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#6B5E4E" stroke-width="1.4" stroke-linecap="round"/>
-    </svg>
-  ''';
 }

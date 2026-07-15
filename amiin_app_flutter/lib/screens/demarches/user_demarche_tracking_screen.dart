@@ -9,6 +9,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/horizon_line.dart';
 import '../../widgets/toast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -168,7 +169,8 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
       body: SafeArea(
         child: Column(
           children: [
-            AmiinHeader(title: d.title, back: true, rightAction: IconButton(
+            AmiinHeader(
+              mode: AmiinMode.info,title: d.title, back: true, rightAction: IconButton(
               icon: Icon(Icons.more_vert, color: context.ac.midTone),
               onPressed: _showMenu,
             )),

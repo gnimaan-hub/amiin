@@ -2,6 +2,8 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/amiin_svg_icons.dart';
+import '../../widgets/horizon_line.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +20,6 @@ import '../../widgets/skeleton.dart';
 import '../../services/annuaire_service.dart';
 
 // ── Mapping catégorie → couleur + emoji ──────────────────────────────────────
-
 
 const Map<String, String> _catEmoji = {
   'Alimentation & Restauration':               '🍽️',
@@ -261,6 +262,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
     return Column(
       children: [
         AmiinHeader(
+              mode: AmiinMode.info,
           title: _selectedCat ?? 'Annuaire',
           back: _selectedCat != null,
           onBack: _goBack,
@@ -468,7 +470,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      SvgPicture.string(_locSvg,
+                      SvgPicture.string(AmiinSvgIcons.loc,
                           width: 11,
                           height: 11,
                           colorFilter: ColorFilter.mode(
@@ -507,12 +509,6 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
     );
   }
 
-  static const String _locSvg = '''
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 1a4 4 0 014 4C10 8.5 6 11 6 11S2 8.5 2 5a4 4 0 014-4z" stroke="currentColor" stroke-width="1.3"/>
-      <circle cx="6" cy="5" r="1.3" fill="currentColor"/>
-    </svg>
-  ''';
 }
 
 // ── Widgets auxiliaires ───────────────────────────────────────────────────────
