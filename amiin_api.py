@@ -79,6 +79,11 @@ EXPAND_MODEL   = 'claude-haiku-4-5-20251001'
 def _model_for(prefs: dict | None) -> str:
     """Choisit le modèle selon la langue de réponse demandée par l'app."""
     return MODEL_CLAUDE_SO if (prefs or {}).get("ai_language") == "so" else MODEL_CLAUDE
+
+def _sampling_kwargs(model: str) -> dict:
+    """Sonnet 5 rejette les paramètres d'échantillonnage (temperature → 400) ;
+    on ne les envoie qu'aux modèles qui les acceptent (Haiku)."""
+    return {} if model == MODEL_CLAUDE_SO else {"temperature": TEMPERATURE}
 TOP_K          = 8
 TOP_K_FINAL    = 8
 MAX_TOKENS     = 2048
@@ -779,10 +784,11 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
         context = build_context(chunks)
 
     prefs_text = _build_preferences_fragment(user_preferences or {})
+    _model = _model_for(user_preferences)
     response = claude_client.messages.create(
-        model=_model_for(user_preferences),
+        model=_model,
         max_tokens=MAX_TOKENS,
-        temperature=TEMPERATURE,
+        **_sampling_kwargs(_model),
         system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
@@ -870,10 +876,11 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     prefs_text = _build_preferences_fragment(user_preferences or {})
     tool_calls = []
     final_usage = None
+    _model = _model_for(user_preferences)
     async with async_claude.messages.stream(
-        model=_model_for(user_preferences),
+        model=_model,
         max_tokens=MAX_TOKENS,
-        temperature=TEMPERATURE,
+        **_sampling_kwargs(_model),
         system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
