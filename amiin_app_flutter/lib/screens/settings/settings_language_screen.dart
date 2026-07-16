@@ -83,7 +83,7 @@ class SettingsLanguageScreen extends StatelessWidget {
                           ),
                           Divider(color: context.ac.border, height: 1, indent: 56),
                           _LangOption(
-                            flag: '🇸🇴',
+                            flag: '🇩🇯',
                             label: 'Soomaali',
                             value: 'so',
                             current: settings.aiLanguage,

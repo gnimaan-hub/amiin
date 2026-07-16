@@ -56,10 +56,10 @@ class SettingsService extends ChangeNotifier {
   /// Voix effectivement utilisée pour la synthèse : force une voix somali
   /// quand la langue de réponse est le somali (les voix fr/en ne prononcent
   /// pas correctement le somali), sauf si l'utilisateur a déjà choisi une
-  /// voix so-*.
+  /// voix so-*. Par défaut : Muuse (voix masculine).
   String get effectiveTtsVoice {
     final v = ttsVoice;
-    if (aiLanguage == 'so' && !v.startsWith('so-')) return 'so-SO-UbaxNeural';
+    if (aiLanguage == 'so' && !v.startsWith('so-')) return 'so-SO-MuuseNeural';
     return v;
   }
 

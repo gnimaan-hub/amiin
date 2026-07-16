@@ -61,6 +61,10 @@ class CloudTtsService {
   bool _producedAudio = false;
   String _rate = '+0%';
   String Function(String)? _cleaner;
+
+  /// Voix imposée pour la session en cours (aperçu des réglages) ;
+  /// null → voix effective des paramètres (effectiveTtsVoice).
+  String? _sessionVoice;
   final List<Future<Uint8List>> _fetchQueue = [];
   Completer<void>? _wakeDrain;
   Future<void>? _drainFuture;
@@ -101,7 +105,11 @@ class CloudTtsService {
   Future<Uint8List> _fetch(String chunk, String rate, CancelToken token) async {
     final response = await api.post<List<int>>(
       '/tts',
-      data: {'text': chunk, 'voice': settingsService.effectiveTtsVoice, 'rate': rate},
+      data: {
+        'text': chunk,
+        'voice': _sessionVoice ?? settingsService.effectiveTtsVoice,
+        'rate': rate,
+      },
       options: Options(responseType: ResponseType.bytes),
       cancelToken: token,
     );
@@ -145,6 +153,7 @@ class CloudTtsService {
     _sessionEnded = false;
     _producedAudio = false;
     _cleaner = cleaner;
+    _sessionVoice = null;
     _fetchQueue.clear();
 
     final speed = settingsService.ttsSpeed;
@@ -282,10 +291,11 @@ class CloudTtsService {
     }
   }
 
-  Future<void> speak(String text, {String? msgId}) async {
+  Future<void> speak(String text, {String? msgId, String? voice}) async {
     await stop();
     if (text.trim().isEmpty) return;
 
+    _sessionVoice = voice;
     final session = ++_session;
     _isPlaying = true;
     _playingMsgId = msgId;

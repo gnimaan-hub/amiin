@@ -73,12 +73,23 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late AnimationController _dotsController;
   late Animation<double> _dotsAnimation;
 
-  static const List<String> _starterQuestions = [
+  static const List<String> _starterQuestionsFr = [
     'Comment renouveler mon passeport ?',
     'Quels documents pour un acte de naissance ?',
     'Rappelle-moi mes prochains rendez-vous',
     'Crée une note avec ma liste de documents',
   ];
+
+  static const List<String> _starterQuestionsSo = [
+    'Sidee baan u cusboonaysiiyaa baasaboorkayga?',
+    'Waraaqaha loo baahan yahay warqadda dhalashada?',
+    'I xasuusi ballamahayga soo socda',
+    'Ii samee qoraal liiska waraaqahayga ah',
+  ];
+
+  /// Suggestions de démarrage dans la langue de réponse d'Amiin.
+  List<String> get _starterQuestions =>
+      settingsService.aiLanguage == 'so' ? _starterQuestionsSo : _starterQuestionsFr;
 
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
@@ -351,11 +362,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final useCloud = settingsService.useCloudTts || settingsService.aiLanguage == 'so';
     if (useCloud) {
       // Moteur cloud Edge TTS — haute qualité, indépendant des voix système.
-      // En cas d'erreur réseau, bascule automatiquement sur flutter_tts.
+      // En cas d'erreur réseau, bascule automatiquement sur flutter_tts —
+      // sauf en somali : la voix locale fr-FR rendrait le texte inintelligible.
       try {
         await cloudTtsService.speak(cleaned, msgId: msgId);
       } catch (_) {
-        await _flutterTts.speak(cleaned);
+        if (settingsService.aiLanguage != 'so') {
+          await _flutterTts.speak(cleaned);
+        }
       }
       if (mounted)
         setState(() {
@@ -436,8 +450,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         });
       }
       // Rien n'a pu être synthétisé (réseau TTS en panne pendant tout le
-      // stream) → repli sur le moteur local avec le texte complet.
-      if (!produced && reply != null && mounted) {
+      // stream) → repli sur le moteur local avec le texte complet — sauf en
+      // somali (pas de voix somali locale, le fr-FR serait inintelligible).
+      if (!produced &&
+          reply != null &&
+          mounted &&
+          settingsService.aiLanguage != 'so') {
         await _flutterTts.speak(_cleanTextForTts(reply));
       }
     } else if (reply != null && mounted && wantAutoRead) {
@@ -1110,6 +1128,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // ── État vide ──────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState(ChatController chat, AmiinThemeColors ac) {
+    final isSo = settingsService.aiLanguage == 'so';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(Spacing.xl),
@@ -1119,12 +1138,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             const AmiinLogo(size: 52, variant: AmiinLogoVariant.turquoise),
             const SizedBox(height: Spacing.lg),
             Text(
-              'Bonjour — je suis Amiin',
+              isSo ? 'Salaan — waxaan ahay Amiin' : 'Bonjour — je suis Amiin',
               style: TextStyles.screenTitle(context).copyWith(fontSize: 20, letterSpacing: -0.3),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'Posez-moi une question sur vos démarches administratives,\nvotre agenda ou les services publics de Djibouti.',
+              isSo
+                  ? 'I weydii su\'aal ku saabsan hawlaha maamulka,\njadwalkaaga ama adeegyada dawladda ee Jabuuti.'
+                  : 'Posez-moi une question sur vos démarches administratives,\nvotre agenda ou les services publics de Djibouti.',
               style: TextStyle(
                 fontFamily: FontFamily.sansLight,
                 fontSize: 14,

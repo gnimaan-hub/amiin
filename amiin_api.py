@@ -96,6 +96,12 @@ _CONVERSATIONAL_STARTERS = (
     "tu es vraiment", "vous êtes vraiment", "tu es bien", "tu es le meilleur",
     "comment ça va", "ça va", "comment allez-vous", "comment vas-tu",
     "bonne journée", "bonne soirée", "à bientôt", "au revoir", "bonne continuation",
+    # Somali — salutations et politesses courantes
+    "salaan", "salaam", "asalamu alaykum", "assalamu alaykum", "nabad",
+    "ma nabad baa", "iska warran", "sidee tahay", "mahadsanid",
+    "waad mahadsan tahay", "aad iyo aad u mahadsanid",
+    "subax wanaagsan", "galab wanaagsan", "habeen wanaagsan",
+    "nabad gelyo", "macasalaamo",
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -149,6 +155,9 @@ Règles :
 - Variante 1 : reformulation en termes JURIDIQUES/TECHNIQUES
 - Variante 2 : reformulation en termes PRATIQUES/QUOTIDIENS
 - Variante 3 : MOTS-CLÉS essentiels (5-8 mots maximum)
+- IMPORTANT : la base de données est en FRANÇAIS. Si la question est posée
+  dans une autre langue (somali, arabe, anglais…), traduis d'abord son sens
+  et rédige les 3 variantes EN FRANÇAIS.
 
 Réponds UNIQUEMENT en JSON, sans backticks :
 {"v1": "...", "v2": "...", "v3": "..."}
@@ -628,7 +637,14 @@ def _build_preferences_fragment(prefs: dict) -> str:
     # Langue de réponse — consigne PRIORITAIRE et explicite. Sans cela, le modèle
     # reste en français (SYSTEM_PROMPT_BASE est 100 % en français) même quand
     # l'utilisateur choisit une autre langue dans l'app.
+    # Cloisonnement strict : la langue choisie dans les paramètres fait foi,
+    # y compris pour le français (une question posée en somali reçoit une
+    # réponse en français si les paramètres sont en français, et inversement).
     lang_map = {
+        "fr": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en français, "
+              "quelle que soit la langue de la question. Si la question est posée dans "
+              "une autre langue (somali, arabe, anglais…), tu la comprends mais tu "
+              "réponds en français.",
         "so": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en somali (Soomaali), "
               "quelle que soit la langue de la question ou du contexte fourni. "
               "Tu maîtrises parfaitement le somali. N'emploie le français sous aucun prétexte "
@@ -786,6 +802,11 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     jina_acc = [0]   # accumulateur de tokens Jina pour cette requête
     is_second_pass = bool(tool_results)
 
+    # Statuts affichés dans l'app pendant le stream, dans la langue d'Amiin.
+    _so = (user_preferences or {}).get("ai_language") == "so"
+    st_think  = "Amiin wuu fikirayaa…" if _so else "Amiin réfléchit…"
+    st_search = "Raadin…" if _so else "Recherche…"
+
     if lat is not None and lon is not None:
         weather_ctx = await loop.run_in_executor(None, _fetch_weather_context, lat, lon)
         if weather_ctx:
@@ -794,16 +815,16 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     if tool_results:
         # 2e passe : pas de RAG, réponse directe avec les résultats d'outils
         context = ""
-        yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
+        yield f'data: {json.dumps({"type": "status", "text": st_think})}\n\n'
     elif _is_conversational(query):
         # Message purement conversationnel : skip RAG complet
         context = ""
-        yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
+        yield f'data: {json.dumps({"type": "status", "text": st_think})}\n\n'
     else:
         # 1re passe : pipeline RAG complet
         should_exp = expand and _should_expand(query)
         direct_embedding = list(_cached_embed(query, token_acc=jina_acc))
-        yield f'data: {json.dumps({"type": "status", "text": "Recherche…"})}\n\n'
+        yield f'data: {json.dumps({"type": "status", "text": st_search})}\n\n'
 
         if should_exp:
             expand_task = loop.run_in_executor(None, expand_query, query)
@@ -827,7 +848,7 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
             chunks = await loop.run_in_executor(None, _search_with_embedding, direct_embedding, TOP_K_FINAL)
 
         context = build_context(chunks)
-        yield f'data: {json.dumps({"type": "status", "text": "Amiin réfléchit…"})}\n\n'
+        yield f'data: {json.dumps({"type": "status", "text": st_think})}\n\n'
 
     prefs_text = _build_preferences_fragment(user_preferences or {})
     tool_calls = []
@@ -1514,6 +1535,23 @@ def _fix_tts_pronunciation(text: str) -> str:
         text = pattern.sub(replacement, text)
     return text
 
+# Règles minimales pour les voix somali : emojis, nombres à séparateurs
+# ("15 000" → "15000") et montants (FDJ → "faran Jabuuti").
+_PRONUNCIATION_RULES_SO = [
+    (_EMOJI_RE, ''),
+    (re.compile(r'\b(\d{1,3})(?:[  ](\d{3}))+\b'),
+     lambda m: m.group(0).replace(' ', '').replace(' ', '')),
+    (re.compile(r'(\d+)\s*(?:FDJ|DJF)\b'),  r'\1 faran Jabuuti'),
+    (re.compile(r'(\d+)\s*€'),               r'\1 yuuro'),
+    (re.compile(r'(\d+)\s*\$'),              r'\1 doolar'),
+]
+
+def _fix_tts_pronunciation_so(text: str) -> str:
+    """Normalisation légère pour les voix somali."""
+    for pattern, replacement in _PRONUNCIATION_RULES_SO:
+        text = pattern.sub(replacement, text)
+    return text
+
 # Voix disponibles dans l'app, groupees par langue.
 # Seules les voix neuronales haute qualité sont exposées.
 _TTS_VOICES = [
@@ -1558,9 +1596,14 @@ async def text_to_speech(req: TTSRequest):
     voice = req.voice if req.voice in valid_ids else "fr-FR-DeniseNeural"
 
     try:
-        # Les règles de prononciation sont franco-centrées (ex: FDJ → "francs
-        # djiboutiens") : on ne les applique qu'aux voix françaises.
-        processed_text = _fix_tts_pronunciation(req.text) if voice.startswith("fr") else req.text
+        # Les règles de prononciation sont par langue : franco-centrées pour
+        # les voix fr-*, règles légères (montants, nombres) pour les voix so-*.
+        if voice.startswith("fr"):
+            processed_text = _fix_tts_pronunciation(req.text)
+        elif voice.startswith("so"):
+            processed_text = _fix_tts_pronunciation_so(req.text)
+        else:
+            processed_text = req.text
         communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
         buf = io.BytesIO()
         async for chunk in communicate.stream():

@@ -22,6 +22,8 @@ const _kCloudVoices = [
   {'id': 'en-US-JennyNeural',            'name': 'Jenny',   'lang': 'Anglais',  'gender': 'F', 'note': ''},
   {'id': 'en-US-GuyNeural',              'name': 'Guy',     'lang': 'Anglais',  'gender': 'M', 'note': ''},
   {'id': 'en-GB-SoniaNeural',            'name': 'Sonia',   'lang': 'Anglais',  'gender': 'F', 'note': ''},
+  {'id': 'so-SO-MuuseNeural',            'name': 'Muuse',   'lang': 'Soomaali', 'gender': 'M', 'note': ''},
+  {'id': 'so-SO-UbaxNeural',             'name': 'Ubax',    'lang': 'Soomaali', 'gender': 'F', 'note': ''},
 ];
 
 class SettingsAssistantScreen extends StatelessWidget {
@@ -477,15 +479,18 @@ class _VoiceTileState extends State<_VoiceTile> {
       return;
     }
     setState(() => _previewing = true);
-    // Sélectionne temporairement la voix pour l'aperçu
-    final prev = settingsService.ttsVoice;
-    settingsService.ttsVoice = widget.voice['id']!;
+    final id = widget.voice['id']!;
+    // Texte d'aperçu dans la langue de la voix.
+    final sample = id.startsWith('so-')
+        ? 'Salaan, waxaan ahay kaaliyahaaga Amiin.'
+        : id.startsWith('en-')
+            ? 'Hello, I am your assistant Amiin.'
+            : 'Bonjour, je suis votre assistant Amiin.';
     try {
-      await cloudTtsService.speak('Bonjour, je suis votre assistant Amiin.');
+      await cloudTtsService.speak(sample, voice: id);
     } catch (_) {
       // ignore — l'erreur est déjà loguée dans CloudTtsService
     }
-    settingsService.ttsVoice = prev;
     if (mounted) setState(() => _previewing = false);
   }
 
