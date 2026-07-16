@@ -70,7 +70,15 @@ JINA_MODEL     = 'jina-embeddings-v3'   # API Jina AI — remplace SentenceTrans
 JINA_EMBED_DIM = 1024                   # dimension du modèle jina-embeddings-v3
 QDRANT_COLLECTION = 'djibouti_knowledge'
 MODEL_CLAUDE   = 'claude-haiku-4-5-20251001'
+# Somali : langue à faibles ressources — Haiku produit un somali calqué sur le
+# français (mot-à-mot). Sonnet 5 a une maîtrise multilingue très supérieure ;
+# on ne paie le surcoût (~3x) que sur les conversations en somali.
+MODEL_CLAUDE_SO = 'claude-sonnet-5'
 EXPAND_MODEL   = 'claude-haiku-4-5-20251001'
+
+def _model_for(prefs: dict | None) -> str:
+    """Choisit le modèle selon la langue de réponse demandée par l'app."""
+    return MODEL_CLAUDE_SO if (prefs or {}).get("ai_language") == "so" else MODEL_CLAUDE
 TOP_K          = 8
 TOP_K_FINAL    = 8
 MAX_TOKENS     = 2048
@@ -648,7 +656,16 @@ def _build_preferences_fragment(prefs: dict) -> str:
         "so": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en somali (Soomaali), "
               "quelle que soit la langue de la question ou du contexte fourni. "
               "Tu maîtrises parfaitement le somali. N'emploie le français sous aucun prétexte "
-              "et ne dis jamais que tu ne peux répondre qu'en français.",
+              "et ne dis jamais que tu ne peux répondre qu'en français.\n"
+              "COMPRÉHENSION (somali djiboutien) : l'utilisateur peut glisser des mots français "
+              "dans sa question somali (ex : « carte identité », « mairie », « timbre », « dossier », "
+              "« extrait de naissance »). Comprends ces emprunts naturellement, sans jamais faire "
+              "remarquer le mélange de langues.\n"
+              "STYLE DE RÉDACTION : rédige directement en somali naturel et idiomatique — ne traduis "
+              "jamais mot à mot depuis le français, aucune tournure calquée. Emploie la terminologie "
+              "somalie correcte et précise (ex : kaarka aqoonsiga, baasaboorka, warqadda dhalashada) : "
+              "Amiin s'exprime dans un somali soigné et savant. Phrases courtes, ton oral et chaleureux, "
+              "comme une conversation WhatsApp.",
         "ar": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en arabe standard moderne, "
               "quelle que soit la langue de la question ou du contexte fourni. "
               "N'emploie le français sous aucun prétexte.",
@@ -763,7 +780,7 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
 
     prefs_text = _build_preferences_fragment(user_preferences or {})
     response = claude_client.messages.create(
-        model=MODEL_CLAUDE,
+        model=_model_for(user_preferences),
         max_tokens=MAX_TOKENS,
         temperature=TEMPERATURE,
         system=_build_system(context, system, prefs_text),
@@ -854,7 +871,7 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     tool_calls = []
     final_usage = None
     async with async_claude.messages.stream(
-        model=MODEL_CLAUDE,
+        model=_model_for(user_preferences),
         max_tokens=MAX_TOKENS,
         temperature=TEMPERATURE,
         system=_build_system(context, system, prefs_text),
@@ -1645,6 +1662,15 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
     data = {"model": GROQ_STT_MODEL, "response_format": "json"}
     if lang in _STT_LANGS:
         data["language"] = lang
+    if lang == "so":
+        # Somali djiboutien : des termes français se glissent dans les phrases
+        # (code-switching). Le prompt amorce Whisper avec ce vocabulaire pour
+        # qu'il soit transcrit correctement au lieu d'être écorché.
+        data["prompt"] = (
+            "carte d'identité, passeport, extrait de naissance, mairie, "
+            "commissariat, timbre, dossier, guichet, certificat de résidence, "
+            "casier judiciaire, NNI, CNSS, OPS, Djibouti"
+        )
     try:
         resp = _requests.post(
             GROQ_STT_URL,
