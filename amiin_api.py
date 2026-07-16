@@ -1559,12 +1559,20 @@ def _fix_tts_pronunciation(text: str) -> str:
         text = pattern.sub(replacement, text)
     return text
 
-# Règles minimales pour les voix somali : emojis, nombres à séparateurs
-# ("15 000" → "15000") et montants (FDJ → "faran Jabuuti").
+# Règles minimales pour les voix somali : emojis, parenthèses de précision,
+# nombres à séparateurs ("15 000" → "15000") et montants (FDJ → "faran Jabuuti").
 _PRONUNCIATION_RULES_SO = [
     (_EMOJI_RE, ''),
+    # Précisions entre parenthèses — souvent des équivalents français
+    # ("extrait de naissance", "État Civil") : utiles à l'écrit, mais elles
+    # hachent la lecture vocale. On les retire (parenthèses + contenu),
+    # en recollant l'espace autour.
+    (re.compile(r'\s*\([^()]*\)'), ''),
     (re.compile(r'\b(\d{1,3})(?:[  ](\d{3}))+\b'),
      lambda m: m.group(0).replace(' ', '').replace(' ', '')),
+    # Milliers à virgule ("1,500") → "1500" (sinon lu "1 virgule 5")
+    (re.compile(r'\b(\d{1,3})(?:,(\d{3}))+\b'),
+     lambda m: m.group(0).replace(',', '')),
     (re.compile(r'(\d+)\s*(?:FDJ|DJF)\b'),  r'\1 faran Jabuuti'),
     (re.compile(r'(\d+)\s*€'),               r'\1 yuuro'),
     (re.compile(r'(\d+)\s*\$'),              r'\1 doolar'),
