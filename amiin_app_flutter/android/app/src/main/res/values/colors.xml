@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="launch_bg">#2C2114</color>
+    <color name="launch_bg">#14213D</color>
 
     <!-- Widget « Aujourd'hui » v5 — carte de marque Amiin.
          Fond dégradé turquoise → encre nuit, texte clair.
@@ -32,4 +32,5 @@
     <!-- Bouton vocal (repris du chat : cercle turquoise doux) -->
     <color name="widget_voice_bg">#2E7FE7E4</color>
     <color name="widget_voice_icon">#CFF6F4</color>
+	<color name="ic_launcher_background">#1E8A8A</color>
 </resources>

@@ -1,5 +1,7 @@
 // ─── AuthService — JWT + refresh token via flutter_secure_storage ────────────
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
@@ -54,6 +56,8 @@ class AuthService extends ChangeNotifier {
   // ── Initialisation (appelée au démarrage depuis SplashScreen) ────────────
 
   Future<void> init() async {
+    if (_initialized) return;
+
     final accessToken  = await _storage.read(key: _kAccessToken);
     final refreshToken = await _storage.read(key: _kRefreshToken);
 
@@ -63,22 +67,40 @@ class AuthService extends ChangeNotifier {
       return;
     }
 
+    // Offline-first : si un utilisateur est en cache, on le considère connecté
+    // tout de suite et on valide la session en arrière-plan. Le backend
+    // (Render free tier) peut mettre 30 s à se réveiller — hors de question
+    // de bloquer le démarrage là-dessus.
+    _user = await _cachedUser();
+    _initialized = true;
+    notifyListeners();
+
+    if (_user != null) {
+      unawaited(_validateSession(accessToken, refreshToken));
+    } else {
+      // Tokens présents mais pas de cache : il faut le réseau pour savoir
+      await _validateSession(accessToken, refreshToken);
+    }
+  }
+
+  /// Vérifie la session auprès du backend. Sur 401 → tentative de refresh
+  /// (échec = déconnexion). Sur erreur réseau → on garde la session locale.
+  Future<void> _validateSession(String accessToken, String refreshToken) async {
     try {
       final resp = await _authDio.get(
         '/auth/me',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
       _user = _parseUser(resp.data as Map<String, dynamic>);
+      await _cacheUser(_user!);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         await _tryRefresh(refreshToken);
-      } else {
-        // Pas de réseau → utiliser le cache local si dispo
-        _user = await _cachedUser();
       }
+      // Pas de réseau / serveur endormi → on conserve l'état local
+    } catch (_) {
+      // Jamais de crash au démarrage pour une erreur de validation
     }
-
-    _initialized = true;
     notifyListeners();
   }
 
@@ -99,6 +121,7 @@ class AuthService extends ChangeNotifier {
       _user = _parseUser(meResp.data as Map<String, dynamic>);
       await _cacheUser(_user!);
     } catch (_) {
+      _user = null;
       await _clearAll();
     }
   }
