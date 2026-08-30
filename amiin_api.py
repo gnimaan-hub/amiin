@@ -1694,7 +1694,7 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
         resp = _requests.post(
             GROQ_STT_URL,
             headers={"Authorization": f"Bearer {key}"},
-            files={"file": (filename or "audio.m4a", audio, content_type or "audio/m4a")},
+            files={"file": (filename or "audio.wav", audio, content_type or "audio/wav")},
             data=data,
             timeout=60,
         )

@@ -31,9 +31,21 @@ class CloudSttService {
     }
     final dir = await getTemporaryDirectory();
     final path =
-        '${dir.path}/amiin_stt_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        '${dir.path}/amiin_stt_${DateTime.now().millisecondsSinceEpoch}.wav';
     await _recorder.start(
-      const RecordConfig(encoder: AudioEncoder.aacLc, numChannels: 1),
+      // WAV/PCM non compressé (pas d'artefacts de codec comme avec AAC) à
+      // 16 kHz — la fréquence native attendue par Whisper, inutile de capter
+      // plus haut. Réduction de bruit + gain auto + anti-écho pour nettoyer
+      // le signal avant transcription (best-effort, ignoré si le
+      // périphérique ne le supporte pas).
+      const RecordConfig(
+        encoder: AudioEncoder.wav,
+        sampleRate: 16000,
+        numChannels: 1,
+        autoGain: true,
+        echoCancel: true,
+        noiseSuppress: true,
+      ),
       path: path,
     );
     _isRecording = true;
@@ -54,7 +66,7 @@ class CloudSttService {
     try {
       final form = FormData.fromMap({
         'lang': lang,
-        'file': await MultipartFile.fromFile(path, filename: 'audio.m4a'),
+        'file': await MultipartFile.fromFile(path, filename: 'audio.wav'),
       });
       final resp = await api.post<Map<String, dynamic>>('/stt', data: form);
       return (resp.data?['text'] as String?)?.trim() ?? '';
