@@ -1674,17 +1674,21 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
             status_code=503,
             detail="STT indisponible : GROQ_API_KEY absente côté serveur.",
         )
-    data = {"model": GROQ_STT_MODEL, "response_format": "json"}
+    data = {"model": GROQ_STT_MODEL, "response_format": "json", "temperature": 0}
     if lang in _STT_LANGS:
         data["language"] = lang
     if lang == "so":
         # Somali djiboutien : des termes français se glissent dans les phrases
-        # (code-switching). Le prompt amorce Whisper avec ce vocabulaire pour
-        # qu'il soit transcrit correctement au lieu d'être écorché.
+        # (code-switching). Whisper utilise ce prompt comme amorce de style —
+        # une phrase réaliste avec la bonne orthographe somalie et le
+        # code-switching naturel guide mieux le modèle qu'une simple liste de
+        # mots hors contexte.
         data["prompt"] = (
-            "carte d'identité, passeport, extrait de naissance, mairie, "
-            "commissariat, timbre, dossier, guichet, certificat de résidence, "
-            "casier judiciaire, NNI, CNSS, OPS, Djibouti"
+            "Waan doonayaa inaan helo kaadhkayga aqoonsiga iyo baasaboorkayga. "
+            "Fadlan ii sheeg xaggee laga helayo dukumentiga extrait de naissance "
+            "ama certificat de résidence ee mairie-da. Waxaan u baahanahay "
+            "shahaadada casriga ah ee CNSS iyo OPS, iyo casier judiciaire-ga "
+            "laga soo qaato commissariat-ka Djibouti."
         )
     try:
         resp = _requests.post(
@@ -1701,20 +1705,51 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
         raise HTTPException(status_code=502, detail=f"STT Groq {resp.status_code}")
     return (resp.json() or {}).get("text", "").strip()
 
+_STT_CORRECT_PROMPT = """Tu relis une transcription vocale automatique (Whisper) en somali parlé à Djibouti, où le somali se mélange couramment avec des termes administratifs français (carte d'identité, mairie, CNSS, OPS, passeport, extrait de naissance, casier judiciaire, commissariat...).
+
+Le reconnaisseur vocal fait des erreurs typiques : mots somalis mal orthographiés, mots français déformés phonétiquement ou remplacés par un mot somali qui sonne pareil, syllabes manquantes ou dupliquées. Ta seule tâche : corriger ces erreurs probables de reconnaissance vocale, en te basant sur le sens général de la phrase (probablement une question ou une démarche administrative). Ne traduis pas, ne reformule pas le style, n'ajoute aucun commentaire ni ponctuation superflue. Si le texte semble déjà correct, renvoie-le tel quel. Réponds uniquement avec le texte corrigé.
+
+Transcription brute :
+{text}"""
+
+async def _correct_somali_transcript(raw_text: str) -> str:
+    """Relit et corrige la transcription Whisper via Claude — Whisper reste
+    peu fiable en somali (langue peu représentée dans son corpus), Claude
+    peut désambiguïser les erreurs probables grâce au contexte administratif."""
+    if not raw_text or not raw_text.strip():
+        return raw_text
+    try:
+        response = await async_claude.messages.create(
+            model=MODEL_CLAUDE_SO,
+            max_tokens=400,
+            **_sampling_kwargs(MODEL_CLAUDE_SO),
+            messages=[{"role": "user", "content": _STT_CORRECT_PROMPT.format(text=raw_text)}],
+        )
+        corrected = response.content[0].text.strip()
+        return corrected or raw_text
+    except Exception as e:
+        logging.warning(f"[STT] Correction LLM échouée : {e}")
+        return raw_text
+
 @app.post("/v1/stt", dependencies=[Depends(tts_user)])
 async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so")):
     """
     Transcrit un fichier audio en texte via Groq Whisper large-v3.
     Champ multipart `file` (audio) + `lang` (code ISO : so, fr, en, ar).
+    En somali, une passe de relecture Claude corrige les erreurs probables
+    du reconnaisseur vocal.
     """
     audio = await file.read()
     if not audio:
         raise HTTPException(status_code=400, detail="fichier audio vide")
     if len(audio) > _STT_MAX_BYTES:
         raise HTTPException(status_code=413, detail="fichier audio trop volumineux")
+    lang = (lang or "so").lower()
     text = await asyncio.to_thread(
-        _groq_transcribe, audio, file.filename, file.content_type, (lang or "so").lower()
+        _groq_transcribe, audio, file.filename, file.content_type, lang
     )
+    if lang == "so":
+        text = await _correct_somali_transcript(text)
     return {"text": text}
 
 # ══════════════════════════════════════════════════════════════════════════════
