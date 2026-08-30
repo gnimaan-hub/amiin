@@ -1725,7 +1725,9 @@ async def _correct_somali_transcript(raw_text: str) -> str:
             **_sampling_kwargs(MODEL_CLAUDE_SO),
             messages=[{"role": "user", "content": _STT_CORRECT_PROMPT.format(text=raw_text)}],
         )
-        corrected = response.content[0].text.strip()
+        corrected = next(
+            (block.text for block in response.content if block.type == "text"), ""
+        ).strip()
         return corrected or raw_text
     except Exception as e:
         logging.warning(f"[STT] Correction LLM échouée : {e}")
