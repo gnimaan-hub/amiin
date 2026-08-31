@@ -45,6 +45,12 @@ class CloudSttService {
         autoGain: true,
         echoCancel: true,
         noiseSuppress: true,
+        // Source dédiée à la reconnaissance vocale : Android désactive la
+        // compression dynamique appliquée aux autres sources (mic, appels)
+        // qui dégrade la reconnaissance, tout en gardant AEC/NS/AGC actifs.
+        androidConfig: AndroidRecordConfig(
+          audioSource: AndroidAudioSource.voiceRecognition,
+        ),
       ),
       path: path,
     );
