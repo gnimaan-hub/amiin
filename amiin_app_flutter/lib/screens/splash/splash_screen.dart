@@ -25,6 +25,8 @@ import '../../theme/colors.dart';
 import '../../theme/typography.dart';
 import '../../services/auth_service.dart';
 import '../../services/bootstrap.dart';
+import '../../services/chat_controller.dart' show chatListenRequest;
+import '../../services/widget_bridge.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -125,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _startLoading() async {
     // Temps minimum : formation (1.6 s) + une respiration du logo net
-    final minSplash = Future.delayed(const Duration(milliseconds: 2800));
+    final minSplash = Future.delayed(const Duration(milliseconds: 5000));
 
     try {
       await Future.wait([
@@ -137,12 +139,28 @@ class _SplashScreenState extends State<SplashScreen>
       debugPrint('Bootstrap : $e');
     }
     await minSplash;
-    if (!mounted) return;
+    if (!mounted) {
+      debugPrint('[SPLASH] _startLoading : unmounted avant navigation, abandon');
+      return;
+    }
 
     // IMPORTANT : la navigation ne dépend que de Future.delayed — jamais
     // d'un TickerFuture. Si l'app est en arrière-plan, les tickers sont
     // suspendus et un `await animateTo(...)` ne se résoudrait jamais.
-    context.go(authService.isLoggedIn ? '/home' : '/login');
+    final loggedIn = authService.isLoggedIn;
+
+    // Un tap sur le widget d'accueil en lancement à froid a pu demander une
+    // route précise (ex. /chat) avant que l'auth soit prête : on l'honore
+    // maintenant plutôt que d'atterrir sur /home puis rebondir.
+    final pending = loggedIn ? WidgetBridge.consumePendingRoute() : null;
+    final target = pending?.route ?? (loggedIn ? '/home' : '/login');
+    debugPrint('[SPLASH] _startLoading : loggedIn=$loggedIn pending=${pending?.route} → go($target)');
+    context.go(target);
+    if (pending != null && pending.voice) {
+      Future.delayed(const Duration(milliseconds: 400), () {
+        chatListenRequest.value++;
+      });
+    }
   }
 
   @override
@@ -219,14 +237,16 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             // Particules en formation
                             if (!_formed && _particles != null)
-                              AnimatedBuilder(
-                                animation: _formCtrl,
-                                builder: (context, _) => CustomPaint(
-                                  painter: _ParticlePainter(
-                                    field: _particles!,
-                                    t: _formCtrl.value *
-                                        _formDuration.inMilliseconds /
-                                        1000.0,
+                              RepaintBoundary(
+                                child: AnimatedBuilder(
+                                  animation: _formCtrl,
+                                  builder: (context, _) => CustomPaint(
+                                    painter: _ParticlePainter(
+                                      field: _particles!,
+                                      t: _formCtrl.value *
+                                          _formDuration.inMilliseconds /
+                                          1000.0,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -266,7 +286,7 @@ class _SplashScreenState extends State<SplashScreen>
                             Text(
                               'ASSISTANT IA · DJIBOUTI',
                               style: TextStyle(
-                                fontFamily: FontFamily.mono,
+                                fontFamily: FontFamily.geo,
                                 fontSize: 11,
                                 letterSpacing: 3.2,
                                 color: accent,
@@ -377,8 +397,9 @@ class _ParticleField {
     final data = await rootBundle.load(assetPath);
     final codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(),
-      // Échantillonnage : ~120 px suffisent pour un nuage dense
-      targetWidth: 120,
+      // Résolution plus fine pour des contours nets, compensée par `step`
+      // ci-dessous afin de garder un nombre de particules raisonnable.
+      targetWidth: 200,
     );
     final img = (await codec.getNextFrame()).image;
     final bytes =
@@ -387,7 +408,7 @@ class _ParticleField {
     final w = img.width, h = img.height;
     final out = <_Particle>[];
     final rnd = math.Random(7);
-    const step = 2;
+    const step = 4;
     for (int y = 0; y < h; y += step) {
       for (int x = 0; x < w; x += step) {
         final i = (y * w + x) * 4;
@@ -428,19 +449,35 @@ class _ParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (!field.loaded) return;
-    final paint = Paint();
-    final ps = (size.width / 110).clamp(1.6, 3.2); // taille d'un grain
+    final ps = (size.width / 140).clamp(1.2, 2.5); // taille d'un grain
+
+    // Regroupe les particules par (couleur, alpha quantifié) afin de ne
+    // faire qu'un seul appel `drawPoints` par groupe au lieu d'un
+    // `drawRect` par particule (des milliers d'appels sinon).
+    final groups = <int, List<Offset>>{};
+    final groupColors = <int, Color>{};
 
     for (final p in field.particles) {
       final lp = ((t - p.delay) / _dur).clamp(0.0, 1.0);
       final e = 1 - math.pow(1 - lp, 3).toDouble(); // easeOutCubic
       final x = (p.sx + (p.tx - p.sx) * e) * size.width;
       final y = (p.sy + (p.ty - p.sy) * e) * size.height;
-      paint.color = p.color.withValues(alpha: (lp * 1.4).clamp(0.0, 1.0));
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(x, y), width: ps, height: ps),
-        paint,
-      );
+      final alpha = (lp * 1.4).clamp(0.0, 1.0);
+      final aByte = (alpha * 255).round();
+      if (aByte == 0) continue;
+      final key = (p.color.toARGB32() & 0x00FFFFFF) | (aByte << 24);
+      (groups[key] ??= []).add(Offset(x, y));
+      groupColors[key] ??= p.color.withValues(alpha: alpha);
+    }
+
+    final paint = Paint()
+      ..isAntiAlias = true
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = ps;
+
+    for (final entry in groups.entries) {
+      paint.color = groupColors[entry.key]!;
+      canvas.drawPoints(ui.PointMode.points, entry.value, paint);
     }
   }
 
