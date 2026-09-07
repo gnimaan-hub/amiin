@@ -4,11 +4,11 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TextDirection;
 import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -58,6 +58,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   /// le moteur natif (somali). Transcription en cours après l'arrêt du micro.
   bool _isTranscribing = false;
 
+  /// Langues sans voix locale fiable sur l'appareil (pas de moteur natif
+  /// speech_to_text convaincant, pas de voix flutter_tts garantie) : on force
+  /// systématiquement le cloud (Groq Whisper pour le STT, Edge TTS pour la
+  /// synthèse) plutôt que de risquer une reconnaissance/lecture dégradée.
+  bool _noReliableLocalVoice(String lang) => lang == 'so' || lang == 'ar';
+
+  /// Vrai quand la conversation se déroule en arabe — le texte (saisie et
+  /// bulles de messages) doit alors se lire de droite à gauche.
+  bool get _isRtl => settingsService.aiLanguage == 'ar';
+
   bool _dictated = false;
 
   // Text-to-speech
@@ -87,9 +97,33 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     'Ii samee qoraal liiska waraaqahayga ah',
   ];
 
+  static const List<String> _starterQuestionsEn = [
+    'How do I renew my passport?',
+    'What documents do I need for a birth certificate?',
+    'Remind me of my upcoming appointments',
+    'Create a note with my document checklist',
+  ];
+
+  static const List<String> _starterQuestionsAr = [
+    'كيف يمكنني تجديد جواز سفري؟',
+    'ما هي الوثائق المطلوبة لشهادة الميلاد؟',
+    'ذكّرني بمواعيدي القادمة',
+    'أنشئ ملاحظة بقائمة وثائقي',
+  ];
+
   /// Suggestions de démarrage dans la langue de réponse d'Amiin.
-  List<String> get _starterQuestions =>
-      settingsService.aiLanguage == 'so' ? _starterQuestionsSo : _starterQuestionsFr;
+  List<String> get _starterQuestions {
+    switch (settingsService.aiLanguage) {
+      case 'so':
+        return _starterQuestionsSo;
+      case 'en':
+        return _starterQuestionsEn;
+      case 'ar':
+        return _starterQuestionsAr;
+      default:
+        return _starterQuestionsFr;
+    }
+  }
 
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
@@ -226,8 +260,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     HapticFeedback.lightImpact();
     if (_isSpeaking) await _stopSpeaking();
 
-    // Langue non gérée par le moteur natif (somali) → STT cloud (Groq Whisper).
-    if (settingsService.aiLanguage == 'so') {
+    // Langue non gérée de façon fiable par le moteur natif (somali, arabe —
+    // code-switching avec le français) → STT cloud (Groq Whisper).
+    if (_noReliableLocalVoice(settingsService.aiLanguage)) {
       await _toggleCloudRecording();
       return;
     }
@@ -267,11 +302,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       onResult: _onSpeechResult,
       listenFor: const Duration(seconds: 120),
       pauseFor: const Duration(seconds: 10),
-      localeId: 'fr_FR',
+      localeId: settingsService.aiLanguage == 'en' ? 'en_US' : 'fr_FR',
     );
   }
 
-  /// Enregistrement + transcription cloud (Groq Whisper) pour le somali.
+  /// Enregistrement + transcription cloud (Groq Whisper) pour les langues
+  /// sans moteur natif fiable (somali, arabe).
   /// 1er tap : démarre l'enregistrement. 2e tap : arrête, transcrit, remplit
   /// le champ de saisie avec le texte reconnu.
   Future<void> _toggleCloudRecording() async {
@@ -283,7 +319,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         _isTranscribing = true;
       });
       try {
-        final text = await cloudSttService.stopAndTranscribe(lang: 'so');
+        final text = await cloudSttService.stopAndTranscribe(
+            lang: settingsService.aiLanguage);
         if (!mounted) return;
         if (text.isNotEmpty) {
           _dictated = true;
@@ -352,22 +389,29 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (_isSpeaking) await _stopSpeaking();
     final cleaned = _cleanTextForTts(text);
     if (cleaned.isEmpty) return;
+
+    // Le moteur local suit la langue de réponse choisie (fr-FR par défaut,
+    // en-US en anglais) — sinon un texte anglais serait lu avec l'accent
+    // et la phonétique françaises.
+    await _flutterTts.setLanguage(
+        settingsService.aiLanguage == 'en' ? 'en-US' : 'fr-FR');
     if (mounted)
       setState(() {
         _isSpeaking = true;
         _speakingMsgId = msgId;
       });
 
-    // Le somali n'a pas de voix locale flutter_tts → cloud obligatoire.
-    final useCloud = settingsService.useCloudTts || settingsService.aiLanguage == 'so';
+    // Somali et arabe n'ont pas de voix locale flutter_tts fiable → cloud obligatoire.
+    final useCloud = settingsService.useCloudTts ||
+        _noReliableLocalVoice(settingsService.aiLanguage);
     if (useCloud) {
       // Moteur cloud Edge TTS — haute qualité, indépendant des voix système.
       // En cas d'erreur réseau, bascule automatiquement sur flutter_tts —
-      // sauf en somali : la voix locale fr-FR rendrait le texte inintelligible.
+      // sauf en somali/arabe : la voix locale fr-FR rendrait le texte inintelligible.
       try {
         await cloudTtsService.speak(cleaned, msgId: msgId);
       } catch (_) {
-        if (settingsService.aiLanguage != 'so') {
+        if (!_noReliableLocalVoice(settingsService.aiLanguage)) {
           await _flutterTts.speak(cleaned);
         }
       }
@@ -384,7 +428,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _stopSpeaking() async {
     _liveTtsActive = false;
-    if (settingsService.useCloudTts || settingsService.aiLanguage == 'so') {
+    if (settingsService.useCloudTts ||
+        _noReliableLocalVoice(settingsService.aiLanguage)) {
       await cloudTtsService.stop();
     } else {
       await _flutterTts.stop();
@@ -431,7 +476,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     // Voix en direct (cloud uniquement) : la session démarre AVANT la
     // réponse — la 1re phrase sera parlée pendant que le reste streame.
     final liveTts = wantAutoRead &&
-        (settingsService.useCloudTts || settingsService.aiLanguage == 'so');
+        (settingsService.useCloudTts ||
+            _noReliableLocalVoice(settingsService.aiLanguage));
     if (liveTts) {
       _liveTtsActive = true;
       cloudTtsService.beginSession(cleaner: _cleanTextForTts);
@@ -451,11 +497,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       }
       // Rien n'a pu être synthétisé (réseau TTS en panne pendant tout le
       // stream) → repli sur le moteur local avec le texte complet — sauf en
-      // somali (pas de voix somali locale, le fr-FR serait inintelligible).
+      // somali/arabe (pas de voix locale fiable, le fr-FR serait inintelligible).
       if (!produced &&
           reply != null &&
           mounted &&
-          settingsService.aiLanguage != 'so') {
+          !_noReliableLocalVoice(settingsService.aiLanguage)) {
+        await _flutterTts.setLanguage(
+            settingsService.aiLanguage == 'en' ? 'en-US' : 'fr-FR');
         await _flutterTts.speak(_cleanTextForTts(reply));
       }
     } else if (reply != null && mounted && wantAutoRead) {
@@ -734,7 +782,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       horizontal: Spacing.md,
                       vertical: Spacing.sm + 2,
                     ),
-                    child: Column(
+                    child: Directionality(
+                      textDirection:
+                          _isRtl ? TextDirection.rtl : TextDirection.ltr,
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MarkdownBody(
@@ -799,6 +850,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 false,
                           ),
                       ],
+                    ),
                     ),
                   ),
                 ),
@@ -920,6 +972,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               controller: _controller,
               maxLines: null,
               maxLength: 1000,
+              textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
+              textAlign: _isRtl ? TextAlign.right : TextAlign.left,
               onChanged: (_) => _dictated = false,
               onSubmitted: (_) => _sendMessage(),
               decoration: InputDecoration(
@@ -1128,24 +1182,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // ── État vide ──────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState(ChatController chat, AmiinThemeColors ac) {
-    final isSo = settingsService.aiLanguage == 'so';
+    final lang = settingsService.aiLanguage;
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(Spacing.xl),
-        child: Column(
+        child: Directionality(
+          textDirection: lang == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const AmiinLogo(size: 52, variant: AmiinLogoVariant.turquoise),
             const SizedBox(height: Spacing.lg),
             Text(
-              isSo ? 'Salaan — waxaan ahay Amiin' : 'Bonjour — je suis Amiin',
+              switch (lang) {
+                'so' => 'Salaan — waxaan ahay Amiin',
+                'en' => 'Hello — I\'m Amiin',
+                'ar' => 'مرحبا — أنا أمين',
+                _ => 'Bonjour — je suis Amiin',
+              },
               style: TextStyles.screenTitle(context).copyWith(fontSize: 20, letterSpacing: -0.3),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              isSo
-                  ? 'I weydii su\'aal ku saabsan hawlaha maamulka,\njadwalkaaga ama adeegyada dawladda ee Jabuuti.'
-                  : 'Posez-moi une question sur vos démarches administratives,\nvotre agenda ou les services publics de Djibouti.',
+              switch (lang) {
+                'so' => 'I weydii su\'aal ku saabsan hawlaha maamulka,\njadwalkaaga ama adeegyada dawladda ee Jabuuti.',
+                'en' => 'Ask me about administrative procedures,\nyour schedule or public services in Djibouti.',
+                'ar' => 'اسألني عن الإجراءات الإدارية،\nجدول مواعيدك أو الخدمات العامة في جيبوتي.',
+                _ => 'Posez-moi une question sur vos démarches administratives,\nvotre agenda ou les services publics de Djibouti.',
+              },
               style: TextStyle(
                 fontFamily: FontFamily.sansLight,
                 fontSize: 14,
@@ -1175,7 +1239,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       child: Row(
                         children: [
                           Icon(
-                            Icons.arrow_forward_ios_rounded,
+                            lang == 'ar'
+                                ? Icons.arrow_back_ios_rounded
+                                : Icons.arrow_forward_ios_rounded,
                             size: 11,
                             color: ac.secretariatAccent,
                           ),
@@ -1194,6 +1260,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

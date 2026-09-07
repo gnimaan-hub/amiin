@@ -89,6 +89,15 @@ class SettingsLanguageScreen extends StatelessWidget {
                             current: settings.aiLanguage,
                             onTap: () => settingsService.aiLanguage = 'so',
                           ),
+                          Divider(color: context.ac.border, height: 1, indent: 56),
+                          _LangOption(
+                            flag: '🇩🇯',
+                            label: 'Afar',
+                            value: 'aa',
+                            current: settings.aiLanguage,
+                            onTap: () => settingsService.aiLanguage = 'aa',
+                            comingSoon: true,
+                          ),
                         ],
                       ),
                     ),
@@ -172,28 +181,42 @@ class _LangOption extends StatelessWidget {
   final String value;
   final String current;
   final VoidCallback onTap;
-  const _LangOption({required this.flag, required this.label, required this.value, required this.current, required this.onTap});
+  /// Langue affichée dans la liste mais pas encore traitée côté IA/voix.
+  final bool comingSoon;
+  const _LangOption({required this.flag, required this.label, required this.value, required this.current, required this.onTap, this.comingSoon = false});
 
   @override
   Widget build(BuildContext context) {
     final selected = value == current;
     final primary = Theme.of(context).colorScheme.primary;
     return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 14),
-        child: Row(
-          children: [
-            Text(flag, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: Spacing.md),
-            Expanded(
-              child: Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
-            ),
-            if (selected)
-              Icon(Icons.check_circle, color: primary, size: 20)
-            else
-              Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
-          ],
+      onTap: comingSoon ? null : onTap,
+      child: Opacity(
+        opacity: comingSoon ? 0.5 : 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 14),
+          child: Row(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
+              ),
+              if (comingSoon)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: context.ac.border.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text('Bientôt', style: TextStyles.caption(context).copyWith(fontSize: 11)),
+                )
+              else if (selected)
+                Icon(Icons.check_circle, color: primary, size: 20)
+              else
+                Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
+            ],
+          ),
         ),
       ),
     );

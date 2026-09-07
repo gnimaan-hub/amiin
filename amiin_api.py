@@ -98,6 +98,15 @@ _FOLLOWUP_PREFIXES = (
     "parfait", "d'accord", "bien sûr", "ça ", "c'est ", "donc ",
     "pourquoi ", "comment ", "combien", "quand ", "où ", "qui ",
     "dis-moi", "explique", "donne",
+    # Anglais
+    "and ", "but ", "thanks", "thank you", "yes", "no ", "sure",
+    "great", "perfect", "alright", "so ", "why ", "how ", "how much",
+    "when ", "where ", "who ", "tell me", "explain", "give me",
+    # Arabe (préfixes bornés par un espace pour éviter de couper des mots
+    # commençant par les mêmes lettres, ex. "كم" dans "كمية")
+    "لكن ", "شكرا", "شكراً", "نعم", "لا ", "حسنا", "حسناً",
+    "ممتاز", "لماذا ", "كيف ", "كم ", "متى ", "أين ",
+    "من هو ", "من هي ", "قل لي", "اشرح", "أعطني",
 )
 
 # Messages purement conversationnels → skip RAG complet (zéro Jina + zéro sources)
@@ -115,6 +124,20 @@ _CONVERSATIONAL_STARTERS = (
     "waad mahadsan tahay", "aad iyo aad u mahadsanid",
     "subax wanaagsan", "galab wanaagsan", "habeen wanaagsan",
     "nabad gelyo", "macasalaamo",
+    # Anglais — salutations et politesses courantes
+    "good morning", "good evening", "good night", "hi", "hey",
+    "thanks", "thank you", "many thanks", "much appreciated",
+    "great", "awesome", "perfect", "amazing", "wonderful", "brilliant",
+    "you're the best", "you are the best", "well done",
+    "how are you", "how's it going", "how are things",
+    "have a good day", "have a good evening", "see you", "goodbye", "bye",
+    # Arabe — salutations et politesses courantes
+    "السلام عليكم", "وعليكم السلام", "مرحبا", "أهلا", "أهلا وسهلا",
+    "صباح الخير", "مساء الخير", "تصبح على خير", "مع السلامة",
+    "شكرا", "شكراً", "شكرا جزيلا", "شكراً جزيلاً", "مشكور", "الله يعطيك العافية",
+    "ممتاز", "رائع", "عظيم", "جميل جدا", "أنت الأفضل",
+    "كيف حالك", "كيف الحال", "شو أخبارك", "كيفك",
+    "يوم سعيد", "مساء سعيد", "إلى اللقاء", "وداعا",
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -673,9 +696,31 @@ def _build_preferences_fragment(prefs: dict) -> str:
               "comme une conversation WhatsApp.",
         "ar": "RÈGLE DE LANGUE ABSOLUE : réponds TOUJOURS et UNIQUEMENT en arabe standard moderne, "
               "quelle que soit la langue de la question ou du contexte fourni. "
-              "N'emploie le français sous aucun prétexte.",
+              "N'emploie le français sous aucun prétexte et ne dis jamais que tu ne peux répondre "
+              "qu'en français.\n"
+              "COMPRÉHENSION (arabe djiboutien) : l'utilisateur peut glisser des mots français dans "
+              "sa question arabe (ex : « carte identité », « mairie », « timbre », « dossier », "
+              "« extrait de naissance »). Comprends ces emprunts naturellement, sans jamais faire "
+              "remarquer le mélange de langues.\n"
+              "STYLE DE RÉDACTION : rédige directement en arabe standard moderne fluide et naturel — "
+              "ne traduis jamais mot à mot depuis le français, aucune tournure calquée. Phrases "
+              "courtes, ton oral et chaleureux, comme une conversation WhatsApp.\n"
+              "NOMS D'INSTITUTIONS ET DE DOCUMENTS : pour les administrations, documents ou "
+              "démarches désignés officiellement en français à Djibouti et qui n'ont pas "
+              "d'équivalent arabe universellement reconnu (état civil, carte d'identité, mairie, "
+              "extrait de naissance, casier judiciaire…), donne d'abord le terme arabe puis, entre "
+              "parenthèses, le nom français officiel — ex. « بطاقة الهوية (carte d'identité) » — pour "
+              "que l'utilisateur reconnaisse le document exact. N'utilise cette parenthèse que pour "
+              "ces noms propres administratifs, jamais pour du vocabulaire courant.",
         "en": "LANGUAGE RULE (ABSOLUTE): always reply ONLY in English, regardless of the language "
-              "of the question or of the provided context. Never use French under any circumstance.",
+              "of the question or of the provided context. If the question is asked in another "
+              "language (French, Somali, Arabic…), understand it but reply in English. Never use "
+              "French under any circumstance, and never say you can only answer in French.\n"
+              "WRITING STYLE: write directly in natural, idiomatic English — never translate word "
+              "for word from French, no calqued phrasing. Use correct, precise English terminology "
+              "for Djiboutian administrative and legal concepts (e.g. national ID card, passport, "
+              "birth certificate, residence permit) rather than literal translations. Short "
+              "sentences, warm conversational tone, like a WhatsApp message.",
     }
     line = lang_map.get(prefs.get("ai_language", "fr"), "")
     if line:
@@ -826,9 +871,18 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     is_second_pass = bool(tool_results)
 
     # Statuts affichés dans l'app pendant le stream, dans la langue d'Amiin.
-    _so = (user_preferences or {}).get("ai_language") == "so"
-    st_think  = "Amiin wuu fikirayaa…" if _so else "Amiin réfléchit…"
-    st_search = "Raadin…" if _so else "Recherche…"
+    _ai_lang = (user_preferences or {}).get("ai_language")
+    _so = _ai_lang == "so"
+    _en = _ai_lang == "en"
+    _ar = _ai_lang == "ar"
+    if _so:
+        st_think, st_search = "Amiin wuu fikirayaa…", "Raadin…"
+    elif _en:
+        st_think, st_search = "Amiin is thinking…", "Searching…"
+    elif _ar:
+        st_think, st_search = "أمين يفكر…", "جارٍ البحث…"
+    else:
+        st_think, st_search = "Amiin réfléchit…", "Recherche…"
 
     if lat is not None and lon is not None:
         weather_ctx = await loop.run_in_executor(None, _fetch_weather_context, lat, lon)
@@ -1584,6 +1638,89 @@ def _fix_tts_pronunciation_so(text: str) -> str:
         text = pattern.sub(replacement, text)
     return text
 
+# Règles pour les voix anglaises — même logique que le français (langue proche,
+# mêmes pièges : nom "Amiin", noms propres djiboutiens, abréviations juridiques,
+# devises), adaptées au lexique/à la graphie anglaise.
+_PRONUNCIATION_RULES_EN = [
+    (_EMOJI_RE, ''),
+
+    # Milliers à virgule, style anglais ("15,000") lus "15 virgule 000" sinon.
+    (re.compile(r'\b(\d{1,3})(?:,(\d{3}))+\b'),
+     lambda m: m.group(0).replace(',', '')),
+    # Au cas où un texte source garderait le style espace ("15 000").
+    (re.compile(r'\b(\d{1,3})(?:[  ](\d{3}))+\b'),
+     lambda m: m.group(0).replace(' ', '').replace(' ', '')),
+
+    # ── Amiin (nom de l'assistant) — même correctif qu'en français : le "e"
+    # final évite la nasalisation et rapproche de la prononciation voulue.
+    (re.compile(r'\bAmiin\b'), 'Amiine'),
+    (re.compile(r'\bamiin\b'), 'amiine'),
+
+    # ── Villes et régions — l'anglais lit correctement "Djibouti" et "Dikhil",
+    # seul "Ali-Sabieh" bénéficie d'un espace pour éviter une lecture "Ali dash".
+    (re.compile(r'\bAli[\s\-]Sabieh\b', re.IGNORECASE), 'Ali Sabieh'),
+
+    # ── Abréviations juridiques ──────────────────────────────────────────────
+    (re.compile(r'\barts?\.?\s*(\d+)', re.IGNORECASE), r'article \1'),
+    (re.compile(r'\bal\.?\s*(\d+)',    re.IGNORECASE), r'paragraph \1'),
+    (re.compile(r'§\s*(\d+)'),                          r'paragraph \1'),
+    (re.compile(r'\betc\.\b',          re.IGNORECASE), 'et cetera'),
+    (re.compile(r'\bcf\.\s*',          re.IGNORECASE), 'see '),
+    (re.compile(r'n°\s*',              re.IGNORECASE), 'number '),
+    (re.compile(r'\bno\.\s*(\d+)',     re.IGNORECASE), r'number \1'),
+
+    # ── Monnaies ─────────────────────────────────────────────────────────────
+    (re.compile(r'(\d+)\s*FDJ\b'),  r'\1 Djiboutian francs'),
+    (re.compile(r'(\d+)\s*DJF\b'),  r'\1 Djiboutian francs'),
+    (re.compile(r'(\d+)\s*€'),      r'\1 euros'),
+    (re.compile(r'(\d+)\s*\$'),     r'\1 dollars'),
+]
+
+def _fix_tts_pronunciation_en(text: str) -> str:
+    """Normalise le texte pour une meilleure prononciation par les voix anglaises."""
+    for pattern, replacement in _PRONUNCIATION_RULES_EN:
+        text = pattern.sub(replacement, text)
+    return text
+
+# Règles pour les voix arabes — même logique que le somali : le texte est déjà
+# écrit dans la langue cible (l'arabe n'a pas le problème de mot français mal
+# lu par un moteur étranger comme "Djibouti" en anglais/français), le point
+# sensible est plutôt les précisions entre parenthèses (noms d'institutions ou
+# de documents laissés en français, ex. « بطاقة الهوية (carte d'identité) »)
+# qui doivent être visibles à l'écrit mais jamais lues à voix haute.
+_PRONUNCIATION_RULES_AR = [
+    (_EMOJI_RE, ''),
+    # Précisions entre parenthèses (équivalents/noms français) — retirées pour
+    # une lecture fluide, comme pour le somali.
+    (re.compile(r'\s*\([^()]*\)'), ''),
+
+    # ── Nombres avec séparateurs de milliers ("15,000" ou "15 000") ─────────
+    (re.compile(r'\b(\d{1,3})(?:,(\d{3}))+\b'),
+     lambda m: m.group(0).replace(',', '')),
+    (re.compile(r'\b(\d{1,3})(?:[  ](\d{3}))+\b'),
+     lambda m: m.group(0).replace(' ', '').replace(' ', '')),
+
+    # ── Abréviations juridiques françaises pouvant subsister dans le texte ──
+    (re.compile(r'\barts?\.?\s*(\d+)', re.IGNORECASE), r'المادة \1'),
+    (re.compile(r'\bal\.?\s*(\d+)',    re.IGNORECASE), r'الفقرة \1'),
+    (re.compile(r'§\s*(\d+)'),                          r'الفقرة \1'),
+    (re.compile(r'\betc\.\b',          re.IGNORECASE), 'إلى آخره'),
+    (re.compile(r'\bcf\.\s*',          re.IGNORECASE), 'انظر '),
+    (re.compile(r'n°\s*',              re.IGNORECASE), 'رقم '),
+
+    # ── Monnaies ─────────────────────────────────────────────────────────────
+    (re.compile(r'(\d+)\s*FDJ\b'),  r'\1 فرنك جيبوتي'),
+    (re.compile(r'(\d+)\s*DJF\b'),  r'\1 فرنك جيبوتي'),
+    (re.compile(r'(\d+)\s*€'),      r'\1 يورو'),
+    (re.compile(r'(\d+)\s*\$'),     r'\1 دولار'),
+]
+
+def _fix_tts_pronunciation_ar(text: str) -> str:
+    """Normalise le texte pour une meilleure prononciation par les voix arabes."""
+    for pattern, replacement in _PRONUNCIATION_RULES_AR:
+        text = pattern.sub(replacement, text)
+    return text
+
 # Voix disponibles dans l'app, groupees par langue.
 # Seules les voix neuronales haute qualité sont exposées.
 _TTS_VOICES = [
@@ -1601,6 +1738,10 @@ _TTS_VOICES = [
     # Somali
     {"id": "so-SO-UbaxNeural",              "name": "Ubax",     "lang": "so-SO", "gender": "F"},
     {"id": "so-SO-MuuseNeural",             "name": "Muuse",    "lang": "so-SO", "gender": "M"},
+    # Arabe (arabe standard moderne — voix Arabie Saoudite, la plus proche du
+    # registre soutenu utilisé pour l'administration et le droit)
+    {"id": "ar-SA-ZariyahNeural",           "name": "Zariyah",  "lang": "ar-SA", "gender": "F"},
+    {"id": "ar-SA-HamedNeural",             "name": "Hamed",    "lang": "ar-SA", "gender": "M"},
 ]
 
 class TTSRequest(BaseModel):
@@ -1634,6 +1775,10 @@ async def text_to_speech(req: TTSRequest):
             processed_text = _fix_tts_pronunciation(req.text)
         elif voice.startswith("so"):
             processed_text = _fix_tts_pronunciation_so(req.text)
+        elif voice.startswith("en"):
+            processed_text = _fix_tts_pronunciation_en(req.text)
+        elif voice.startswith("ar"):
+            processed_text = _fix_tts_pronunciation_ar(req.text)
         else:
             processed_text = req.text
         communicate = edge_tts.Communicate(processed_text, voice, rate=req.rate)
@@ -1689,6 +1834,17 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
             "ama certificat de résidence ee mairie-da. Waxaan u baahanahay "
             "shahaadada casriga ah ee CNSS iyo OPS, iyo casier judiciaire-ga "
             "laga soo qaato commissariat-ka Djibouti."
+        )
+    elif lang == "ar":
+        # Arabe djiboutien : même phénomène de code-switching qu'en somali —
+        # les démarches administratives se disent souvent en français au
+        # milieu d'une phrase arabe. Cette amorce guide Whisper vers la bonne
+        # orthographe arabe et le mélange naturel avec les termes français.
+        data["prompt"] = (
+            "أريد الحصول على بطاقة الهوية الخاصة بي وجواز سفري. من فضلك أخبرني "
+            "أين يمكنني الحصول على extrait de naissance أو certificat de "
+            "résidence من mairie. أحتاج إلى الشهادة الحديثة من CNSS و OPS، "
+            "وكذلك casier judiciaire من commissariat جيبوتي."
         )
     try:
         resp = _requests.post(

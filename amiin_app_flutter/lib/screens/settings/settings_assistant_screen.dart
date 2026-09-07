@@ -24,6 +24,8 @@ const _kCloudVoices = [
   {'id': 'en-GB-SoniaNeural',            'name': 'Sonia',   'lang': 'Anglais',  'gender': 'F', 'note': ''},
   {'id': 'so-SO-MuuseNeural',            'name': 'Muuse',   'lang': 'Soomaali', 'gender': 'M', 'note': ''},
   {'id': 'so-SO-UbaxNeural',             'name': 'Ubax',    'lang': 'Soomaali', 'gender': 'F', 'note': ''},
+  {'id': 'ar-SA-HamedNeural',            'name': 'Hamed',   'lang': 'العربية',  'gender': 'M', 'note': ''},
+  {'id': 'ar-SA-ZariyahNeural',          'name': 'Zariyah', 'lang': 'العربية',  'gender': 'F', 'note': ''},
 ];
 
 class SettingsAssistantScreen extends StatelessWidget {

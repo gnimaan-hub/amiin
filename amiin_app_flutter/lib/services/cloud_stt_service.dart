@@ -1,7 +1,9 @@
 // ─── CloudSttService ──────────────────────────────────────────────────────────
 // Reconnaissance vocale cloud via Groq Whisper (large-v3), utilisée quand la
-// langue de réponse n'est pas gérée par le moteur natif du téléphone —
-// typiquement le somali, absent des reconnaisseurs Android/iOS.
+// langue de réponse n'est pas gérée de façon fiable par le moteur natif du
+// téléphone — le somali (absent des reconnaisseurs Android/iOS) et l'arabe
+// (code-switching fréquent avec des termes administratifs français, mal
+// géré par les moteurs natifs génériques).
 //
 // Flux : start() enregistre un fichier audio (AAC/m4a) ; stopAndTranscribe()
 // arrête l'enregistrement, envoie le fichier à POST /stt (multipart) et
