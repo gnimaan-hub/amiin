@@ -31,6 +31,7 @@ import 'package:workmanager/workmanager.dart';
 import '../navigation/app_router.dart';
 import 'agenda_service.dart';
 import 'api_client.dart';
+import 'auth_service.dart';
 import 'chat_controller.dart';
 import 'home_brief_service.dart';
 
@@ -48,6 +49,7 @@ const _kBackgroundTask = 'amiin_widget_refresh';
 void widgetBackgroundDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
+      AuthService.markBackgroundIsolate();
       ApiClient.init(); // intercepteur auth : token + refresh automatique
       final resp = await api.get('/home/brief');
       final brief = HomeBrief.fromJson(resp.data as Map?);
@@ -97,15 +99,34 @@ class WidgetBridge {
 
   static void _wireWidgetTaps() {
     // App déjà ouverte en arrière-plan → flux
-    HomeWidget.widgetClicked.listen(_handleWidgetUri);
-    // App lancée à froid par le tap → URI initiale
-    HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
+    HomeWidget.widgetClicked.listen((uri) => _handleWidgetUri(uri, coldStart: false));
+    // App lancée à froid par le tap → URI initiale. À ce stade authService.init()
+    // tourne encore en parallèle (voir bootstrap.dart) : naviguer tout de suite
+    // ferait passer isLoggedIn pour false et renverrait vers /login alors que
+    // l'utilisateur est bien connecté. On mémorise juste la route voulue, le
+    // splash s'en charge une fois l'auth prête (voir consumePendingRoute).
+    HomeWidget.initiallyLaunchedFromHomeWidget()
+        .then((uri) => _handleWidgetUri(uri, coldStart: true));
   }
 
   static Uri? _lastUri;
   static DateTime _lastUriAt = DateTime.fromMillisecondsSinceEpoch(0);
 
-  static void _handleWidgetUri(Uri? uri) {
+  /// Route demandée par un tap widget survenu avant que le splash ait fini
+  /// d'initialiser l'auth. Consommée une seule fois par [consumePendingRoute].
+  static String? pendingRoute;
+  static bool _pendingVoice = false;
+
+  static ({String route, bool voice})? consumePendingRoute() {
+    final route = pendingRoute;
+    if (route == null) return null;
+    final voice = _pendingVoice;
+    pendingRoute = null;
+    _pendingVoice = false;
+    return (route: route, voice: voice);
+  }
+
+  static void _handleWidgetUri(Uri? uri, {required bool coldStart}) {
     if (uri == null) return;
     // Au lancement à froid, la même URI arrive deux fois (valeur initiale +
     // flux). Sans dédup : double navigation et double toggle du micro
@@ -127,11 +148,21 @@ class WidgetBridge {
     final route = routes[target];
     if (route == null) return; // amiin://home → comportement par défaut
 
-    // Lancement à froid : attendre que le premier frame soit rendu avant de
-    // naviguer, sinon GoRouter n'est pas encore attaché.
+    final voice = target == 'chat' && uri.queryParameters['voice'] == '1';
+
+    if (coldStart) {
+      debugPrint('[WIDGET] tap à froid → route différée : $route (voice=$voice)');
+      pendingRoute = route;
+      _pendingVoice = voice;
+      return;
+    }
+    debugPrint('[WIDGET] tap à chaud → navigation immédiate : $route (voice=$voice)');
+
+    // App déjà chaude (authService déjà initialisé) : on peut naviguer
+    // directement, il suffit d'attendre le prochain frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       appRouter.go(route);
-      if (target == 'chat' && uri.queryParameters['voice'] == '1') {
+      if (voice) {
         // Laisse le temps au ChatScreen de monter et d'attacher son listener.
         Future.delayed(const Duration(milliseconds: 400), () {
           chatListenRequest.value++;

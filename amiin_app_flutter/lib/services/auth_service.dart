@@ -49,6 +49,13 @@ class AuthService extends ChangeNotifier {
   AuthUser? _user;
   bool _initialized = false;
 
+  // Positionné à true uniquement dans l'isolate WorkManager (widget de fond).
+  // Cet isolate ne doit jamais pouvoir effacer la session de l'app au premier
+  // plan : un refresh échoué en tâche de fond doit juste abandonner ce cycle,
+  // pas déconnecter l'utilisateur.
+  static bool _isBackgroundIsolate = false;
+  static void markBackgroundIsolate() => _isBackgroundIsolate = true;
+
   AuthUser? get currentUser  => _user;
   bool      get isLoggedIn   => _user != null;
   bool      get initialized  => _initialized;
@@ -56,13 +63,22 @@ class AuthService extends ChangeNotifier {
   // ── Initialisation (appelée au démarrage depuis SplashScreen) ────────────
 
   Future<void> init() async {
-    if (_initialized) return;
+    if (_initialized) {
+      debugPrint('[AUTH] init() ignoré : déjà initialisé (isLoggedIn=$isLoggedIn)');
+      return;
+    }
 
     final accessToken  = await _storage.read(key: _kAccessToken);
     final refreshToken = await _storage.read(key: _kRefreshToken);
+    debugPrint('[AUTH] init() : accessToken=${accessToken != null} refreshToken=${refreshToken != null}');
 
-    if (accessToken == null || refreshToken == null) {
+    // Seul refreshToken conditionne la session : accessToken peut être
+    // absent (JWT à courte durée de vie non renouvelé depuis longtemps) sans
+    // que la session soit invalide pour autant — _validateSession tentera un
+    // refresh dans ce cas plutôt que de forcer un retour au login.
+    if (refreshToken == null) {
       _initialized = true;
+      debugPrint('[AUTH] init() : pas de refresh token → non connecté');
       notifyListeners();
       return;
     }
@@ -73,6 +89,7 @@ class AuthService extends ChangeNotifier {
     // de bloquer le démarrage là-dessus.
     _user = await _cachedUser();
     _initialized = true;
+    debugPrint('[AUTH] init() : cachedUser=${_user != null} → isLoggedIn=$isLoggedIn');
     notifyListeners();
 
     if (_user != null) {
@@ -83,9 +100,15 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Vérifie la session auprès du backend. Sur 401 → tentative de refresh
-  /// (échec = déconnexion). Sur erreur réseau → on garde la session locale.
-  Future<void> _validateSession(String accessToken, String refreshToken) async {
+  /// Vérifie la session auprès du backend. Sur 401 (ou pas d'accessToken du
+  /// tout) → tentative de refresh (échec = déconnexion). Sur erreur réseau →
+  /// on garde la session locale.
+  Future<void> _validateSession(String? accessToken, String refreshToken) async {
+    if (accessToken == null) {
+      await _tryRefresh(refreshToken);
+      notifyListeners();
+      return;
+    }
     try {
       final resp = await _authDio.get(
         '/auth/me',
@@ -93,36 +116,42 @@ class AuthService extends ChangeNotifier {
       );
       _user = _parseUser(resp.data as Map<String, dynamic>);
       await _cacheUser(_user!);
+      debugPrint('[AUTH] _validateSession : OK (${_user!.email})');
     } on DioException catch (e) {
+      debugPrint('[AUTH] _validateSession : DioException status=${e.response?.statusCode} type=${e.type}');
       if (e.response?.statusCode == 401) {
         await _tryRefresh(refreshToken);
       }
       // Pas de réseau / serveur endormi → on conserve l'état local
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[AUTH] _validateSession : erreur inattendue $e');
       // Jamais de crash au démarrage pour une erreur de validation
     }
     notifyListeners();
   }
 
+  // Passe systématiquement par refreshAccessToken() (verrou partagé, voir
+  // plus bas) au lieu de dupliquer l'appel /auth/refresh ici : c'était la
+  // source d'une course avec l'intercepteur ApiClient — deux appels
+  // simultanés pouvaient consommer le même refresh token à usage unique et
+  // se faire mutuellement invalider, provoquant une déconnexion + purge des
+  // données locales alors que la session était en fait valide.
   Future<void> _tryRefresh(String refreshToken) async {
+    final newAccess = await refreshAccessToken();
+    if (newAccess == null) {
+      debugPrint('[AUTH] _tryRefresh : refresh échoué ou déjà géré par un autre appel');
+      return;
+    }
     try {
-      final resp = await _authDio.post(
-        '/auth/refresh',
-        data: {'refresh_token': refreshToken},
-      );
-      final newAccess  = resp.data['access_token']  as String;
-      final newRefresh = resp.data['refresh_token'] as String;
-      await _storeTokens(accessToken: newAccess, refreshToken: newRefresh);
-
       final meResp = await _authDio.get(
         '/auth/me',
         options: Options(headers: {'Authorization': 'Bearer $newAccess'}),
       );
       _user = _parseUser(meResp.data as Map<String, dynamic>);
       await _cacheUser(_user!);
-    } catch (_) {
-      _user = null;
-      await _clearAll();
+      debugPrint('[AUTH] _tryRefresh : OK, nouvelle session pour ${_user!.email}');
+    } catch (e) {
+      debugPrint('[AUTH] _tryRefresh : /auth/me après refresh a échoué : $e');
     }
   }
 
@@ -163,15 +192,36 @@ class AuthService extends ChangeNotifier {
 
   // ── Appelé par l'intercepteur ApiClient pour gérer un 401 ────────────────
 
-  bool _isRefreshing = false;
+  // Verrou partagé par TOUS les appelants (intercepteur ApiClient sur 401,
+  // et _validateSession au démarrage) : un refresh déjà en cours est
+  // réutilisé au lieu d'en déclencher un second en parallèle, ce qui
+  // évitait auparavant deux requêtes /auth/refresh simultanées avec le même
+  // refresh token à usage unique (l'une des deux étant systématiquement
+  // rejetée par le backend).
+  Future<String?>? _refreshInFlight;
 
-  Future<String?> refreshAccessToken() async {
-    if (_isRefreshing) return null;
-    _isRefreshing = true;
+  Future<String?> refreshAccessToken() {
+    return _refreshInFlight ??= _doRefresh().whenComplete(() {
+      _refreshInFlight = null;
+    });
+  }
+
+  Future<String?> _doRefresh() async {
+    // La tâche de fond du widget tourne dans un isolate WorkManager séparé :
+    // son AuthService/_refreshInFlight est une instance distincte, sans
+    // aucun verrou partagé avec l'app au premier plan. Si elle tentait un
+    // refresh en même temps que l'app, les deux consommeraient le même
+    // refresh token à usage unique et l'une des deux corromprait la session
+    // de l'autre (accessToken écrasé/supprimé alors que refreshToken
+    // survit). Elle n'utilise donc que le token courant, best-effort ; en
+    // cas de 401 elle abandonne simplement ce cycle et réessaiera dans
+    // l'heure, une fois l'app au premier plan aura naturellement rafraîchi.
+    if (_isBackgroundIsolate) return null;
+
+    final refreshToken = await _storage.read(key: _kRefreshToken);
+    if (refreshToken == null) return null;
+
     try {
-      final refreshToken = await _storage.read(key: _kRefreshToken);
-      if (refreshToken == null) return null;
-
       final resp = await _authDio.post(
         '/auth/refresh',
         data: {'refresh_token': refreshToken},
@@ -180,13 +230,30 @@ class AuthService extends ChangeNotifier {
       final newRefresh = resp.data['refresh_token'] as String;
       await _storeTokens(accessToken: newAccess, refreshToken: newRefresh);
       return newAccess;
-    } catch (_) {
-      _user = null;
-      await _clearAll();
-      notifyListeners();
+    } catch (e) {
+      // Le refresh tourne désormais à chaque démarrage (l'accessToken ne
+      // survit pas toujours au redémarrage du process). Une erreur réseau
+      // (hors ligne, backend endormi, timeout) ne prouve absolument pas que
+      // le refresh token est invalide — seul un vrai rejet du serveur
+      // (401/403) le prouve. Ne jamais déconnecter sur une simple absence
+      // de réseau, sous peine de forcer un login à chaque ouverture hors
+      // connexion (contraire au mode offline-first voulu par l'app).
+      final isAuthRejection = e is DioException &&
+          (e.response?.statusCode == 401 || e.response?.statusCode == 403);
+      if (!isAuthRejection) {
+        debugPrint('[AUTH] _doRefresh : échec réseau (pas d\'auth rejetée) → session conservée : $e');
+        return null;
+      }
+
+      // Si un autre runtime a déjà tourné le refresh token entre-temps, la
+      // session est en fait valide, il ne faut surtout pas l'effacer.
+      final current = await _storage.read(key: _kRefreshToken);
+      if (current == refreshToken) {
+        _user = null;
+        await _clearAll();
+        notifyListeners();
+      }
       return null;
-    } finally {
-      _isRefreshing = false;
     }
   }
 
@@ -230,7 +297,16 @@ class AuthService extends ChangeNotifier {
     return AuthUser(id: id, email: email, displayName: name ?? email.split('@')[0]);
   }
 
-  Future<void> _clearAll() => _storage.deleteAll();
+  // Supprime uniquement les clés d'auth, jamais deleteAll() : ce storage est
+  // partagé avec d'autres services (voir hive_utils.dart) et un deleteAll()
+  // effacerait des données qui n'ont rien à voir avec la session.
+  Future<void> _clearAll() => Future.wait([
+    _storage.delete(key: _kAccessToken),
+    _storage.delete(key: _kRefreshToken),
+    _storage.delete(key: _kUserId),
+    _storage.delete(key: _kEmail),
+    _storage.delete(key: _kDisplayName),
+  ]);
 
   AuthUser _parseUser(Map<String, dynamic> d) => AuthUser(
     id:          d['id']           as String,

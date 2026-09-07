@@ -95,7 +95,13 @@ class NotificationService {
 
   Future<void> cancelReminder(String id) async {
     if (!_initialized) return;
-    await _plugin.cancel(_stableId(id));
+    try {
+      await _plugin.cancel(_stableId(id));
+    } catch (e) {
+      // Ne doit jamais empêcher la suppression réelle de l'événement
+      // (agenda_service.deleteEvent appelle ceci avant Box.delete).
+      debugPrint('Notification cancel error: $e');
+    }
   }
 
   Future<void> cancelAll() async {

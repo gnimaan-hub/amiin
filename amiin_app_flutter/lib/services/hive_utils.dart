@@ -20,8 +20,17 @@ HiveAesCipher? amiinCipher;
 
 Future<void> initHiveCipher() async {
   try {
+    // Namespace dédié, distinct du stockage utilisé par AuthService : un
+    // AuthService._clearAll() (déconnexion / refresh de token échoué) ne
+    // doit jamais pouvoir effacer cette clé — sinon toutes les boxes Hive
+    // (chat, agenda, notes) deviennent indéchiffrables et sont recréées
+    // vides au prochain démarrage.
     const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+      aOptions: AndroidOptions(
+        encryptedSharedPreferences: true,
+        sharedPreferencesName: 'amiin_hive_keystore',
+      ),
+      iOptions: IOSOptions(accountName: 'amiin_hive_keystore'),
     );
     final stored = await storage.read(key: _kHiveKeyName);
     if (stored != null) {
