@@ -83,8 +83,14 @@ def _model_for(prefs: dict | None) -> str:
 
 def _sampling_kwargs(model: str) -> dict:
     """Sonnet 5 rejette les paramètres d'échantillonnage (temperature → 400) ;
-    on ne les envoie qu'aux modèles qui les acceptent (Haiku)."""
-    return {} if model == MODEL_CLAUDE_SO else {"temperature": TEMPERATURE}
+    on ne les envoie qu'aux modèles qui les acceptent (Haiku).
+    Sonnet 5 tourne en thinking adaptatif par défaut dès que le paramètre est
+    omis — coûteux pour de simples réponses conversationnelles de 3-4 phrases.
+    effort="low" réduit ce raisonnement invisible sans le désactiver complètement
+    (Haiku 4.5 n'accepte pas ce paramètre, donc on ne l'envoie qu'à Sonnet 5)."""
+    if model == MODEL_CLAUDE_SO:
+        return {"output_config": {"effort": "low"}}
+    return {"temperature": TEMPERATURE}
 TOP_K          = 8
 TOP_K_FINAL    = 8
 MAX_TOKENS     = 2048
@@ -737,15 +743,6 @@ def _build_preferences_fragment(prefs: dict) -> str:
 
 
 def _build_system(context: str, system_override: str = None, preferences_text: str = None) -> list:
-    dynamic_parts = []
-    if context:
-        dynamic_parts.append(f"CONTEXTE (base de connaissances) :\n{context}")
-    if system_override:
-        dynamic_parts.append(f"## Contexte temps réel de l'utilisateur :\n{system_override}")
-    # Les préférences viennent en dernier pour prendre le dessus sur SYSTEM_PROMPT_BASE
-    if preferences_text:
-        dynamic_parts.append(preferences_text)
-
     blocks = [
         {
             "type": "text",
@@ -753,6 +750,23 @@ def _build_system(context: str, system_override: str = None, preferences_text: s
             "cache_control": {"type": "ephemeral"}
         }
     ]
+    # Bloc dédié pour les préférences (langue, longueur, expertise) : stable sur
+    # toute une session utilisateur (même valeurs à chaque tour), contrairement
+    # au contexte RAG ci-dessous qui change à chaque message. Son propre
+    # cache_control permet de le réutiliser depuis le cache même quand le
+    # contexte RAG, lui, ne matche jamais.
+    if preferences_text:
+        blocks.append({
+            "type": "text",
+            "text": preferences_text,
+            "cache_control": {"type": "ephemeral"}
+        })
+
+    dynamic_parts = []
+    if context:
+        dynamic_parts.append(f"CONTEXTE (base de connaissances) :\n{context}")
+    if system_override:
+        dynamic_parts.append(f"## Contexte temps réel de l'utilisateur :\n{system_override}")
     if dynamic_parts:
         blocks.append({"type": "text", "text": "\n\n".join(dynamic_parts)})
     return blocks
@@ -838,7 +852,6 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
         system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
-        extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
     )
 
     _log_usage(response.usage, "[sync] ")
@@ -939,7 +952,6 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
         system=_build_system(context, system, prefs_text),
         tools=TOOLS,
         messages=_build_messages(query, history, pending_tool_uses, tool_results),
-        extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
     ) as stream:
         async for text in stream.text_stream:
             yield f'data: {json.dumps({"type": "token", "text": text})}\n\n'
