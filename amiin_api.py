@@ -11,6 +11,7 @@ import json
 import math
 import time
 import asyncio
+import difflib
 import logging
 import functools
 from concurrent.futures import ThreadPoolExecutor
@@ -1829,7 +1830,7 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
         # code-switching naturel guide mieux le modèle qu'une simple liste de
         # mots hors contexte.
         data["prompt"] = (
-            "Waan doonayaa inaan helo kaadhkayga aqoonsiga iyo baasaboorkayga. "
+            "Waan doonayaa inaan helo kaarka aqoonsiga iyo baasaboorkayga. "
             "Fadlan ii sheeg xaggee laga helayo dukumentiga extrait de naissance "
             "ama certificat de résidence ee mairie-da. Waxaan u baahanahay "
             "shahaadada casriga ah ee CNSS iyo OPS, iyo casier judiciaire-ga "
@@ -1861,11 +1862,72 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
         raise HTTPException(status_code=502, detail=f"STT Groq {resp.status_code}")
     return (resp.json() or {}).get("text", "").strip()
 
+# Lexique fermé de termes récurrents en somali djiboutien (démarches
+# administratives) que Whisper transcrit régulièrement de travers. On ne
+# corrige QUE si un mot (ou une courte séquence) est un quasi-homophone
+# exact d'un terme du lexique — jamais de déduction du sens à partir du
+# contexte. C'est le remplaçant volontairement plus timide de la relecture
+# par Claude retirée précédemment : celle-ci reformulait parfois vers un
+# tout autre sens sur une transcription déjà déformée (cumul d'erreurs).
+# Orthographes alignées sur celles déjà utilisées dans lang_map["so"] plus haut.
+_SO_LEXICON = [
+    "kaarka aqoonsiga", "baasaboorka", "warqadda dhalashada",
+    "shahaadada deganaanshaha",
+    "carte d'identité", "extrait de naissance", "certificat de résidence",
+    "casier judiciaire", "passeport", "mairie", "commissariat",
+    "CNSS", "OPS", "Djibouti", "iska waran", "dakhtarka",
+]
+# En dessous de cette longueur (acronymes courts type CNSS/OPS), la
+# comparaison approximative devient dangereuse — un mot de 3 lettres
+# ressemble toujours "assez" à un autre mot de 3 lettres. On exige alors
+# une correspondance exacte (insensible à la casse) plutôt qu'un score.
+_SO_LEXICON_FUZZY_MIN_LEN = 5
+_SO_LEXICON_FUZZY_THRESHOLD = 0.8
+
+def _correct_with_lexicon(text: str) -> str:
+    """Remplace les quasi-homophones d'un terme du lexique par son
+    orthographe exacte, mot à mot ou phrase par phrase, sans jamais
+    toucher au reste de la transcription."""
+    if not text.strip():
+        return text
+    entries = sorted(
+        ((p, p.lower().split(" ")) for p in _SO_LEXICON),
+        key=lambda e: -len(e[1]),   # phrases avant mots isolés
+    )
+    tokens = text.split(" ")
+    out, i, n = [], 0, len(tokens)
+    while i < n:
+        best = None
+        for canonical, words in entries:
+            span = len(words)
+            if i + span > n:
+                continue
+            candidate = " ".join(tokens[i:i + span]).strip(".,;:!?").lower()
+            target = " ".join(words)
+            if candidate == target:
+                break   # déjà correct
+            if len(target) < _SO_LEXICON_FUZZY_MIN_LEN:
+                continue   # acronyme/mot court : pas d'approximation
+            if abs(len(candidate) - len(target)) > max(2, len(target) // 3):
+                continue   # longueur trop différente pour être le même mot
+            if difflib.SequenceMatcher(None, candidate, target).ratio() >= _SO_LEXICON_FUZZY_THRESHOLD:
+                best = (span, canonical)
+                break
+        if best:
+            out.append(best[1])
+            i += best[0]
+        else:
+            out.append(tokens[i])
+            i += 1
+    return " ".join(out)
+
 @app.post("/v1/stt", dependencies=[Depends(tts_user)])
 async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so")):
     """
     Transcrit un fichier audio en texte via Groq Whisper large-v3.
     Champ multipart `file` (audio) + `lang` (code ISO : so, fr, en, ar).
+    En somali, une correction par lexique fermé redresse les quasi-homophones
+    de termes administratifs connus (sans jamais reformuler le sens).
     """
     audio = await file.read()
     if not audio:
@@ -1876,6 +1938,8 @@ async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so")):
     text = await asyncio.to_thread(
         _groq_transcribe, audio, file.filename, file.content_type, lang
     )
+    if lang == "so":
+        text = _correct_with_lexicon(text)
     return {"text": text}
 
 # ══════════════════════════════════════════════════════════════════════════════
