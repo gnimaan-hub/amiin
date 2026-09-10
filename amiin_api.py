@@ -91,8 +91,8 @@ def _sampling_kwargs(model: str) -> dict:
     if model == MODEL_CLAUDE_SO:
         return {"output_config": {"effort": "low"}}
     return {"temperature": TEMPERATURE}
-TOP_K          = 8
-TOP_K_FINAL    = 8
+TOP_K          = 6
+TOP_K_FINAL    = 4
 MAX_TOKENS     = 2048
 TEMPERATURE    = 0.3
 
@@ -774,7 +774,7 @@ def _build_system(context: str, system_override: str = None, preferences_text: s
 def _build_messages(query: str, history, pending_tool_uses=None, tool_results=None) -> list:
     msgs = []
     if history:
-        for msg in history[-10:]:
+        for msg in history[-6:]:
             msgs.append({"role": msg.role, "content": msg.content})
     msgs.append({"role": "user", "content": query})
 
