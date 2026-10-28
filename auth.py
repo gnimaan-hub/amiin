@@ -6,15 +6,17 @@ Endpoints : POST /auth/register, /auth/login, /auth/refresh, /auth/logout
 """
 
 import os
+import time
 import uuid
 import hashlib
 import secrets
+from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import psycopg2
@@ -42,12 +44,43 @@ router  = APIRouter(prefix="/auth", tags=["auth"])
 def _get_conn():
     return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
+# ── Rate limiting (fenêtre glissante en mémoire, instance unique) ──────────────
+# Seuils volontairement larges par IP : à Djibouti beaucoup d'abonnés mobiles
+# sortent par la même IP (CGNAT). La vraie protection anti-force-brute est le
+# plafond d'échecs par email.
+
+_auth_buckets: dict = defaultdict(deque)
+
+def _hit(key: str, max_calls: int, window_s: int) -> None:
+    now = time.monotonic()
+    bucket = _auth_buckets[key]
+    while bucket and now - bucket[0] > window_s:
+        bucket.popleft()
+    if len(bucket) >= max_calls:
+        raise HTTPException(status_code=429, detail="Trop de tentatives — réessayez plus tard.")
+    bucket.append(now)
+
+def _client_ip(request: Request) -> str:
+    # Derrière le proxy Render : la dernière entrée de X-Forwarded-For est celle
+    # ajoutée par le proxy (les précédentes peuvent être forgées par le client).
+    fwd = request.headers.get("x-forwarded-for", "")
+    if fwd:
+        return fwd.split(",")[-1].strip()
+    return request.client.host if request.client else "unknown"
+
+def _login_failures_exceeded(email: str) -> bool:
+    bucket = _auth_buckets[f"login_fail:{email}"]
+    now = time.monotonic()
+    while bucket and now - bucket[0] > 15 * 60:
+        bucket.popleft()
+    return len(bucket) >= 10
+
 # ── Schemas ────────────────────────────────────────────────────────────────────
 
 class RegisterRequest(BaseModel):
-    email: str
-    password: str
-    display_name: str = ""
+    email: str = Field(max_length=254)
+    password: str = Field(max_length=128)
+    display_name: str = Field("", max_length=60)
 
     @field_validator("password")
     @classmethod
@@ -63,8 +96,8 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: str
-    password: str
+    email: str = Field(max_length=254)
+    password: str = Field(max_length=128)
 
     @field_validator("email")
     @classmethod
@@ -140,7 +173,8 @@ def get_current_user(creds: Optional[HTTPAuthorizationCredentials] = Depends(bea
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
 @router.post("/register", response_model=TokenResponse, status_code=201)
-def register(body: RegisterRequest):
+def register(body: RegisterRequest, request: Request):
+    _hit(f"register:{_client_ip(request)}", max_calls=20, window_s=3600)
     pw_hash = pwd_ctx.hash(body.password)
     display = body.display_name or body.email.split("@")[0]
     try:
@@ -164,7 +198,10 @@ def register(body: RegisterRequest):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(body: LoginRequest):
+def login(body: LoginRequest, request: Request):
+    _hit(f"login:{_client_ip(request)}", max_calls=30, window_s=60)
+    if _login_failures_exceeded(body.email):
+        raise HTTPException(status_code=429, detail="Trop de tentatives — réessayez dans 15 minutes.")
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -174,6 +211,7 @@ def login(body: LoginRequest):
             row = cur.fetchone()
 
     if not row or not pwd_ctx.verify(body.password, row["password_hash"]):
+        _auth_buckets[f"login_fail:{body.email}"].append(time.monotonic())
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect.")
     if not row["is_active"]:
         raise HTTPException(status_code=403, detail="Compte désactivé.")
@@ -186,7 +224,8 @@ def login(body: LoginRequest):
 
 
 @router.post("/refresh", response_model=TokenResponse)
-def refresh_token(body: RefreshRequest):
+def refresh_token(body: RefreshRequest, request: Request):
+    _hit(f"refresh:{_client_ip(request)}", max_calls=60, window_s=60)
     h = _hash_refresh(body.refresh_token)
     now = datetime.now(tz=timezone.utc)
 

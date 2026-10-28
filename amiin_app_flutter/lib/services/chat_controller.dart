@@ -56,7 +56,6 @@ class ChatController extends ChangeNotifier {
     _messages.addAll(
         MemoryService().getRecentMessages(limit: loadedHistoryLimit));
     unawaited(_refreshEnvContextIfStale());
-    unawaited(_loadDemarchesCatalog());
   }
 
   final AmiinApiService _api;
@@ -109,20 +108,8 @@ class ChatController extends ChangeNotifier {
   // Position GPS préchargée (météo gérée côté backend via OWM)
   double _lat = 11.5721;
   double _lon = 43.1456;
-  bool _located = false;
   DateTime? _gpsRefreshedAt;
   bool _gpsFetching = false;
-
-  // Catalogue des démarches (chargé une fois au démarrage)
-  String _demarchesCatalog = '';
-
-  Future<void> _loadDemarchesCatalog() async {
-    try {
-      _demarchesCatalog = await demarchesService.getCatalogSummaryForAmiin();
-    } catch (_) {
-      _demarchesCatalog = '';
-    }
-  }
 
   @override
   void dispose() {
@@ -200,7 +187,7 @@ class ChatController extends ChangeNotifier {
     final apiHistory = history
         .map((m) => {
               'role': m.role == 'user' ? 'user' : 'assistant',
-              'content': m.content,
+              'content': _clip(m.content, _maxHistoryChars),
             })
         .toList()
         .cast<Map<String, String>>();
@@ -220,7 +207,7 @@ class ChatController extends ChangeNotifier {
     // Rafraîchir le contexte en tâche de fond pour le prochain message ;
     // celui-ci part immédiatement avec le contexte déjà disponible.
     unawaited(_refreshEnvContextIfStale());
-    final systemPrompt = _buildSystemPrompt();
+    final clientContext = _buildClientContext();
 
     final streamId = _uuid.v4();
     final msgTimestamp = DateTime.now();
@@ -241,7 +228,7 @@ class ChatController extends ChangeNotifier {
         await for (final event in _api.sendMessageStream(
           message: text,
           history: apiHistory,
-          system: systemPrompt,
+          clientContext: clientContext,
           pendingToolUses: pendingReads,
           toolResults: toolResults,
           lat: _lat,
@@ -480,7 +467,7 @@ class ChatController extends ChangeNotifier {
 
       results.add({
         'tool_use_id': tc['id'],
-        'content': content,
+        'content': _clip(content, _maxToolResultChars),
       });
     }
 
@@ -795,44 +782,31 @@ class ChatController extends ChangeNotifier {
     _notice('Suppression annulée');
   }
 
-  // ── System prompt ─────────────────────────────────────────────────────────
+  // ── Contexte utilisateur ──────────────────────────────────────────────────
 
-  String _buildSystemPrompt() {
-    final now = DateTime.now();
-    final buffer = StringBuffer()
-      ..writeln(
-          'Date et heure actuelles : ${DateFormat('EEEE d MMMM yyyy à HH:mm', 'fr').format(now)}');
+  // Bornes alignées sur celles du backend (amiin_api.py) : au-delà, il
+  // rejetterait la requête.
+  static const int _maxHistoryChars = 12000;
+  static const int _maxToolResultChars = 15000;
 
-    buffer.writeln(_located
-        ? 'Localisation : ${_lat.toStringAsFixed(2)}, ${_lon.toStringAsFixed(2)}'
-        : 'Localisation : Djibouti-ville (11.5721, 43.1456)');
+  static String _clip(String s, int max) =>
+      s.length <= max ? s : '${s.substring(0, max - 1)}…';
 
-    // Catalogue des démarches administratives
-    if (_demarchesCatalog.isNotEmpty) {
-      buffer.writeln('\n$_demarchesCatalog');
-      buffer.writeln(
-        'Pour obtenir le détail complet d\'une démarche (étapes, pièces, organisme, coût), '
-        'utilise l\'outil get_demarche_detail avec son ID (ex: "egouv_102").',
-      );
-    }
-
-    // Profil utilisateur (injecté depuis les paramètres)
-    final profileFragment = settingsService.profileSystemPromptFragment;
-    if (profileFragment.isNotEmpty) {
-      buffer.writeln('\n$profileFragment');
-    }
-
-    // Mémoire : actions récentes de l'utilisateur
+  /// Données structurées seulement : le backend formule lui-même le texte
+  /// injecté dans le prompt (le catalogue des démarches y est déjà).
+  Map<String, dynamic> _buildClientContext() {
     final actions = MemoryService().getRecentActions(limit: 8);
-    if (actions.isNotEmpty) {
-      buffer.writeln("\nActions récentes de l'utilisateur (mémoire) :");
-      for (final a in actions) {
-        buffer.writeln(
-            '- ${DateFormat('dd/MM').format(a.timestamp)} : ${a.summary}');
-      }
-    }
-
-    return buffer.toString();
+    return {
+      'now': DateTime.now().toIso8601String(),
+      'profile': settingsService.profileContextPayload,
+      'recent_actions': [
+        for (final a in actions)
+          {
+            'date': a.timestamp.toIso8601String(),
+            'summary': _clip(a.summary, 200),
+          },
+      ],
+    };
   }
 
   Future<void> _refreshEnvContextIfStale() async {
@@ -846,7 +820,6 @@ class ChatController extends ChangeNotifier {
       final pos = await LocationService().getCurrentLocation();
       _lat = pos.latitude;
       _lon = pos.longitude;
-      _located = true;
       _gpsRefreshedAt = DateTime.now();
     } catch (e) {
       debugPrint('GPS indisponible: $e');

@@ -888,30 +888,7 @@ class DemarchesService {
 
   Future<void> init() async => _init();
 
-  // ── Résumé pour Amiin ─────────────────────────────────────────────────────
-
-  Future<String> getCatalogSummaryForAmiin() async {
-    await _init();
-    final buf = StringBuffer('Catalogue des démarches administratives de Djibouti :\n\n');
-    final byCategory = <DemarcheCategory, List<Demarche>>{};
-    for (final d in _catalogBox.values) {
-      byCategory.putIfAbsent(d.category, () => []).add(d);
-    }
-    for (final cat in DemarcheCategory.values) {
-      final items = byCategory[cat];
-      if (items == null || items.isEmpty) continue;
-      buf.writeln('## ${cat.label}');
-      for (final d in items) {
-        final typeLabel = d.type == DemarcheType.procedure ? '📋' : 'ℹ️';
-        buf.write('$typeLabel [${d.id}] ${d.title}');
-        if (d.duration != null) buf.write(' — délai : ${d.duration}');
-        if (d.cost != null) buf.write(' — coût : ${d.cost}');
-        buf.writeln();
-      }
-      buf.writeln();
-    }
-    return buf.toString();
-  }
+  // ── Détail pour Amiin (outil get_demarche_detail) ─────────────────────────
 
   Future<String> getDemarcheDetailForAmiin(String id) async {
     try {

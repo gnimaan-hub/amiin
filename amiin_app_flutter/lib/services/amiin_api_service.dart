@@ -97,7 +97,7 @@ class AmiinApiService {
   Future<({String reply, List<Map<String, dynamic>> toolCalls})> sendMessage({
     required String message,
     required List<Map<String, String>> history,
-    String? system,
+    Map<String, dynamic>? clientContext,
     bool expand = true,
     CancelToken? cancelToken,
   }) async {
@@ -106,7 +106,7 @@ class AmiinApiService {
       data: {
         'message': message,
         'history': history,
-        'system': system,
+        if (clientContext != null) 'client_context': clientContext,
         'expand': expand,
       },
       options: Options(
@@ -151,7 +151,7 @@ class AmiinApiService {
   Stream<ChatStreamEvent> sendMessageStream({
     required String message,
     required List<Map<String, String>> history,
-    String? system,
+    Map<String, dynamic>? clientContext,
     bool expand = true,
     List<Map<String, dynamic>>? pendingToolUses,
     List<Map<String, dynamic>>? toolResults,
@@ -166,7 +166,7 @@ class AmiinApiService {
       final body = <String, dynamic>{
         'message': message,
         'history': history,
-        'system': system,
+        if (clientContext != null) 'client_context': clientContext,
         'expand': expand,
         if (lat != null) 'lat': lat,
         if (lon != null) 'lon': lon,

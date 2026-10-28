@@ -229,49 +229,23 @@ class SettingsService extends ChangeNotifier {
     'currency': currency,
   };
 
-  // ── Fragment de system prompt : contexte utilisateur pour Amiin ───────────
+  // ── Profil transmis à Amiin (données brutes, formulées par le backend) ────
+  // Longueurs bornées comme côté serveur (ClientProfile dans amiin_api.py).
+  // La langue, les sources et la devise passent par userPreferencesPayload.
 
-  String get profileSystemPromptFragment {
-    final parts = <String>[];
-    if (displayName.isNotEmpty) {
-      parts.add("L'utilisateur s'appelle $displayName.");
-    }
-    if (profileBirthYear != null) {
-      final age = DateTime.now().year - profileBirthYear!;
-      parts.add("Il/elle a environ $age ans.");
-    }
-    if (profileProfession.isNotEmpty) {
-      parts.add("Profession : $profileProfession.");
-    }
-    if (profileEmployment.isNotEmpty) {
-      const labels = {
-        'employee': 'Salarié(e)',
-        'freelance': 'Indépendant(e)',
-        'unemployed': 'Sans emploi',
-        'student': 'Étudiant(e)',
-      };
-      parts.add("Situation : ${labels[profileEmployment] ?? profileEmployment}.");
-    }
-    if (profileNativeLanguage.isNotEmpty) {
-      parts.add("Langue maternelle : $profileNativeLanguage.");
-    }
-    if (profilePhone.isNotEmpty) {
-      parts.add("Téléphone : $profilePhone.");
-    }
-    if (aiLanguage != 'fr') {
-      const names = {'en': 'anglais', 'ar': 'arabe', 'so': 'somali'};
-      parts.add("Réponds toujours en ${names[aiLanguage] ?? aiLanguage}.");
-    }
-    if (favoriteTopics.isNotEmpty) {
-      parts.add("Domaines d'intérêt prioritaires : ${favoriteTopics.join(', ')}.");
-    }
-    if (showSources) {
-      parts.add("Cite systématiquement tes sources dans tes réponses.");
-    }
-    if (currency != 'DJF') {
-      parts.add("Exprime les montants en $currency.");
-    }
-    return parts.isEmpty ? '' : "Profil de l'utilisateur :\n${parts.join(' ')}";
+  static String _cap(String s, int max) => s.length <= max ? s : s.substring(0, max);
+
+  Map<String, dynamic> get profileContextPayload {
+    final year = profileBirthYear;
+    return {
+      'display_name': _cap(displayName, 60),
+      if (year != null && year >= 1900 && year <= 2100) 'birth_year': year,
+      'profession': _cap(profileProfession, 80),
+      'employment': _cap(profileEmployment, 20),
+      'native_language': _cap(profileNativeLanguage, 40),
+      'phone': _cap(profilePhone, 30),
+      'favorite_topics': [for (final t in favoriteTopics.take(10)) _cap(t, 40)],
+    };
   }
 
 }
