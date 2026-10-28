@@ -1,6 +1,9 @@
 // ─── SettingsAboutScreen ── À propos & Support ────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/toast.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
@@ -69,26 +72,15 @@ class SettingsAboutScreen extends StatelessWidget {
                         subtitle: 'Voir les dernières mises à jour',
                         onTap: () => _showChangelog(context),
                       ),
-                      SettingRow(
-                        icon: Icons.book_outlined,
-                        label: 'Guide d\'utilisation',
-                        subtitle: 'Rejouer l\'introduction à Amiin',
-                        onTap: () => _stub(context, 'Guide bientôt disponible'),
-                      ),
                     ]),
 
                     const SettingsSection('Support'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.help_outline,
-                        label: 'Centre d\'aide / FAQ',
-                        onTap: () => _stub(context, 'Ouverture du navigateur'),
-                      ),
-                      SettingRow(
                         icon: Icons.mail_outline,
                         label: 'Contacter le support',
                         subtitle: 'support@amiin.dj',
-                        onTap: () => _stub(context, 'Ouverture de la messagerie'),
+                        onTap: () => _mailSupport(context, 'Amiin — demande de support', ''),
                       ),
                       SettingRow(
                         icon: Icons.flag_outlined,
@@ -100,14 +92,13 @@ class SettingsAboutScreen extends StatelessWidget {
                     const SettingsSection('Communauté'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.star_outline,
-                        label: 'Noter l\'application',
-                        onTap: () => _stub(context, 'Ouverture du store'),
-                      ),
-                      SettingRow(
                         icon: Icons.share_outlined,
                         label: 'Partager Amiin',
-                        onTap: () => _stub(context, 'Partage ouvert'),
+                        onTap: () => Share.share(
+                          'Je te recommande Amiin, l\'assistant qui répond à tes questions '
+                          'sur les démarches et les lois à Djibouti.',
+                          subject: 'Amiin',
+                        ),
                       ),
                     ]),
 
@@ -166,14 +157,24 @@ class SettingsAboutScreen extends StatelessWidget {
             child: const Text('Annuler'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Cache vidé avec succès'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
+              final tmp = await getTemporaryDirectory();
+              if (await tmp.exists()) {
+                for (final entry in tmp.listSync()) {
+                  try {
+                    entry.deleteSync(recursive: true);
+                  } catch (_) {}   // fichier en cours d'utilisation : ignoré
+                }
+              }
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Cache vidé'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             },
             child: const Text('Vider'),
           ),
@@ -182,10 +183,14 @@ class SettingsAboutScreen extends StatelessWidget {
     );
   }
 
-  void _stub(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
-    );
+  /// Ouvre l'application de messagerie vers le support, sujet et corps
+  /// pré-remplis (pas d'envoi côté serveur).
+  Future<void> _mailSupport(BuildContext context, String subject, String body) async {
+    final uri = Uri.parse('mailto:support@amiin.dj'
+        '?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}');
+    if (!await launchUrl(uri) && context.mounted) {
+      AmiinToast.show(context, 'Aucune application de messagerie — écrivez à support@amiin.dj');
+    }
   }
 
   void _showChangelog(BuildContext context) {
@@ -241,9 +246,9 @@ class SettingsAboutScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              AmiinToast.show(context, 'Rapport envoyé — merci !');
+              _mailSupport(context, 'Amiin — signalement ($_version)', ctrl.text);
             },
-            child: const Text('Envoyer'),
+            child: const Text('Envoyer par e-mail'),
           ),
         ],
       ),

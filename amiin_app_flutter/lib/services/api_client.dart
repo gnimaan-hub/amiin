@@ -48,12 +48,15 @@ class ApiClient {
         return handler.next(options);
       },
       onError: (DioException error, handler) async {
-        // Tentative de refresh sur 401 (token expiré)
-        if (error.response?.statusCode == 401) {
+        // Tentative de refresh sur 401 (token expiré) — une seule fois par
+        // requête : si la requête rejouée reprend un 401, on n'enchaîne pas
+        // refresh sur refresh.
+        final opts = error.requestOptions;
+        if (error.response?.statusCode == 401 && opts.extra['retried'] != true) {
           final newToken = await authService.refreshAccessToken();
           if (newToken != null) {
             try {
-              final opts = error.requestOptions;
+              opts.extra['retried'] = true;
               opts.headers['Authorization'] = 'Bearer $newToken';
               final resp = await _dio.fetch(opts);
               return handler.resolve(resp);

@@ -111,7 +111,7 @@ class SettingRow extends StatelessWidget {
               Switch(
                 value: toggleValue,
                 onChanged: onToggle,
-                activeColor: primary,
+                activeThumbColor: primary,
               )
             else if (onTap != null && showChevron)
               Icon(Icons.chevron_right, color: context.ac.muted, size: 18),

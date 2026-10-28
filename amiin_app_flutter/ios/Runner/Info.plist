@@ -6,6 +6,8 @@
 		<string>Amiin utilise le microphone pour la dictée vocale de vos questions.</string>
 		<key>NSSpeechRecognitionUsageDescription</key>
 		<string>Amiin utilise la reconnaissance vocale pour transcrire vos questions.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Amiin utilise votre position pour trouver les services publics proches et adapter la météo.</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

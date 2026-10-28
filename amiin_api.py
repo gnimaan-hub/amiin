@@ -1,12 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
 """
 amiin_api.py - Serveur API FastAPI pour l'app mobile Amiin
-Connecte l'app Flutter au pipeline RAG (ChromaDB + Claude)
+Connecte l'app Flutter au pipeline RAG (Jina + Qdrant Cloud + Claude)
 v2.2 : streaming SSE, skip expand auto, cache LRU embedding, parallélisation.
 """
 
 import os
 import io
+import hmac
 import json
 import math
 import time
@@ -23,12 +24,12 @@ from datetime import datetime, timedelta, timezone
 
 import edge_tts
 
-from fastapi import FastAPI, HTTPException, Depends, File, UploadFile, Form, Request, Path
+from fastapi import FastAPI, HTTPException, Depends, File, UploadFile, Form, Request, Path, Query, Header
 from fastapi.responses import StreamingResponse, Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
-from auth import router as auth_router, get_current_user, _get_conn as _db_conn
+from auth import router as auth_router, get_current_user, ensure_auth_schema, _get_conn as _db_conn
 
 import requests as _requests
 from dotenv import load_dotenv
@@ -58,6 +59,8 @@ _req_sh = logging.StreamHandler()
 _req_sh.setFormatter(logging.Formatter('[REQ] %(message)s'))
 _req_logger.addHandler(_req_sh)
 
+_LOG_QUERY_TEXT = os.environ.get("LOG_QUERY_TEXT", "") == "1"
+
 def _log_request(data: dict) -> None:
     """Écrit une ligne JSON dans amiin_requests.log ET sur stdout (Render dashboard)."""
     _req_logger.info(json.dumps(data, ensure_ascii=False))
@@ -66,8 +69,6 @@ def _log_request(data: dict) -> None:
 # CONFIGURATION
 # ══════════════════════════════════════════════════════════════════════════════
 
-DB_PATH        = './amiin_db'            # Conservé pour fallback local uniquement
-COLLECTION     = 'djibouti_knowledge'
 JINA_MODEL     = 'jina-embeddings-v3'   # API Jina AI — remplace SentenceTransformers local
 JINA_EMBED_DIM = 1024                   # dimension du modèle jina-embeddings-v3
 QDRANT_COLLECTION = 'djibouti_knowledge'
@@ -475,7 +476,6 @@ class AmiinServiceOut(BaseModel):
 
 jina_api_key: str = ""
 qdrant_client: QdrantClient = None
-collection = None          # ChromaDB — conservé pour compatibilité stats locale
 claude_client: Anthropic = None
 async_claude: AsyncAnthropic = None
 
@@ -498,7 +498,7 @@ def _load_env_key(key_name: str) -> str:
     return val
 
 def load_components():
-    global jina_api_key, qdrant_client, collection, claude_client, async_claude
+    global jina_api_key, qdrant_client, claude_client, async_claude
 
     # ── Jina AI (embeddings) ──────────────────────────────────────────────────
     logging.info("Chargement de la clé Jina AI...")
@@ -1080,8 +1080,12 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     else:
         # 1re passe : pipeline RAG complet
         should_exp = expand and _should_expand(query)
-        direct_embedding = list(_cached_embed(query, token_acc=jina_acc))
         yield f'data: {json.dumps({"type": "status", "text": st_search})}\n\n'
+        # Appels réseau bloquants (Jina, Qdrant) toujours hors de la boucle
+        # d'événements : avec un seul worker, un appel lent figerait tous les
+        # autres utilisateurs, streams en cours compris.
+        direct_embedding = list(await loop.run_in_executor(
+            None, functools.partial(_cached_embed, query, token_acc=jina_acc)))
 
         if should_exp:
             expand_task = loop.run_in_executor(None, expand_query, query)
@@ -1095,8 +1099,12 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
                     None, lambda: _jina_embed_batch(extras)
                 )
                 jina_acc[0] += extra_tokens
-                for emb in extra_embs_raw:
-                    for chunk in _search_with_embedding(emb, TOP_K):
+                extra_results = await asyncio.gather(*(
+                    loop.run_in_executor(None, _search_with_embedding, emb, TOP_K)
+                    for emb in extra_embs_raw
+                ))
+                for result in extra_results:
+                    for chunk in result:
                         cid = chunk['id']
                         if cid not in all_chunks or chunk['distance'] < all_chunks[cid]['distance']:
                             all_chunks[cid] = chunk
@@ -1151,7 +1159,9 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     # ── Log fichier ───────────────────────────────────────────────────────────
     _log_request({
         "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "query":           query[:300],
+        # Texte des questions : données personnelles potentielles, journalisé
+        # seulement si LOG_QUERY_TEXT=1 (diagnostic ponctuel).
+        "query":           query[:300] if _LOG_QUERY_TEXT else f"<{len(query)} car.>",
         "history_len":     len(history) if history else 0,
         "pass":            usage["pass"],
         "expand":          expand and not is_second_pass,
@@ -1218,6 +1228,10 @@ def _chunk_to_service(chunk_id, document, metadata, ref_lat=None, ref_lng=None, 
 async def lifespan(app: FastAPI):
     load_components()
     _ensure_favorites_table()
+    try:
+        ensure_auth_schema()
+    except Exception:
+        logging.exception("Migration du schéma d'authentification impossible")
     yield
 
 app = FastAPI(
@@ -1314,11 +1328,13 @@ def _user_favorites(user_id: str) -> set:
 # ─── Health ───────────────────────────────────────────────────────────────────
 
 @app.get("/v1/logs")
-async def get_logs(n: int = 100, secret: Optional[str] = None):
+def get_logs(n: int = Query(100, ge=1, le=1000),
+             x_log_secret: Optional[str] = Header(None)):
     """Retourne les n dernières lignes de amiin_requests.log.
-    Accessible uniquement si LOG_SECRET est définie ET fournie en ?secret=…"""
+    Accessible uniquement si LOG_SECRET est définie ET fournie dans l'en-tête
+    X-Log-Secret (jamais en query string : elle finirait dans les logs d'accès)."""
     log_secret = os.environ.get("LOG_SECRET", "")
-    if not log_secret or secret != log_secret:
+    if not log_secret or not x_log_secret or not hmac.compare_digest(x_log_secret, log_secret):
         raise HTTPException(status_code=401, detail="Accès refusé — LOG_SECRET requis.")
     log_path = "amiin_requests.log"
     if not os.path.exists(log_path):

@@ -255,7 +255,7 @@ class SettingsAssistantScreen extends StatelessWidget {
                               Switch(
                                 value: settings.useCloudTts,
                                 onChanged: (v) => settingsService.useCloudTts = v,
-                                activeColor: primary,
+                                activeThumbColor: primary,
                               ),
                             ],
                           ),

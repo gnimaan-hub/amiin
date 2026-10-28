@@ -43,3 +43,7 @@ test_*.py
 *.iml
 Thumbs.db
 .DS_Store
+
+# Tests (non embarqués dans l image)
+tests/
+requirements-dev.txt

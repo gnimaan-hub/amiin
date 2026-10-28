@@ -27,10 +27,8 @@ python-multipart==0.0.20        # requis par FastAPI pour l'upload de fichiers (
 
 # ── BASE DE DONNÉES (nouveau) ─────────────────────────────────────
 psycopg2-binary==2.9.10        # driver PostgreSQL
-SQLAlchemy==2.0.41             # ORM
-passlib==1.7.4                  # hash des mots de passe
-bcrypt==3.2.2                  # pin <4.0 — passlib 1.7.4 incompatible avec bcrypt 4.x
-python-jose[cryptography]==3.3.0  # JWT tokens
+bcrypt==4.3.0                  # hash des mots de passe (utilisé directement, sans passlib)
+PyJWT==2.10.1                  # JWT tokens (remplace python-jose, CVE-2024-33663/33664)
 
 # ── SYNTHÈSE VOCALE CLOUD (Edge TTS) ──────────────────────────────
 edge-tts==7.2.8               # TTS neuronal Microsoft Edge — gratuit, sans clé API

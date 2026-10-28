@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'hive_utils.dart';
 import 'memory_service.dart';
 import 'notification_service.dart';
 import 'settings_service.dart';
@@ -427,9 +428,15 @@ class DemarchesService {
     if (_initialized) return;
     if (!Hive.isAdapterRegistered(12)) Hive.registerAdapter(DemarcheAdapter());
     if (!Hive.isAdapterRegistered(13)) Hive.registerAdapter(UserDemarcheAdapter());
+    // Le catalogue est public (pas de chiffrement) ; le suivi des démarches
+    // de l'utilisateur est chiffré comme les autres données personnelles.
     _catalogBox   = await Hive.openBox<Demarche>(_catalogBoxName);
-    _userBox      = await Hive.openBox<UserDemarche>(_userBoxName);
     _settingsBox  = await Hive.openBox<dynamic>(_settingsBoxName);
+    _userBox      = await openBoxMigratingToEncrypted<UserDemarche>(
+      _userBoxName,
+      migrated: _settingsBox.get('user_box_encrypted') == true,
+      markMigrated: () => _settingsBox.put('user_box_encrypted', true),
+    );
     _initialized  = true;
     await _loadInitialCatalog();
   }

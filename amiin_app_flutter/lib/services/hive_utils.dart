@@ -46,6 +46,46 @@ Future<void> initHiveCipher() async {
   }
 }
 
+/// Ouvre avec le cipher global une box créée autrefois EN CLAIR, en recopiant
+/// son contenu une seule fois. On ne peut pas se fier à [openBoxSafe] pour ce
+/// cas : Hive, en mode récupération, peut ouvrir une box en clair avec un
+/// cipher en écartant silencieusement les entrées illisibles (perte de données).
+/// [migrated]/[markMigrated] persistent le drapeau de migration.
+Future<Box<T>> openBoxMigratingToEncrypted<T>(
+  String name, {
+  required bool migrated,
+  required Future<void> Function() markMigrated,
+}) async {
+  if (amiinCipher == null) return Hive.openBox<T>(name);
+  if (migrated) return openBoxSafe<T>(name);
+
+  final plain = await Hive.openBox<T>(name);
+  final entries = Map<dynamic, T>.from(plain.toMap());
+  await plain.deleteFromDisk();
+  final box = await Hive.openBox<T>(name, encryptionCipher: amiinCipher);
+  await box.putAll(entries);
+  await markMigrated();
+  return box;
+}
+
+/// Efface toutes les données utilisateur stockées sur l'appareil
+/// (conversations, mémoire, notes, agenda, suivi des démarches, profil et
+/// préférences, cache d'accueil). Le catalogue public des démarches et la clé
+/// de chiffrement sont conservés.
+Future<void> wipeLocalUserData() async {
+  const names = [
+    'chat_messages', 'user_actions', 'notes_box', 'agenda_events',
+    'user_demarches', 'settings', 'home_brief',
+  ];
+  for (final name in names) {
+    if (Hive.isBoxOpen(name)) {
+      await Hive.box<dynamic>(name).clear();
+    } else {
+      await Hive.deleteBoxFromDisk(name);
+    }
+  }
+}
+
 /// Ouvre une box avec le cipher global. Si la box existante n'est pas
 /// déchiffrable (ancienne box non chiffrée, clé perdue…), elle est
 /// supprimée puis recréée — préférable à une app qui ne démarre plus.

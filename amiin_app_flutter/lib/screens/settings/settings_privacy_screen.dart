@@ -6,6 +6,10 @@ import 'package:provider/provider.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
+import '../../services/chat_controller.dart';
+import '../../services/export_service.dart';
+import '../../services/hive_utils.dart';
+import '../../services/memory_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/header.dart';
 import '../../widgets/card.dart';
@@ -61,39 +65,13 @@ class SettingsPrivacyScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SettingsSection('Amélioration du service'),
-                    SettingCard(children: [
-                      SettingRow(
-                        icon: Icons.bug_report_outlined,
-                        label: 'Rapports d\'erreurs automatiques',
-                        subtitle: 'Aucune donnée personnelle envoyée',
-                        toggle: true,
-                        toggleValue: settings.errorReporting,
-                        onToggle: (v) => settingsService.errorReporting = v,
-                      ),
-                      SettingRow(
-                        icon: Icons.insights_outlined,
-                        label: 'Analytique d\'usage',
-                        subtitle: 'Aide à améliorer l\'expérience Amiin',
-                        toggle: true,
-                        toggleValue: settings.analytics,
-                        onToggle: (v) => settingsService.analytics = v,
-                      ),
-                    ]),
-
                     const SettingsSection('Historique des conversations'),
                     SettingCard(children: [
                       SettingRow(
                         icon: Icons.history_outlined,
-                        label: 'Durée de conservation',
-                        value: '90 jours',
-                        onTap: () => _showRetentionPicker(context),
-                      ),
-                      SettingRow(
-                        icon: Icons.download_outlined,
-                        label: 'Exporter mes conversations',
-                        subtitle: 'Fichier JSON',
-                        onTap: () => _stub(context, 'Export disponible prochainement — nécessite une connexion'),
+                        label: 'Conservation',
+                        value: '${MemoryService.maxStoredMessages} derniers messages',
+                        subtitle: 'Sur cet appareil uniquement',
                       ),
                       SettingRow(
                         icon: Icons.delete_outline,
@@ -104,6 +82,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                           context,
                           'Effacer l\'historique',
                           'Toutes vos conversations seront supprimées définitivement.',
+                          () async => context.read<ChatController>().clearConversation(),
                         ),
                       ),
                     ]),
@@ -111,35 +90,29 @@ class SettingsPrivacyScreen extends StatelessWidget {
                     const SettingsSection('Mes données'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.folder_zip_outlined,
-                        label: 'Télécharger mes données',
-                        subtitle: 'Archive complète de votre compte',
-                        onTap: () => _stub(context, 'Téléchargement disponible prochainement'),
+                        icon: Icons.download_outlined,
+                        label: 'Exporter mes données',
+                        subtitle: 'Conversations, notes, agenda, démarches — fichier JSON',
+                        onTap: () => _export(context),
                       ),
                       SettingRow(
                         icon: Icons.delete_forever_outlined,
                         label: 'Supprimer toutes mes données',
-                        subtitle: 'Suppression locale et sur les serveurs Amiin',
+                        subtitle: 'Sur cet appareil — le compte se supprime dans Compte',
                         destructive: true,
                         onTap: () => _confirmClear(
                           context,
                           'Supprimer toutes vos données',
-                          'Cette action supprime définitivement toutes vos données locales et sur nos serveurs. Elle est irréversible.',
+                          'Conversations, notes, agenda, démarches suivies, profil et préférences '
+                          'enregistrés sur cet appareil seront supprimés définitivement. '
+                          'Pour supprimer aussi votre compte sur nos serveurs, utilisez '
+                          'Paramètres › Compte › Supprimer le compte.',
+                          () async {
+                            final chat = context.read<ChatController>();
+                            await wipeLocalUserData();
+                            chat.clearConversation();
+                          },
                         ),
-                      ),
-                    ]),
-
-                    const SettingsSection('Documents légaux'),
-                    SettingCard(children: [
-                      SettingRow(
-                        icon: Icons.privacy_tip_outlined,
-                        label: 'Politique de confidentialité',
-                        onTap: () => _stub(context, 'Ouverture du navigateur'),
-                      ),
-                      SettingRow(
-                        icon: Icons.gavel_outlined,
-                        label: 'Conditions d\'utilisation',
-                        onTap: () => _stub(context, 'Ouverture du navigateur'),
                       ),
                     ]),
 
@@ -154,33 +127,16 @@ class SettingsPrivacyScreen extends StatelessWidget {
     );
   }
 
-  void _stub(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
-    );
+  Future<void> _export(BuildContext context) async {
+    try {
+      await exportService.exportAndShare();
+    } catch (e) {
+      if (context.mounted) AmiinToast.show(context, 'Export impossible : $e');
+    }
   }
 
-  void _showRetentionPicker(BuildContext context) {
-    const options = ['30 jours', '90 jours', '1 an', 'Indéfini'];
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options
-              .map((o) => ListTile(
-                    title: Text(o),
-                    onTap: () => Navigator.pop(ctx),
-                  ))
-              .toList(),
-        ),
-      ),
-    );
-  }
-
-  void _confirmClear(BuildContext context, String title, String message) {
+  void _confirmClear(BuildContext context, String title, String message,
+      Future<void> Function() action) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -191,9 +147,10 @@ class SettingsPrivacyScreen extends StatelessWidget {
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Annuler')),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              AmiinToast.show(context, 'Action effectuée');
+              await action();
+              if (context.mounted) AmiinToast.show(context, 'Données supprimées');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Supprimer'),

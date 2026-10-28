@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
+import 'hive_utils.dart';
+
 // Base URL partagée sans importer api_client (évite la dépendance circulaire)
 const _kBaseUrl = String.fromEnvironment(
   'AMIIN_API_URL',
@@ -185,6 +187,69 @@ class AuthService extends ChangeNotifier {
         await _authDio.post('/auth/logout', data: {'refresh_token': refreshToken});
       } catch (_) {}
     }
+    _user = null;
+    await _clearAll();
+    notifyListeners();
+  }
+
+  Future<Options> _authed() async {
+    final token = await refreshAccessToken() ?? await getAccessToken();
+    return Options(headers: {'Authorization': 'Bearer $token'});
+  }
+
+  Future<void> updateDisplayName(String displayName) async {
+    final resp = await _authDio.patch('/auth/me',
+        data: {'display_name': displayName}, options: await _authed());
+    _user = _parseUser(resp.data as Map<String, dynamic>);
+    await _cacheUser(_user!);
+    notifyListeners();
+  }
+
+  /// Change le mot de passe ; le serveur coupe les autres sessions et renvoie
+  /// de nouveaux tokens pour cet appareil.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final resp = await _authDio.post('/auth/change-password',
+        data: {'current_password': currentPassword, 'new_password': newPassword},
+        options: await _authed());
+    await _storeTokens(
+      accessToken: resp.data['access_token'] as String,
+      refreshToken: resp.data['refresh_token'] as String,
+    );
+  }
+
+  /// Ferme toutes les sessions du compte (tous appareils), puis celle-ci.
+  Future<void> logoutAll() async {
+    try {
+      await _authDio.post('/auth/logout-all', options: await _authed());
+    } catch (_) {}
+    _user = null;
+    await _clearAll();
+    notifyListeners();
+  }
+
+  /// Demande l'envoi d'un code à 6 chiffres par e-mail (réponse identique que
+  /// le compte existe ou non).
+  Future<void> forgotPassword(String email) =>
+      _authDio.post('/auth/forgot-password', data: {'email': email});
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) =>
+      _authDio.post('/auth/reset-password',
+          data: {'email': email, 'code': code, 'new_password': newPassword});
+
+  /// Supprime définitivement le compte côté serveur (mot de passe requis),
+  /// puis efface la session et toutes les données locales de l'utilisateur.
+  /// Lève une DioException si le serveur refuse (ex. mot de passe incorrect).
+  Future<void> deleteAccount({required String password}) async {
+    await _authDio.delete('/auth/me',
+        data: {'password': password}, options: await _authed());
+    await wipeLocalUserData();
     _user = null;
     await _clearAll();
     notifyListeners();

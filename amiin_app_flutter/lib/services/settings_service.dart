@@ -192,12 +192,6 @@ class SettingsService extends ChangeNotifier {
 
   // ── Confidentialité ───────────────────────────────────────────────────────
 
-  bool get errorReporting => _get('error_reporting', true);
-  set errorReporting(bool v) => _set('error_reporting', v);
-
-  bool get analytics => _get('analytics', true);
-  set analytics(bool v) => _set('analytics', v);
-
   /// Afficher les sources dans les réponses d'Amiin
   bool get showSources => _get('show_sources', false);
   set showSources(bool v) => _set('show_sources', v);

@@ -110,16 +110,8 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ]),
 
-                    // ── Abonnement ────────────────────────────────────────
-                    const SettingsSection('Abonnement'),
-                    SettingCard(children: [
-                      SettingRow(
-                        icon: Icons.credit_card_outlined,
-                        label: 'Facturation',
-                        subtitle: 'Plan actuel, historique',
-                        onTap: () => context.push('/settings/billing'),
-                      ),
-                    ]),
+                    // ── Abonnement : masqué tant qu'aucune offre payante
+                    // n'existe (l'écran /settings/billing reste routé).
 
                     // ── Support ───────────────────────────────────────────
                     const SettingsSection('Support'),

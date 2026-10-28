@@ -199,35 +199,143 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Réinitialisation en deux étapes : e-mail → code à 6 chiffres reçu par
+  /// e-mail + nouveau mot de passe.
   void _showForgotDialog(BuildContext context) {
+    final emailCtrl = TextEditingController(text: _emailCtrl.text.trim());
+    final codeCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+    bool codeSent = false;
+    bool busy = false;
+    String? error;
+    String? info;
+
+    final textStyle = TextStyle(fontFamily: FontFamily.sans, color: ColorsAmiin.onDark);
+    InputDecoration deco(String label) => InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: ColorsAmiin.onDark.withValues(alpha: 0.6)),
+        );
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: ColorsAmiin.darkMid,
-        title: Text(
-          'Mot de passe oublié',
-          style: TextStyle(fontFamily: FontFamily.geo, color: ColorsAmiin.onDark),
-        ),
-        content: Text(
-          'Contactez le support à support@amiin.dj pour réinitialiser votre mot de passe.',
-          style: TextStyle(
-            fontFamily: FontFamily.sans,
-            color: ColorsAmiin.onDark.withValues(alpha: 0.7),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'OK',
-              style: TextStyle(
-                color: ColorsAmiin.turquoiseMid,
-                fontFamily: FontFamily.geo,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          Future<void> run(Future<void> Function() action) async {
+            setState(() { busy = true; error = null; });
+            try {
+              await action();
+            } on DioException catch (e) {
+              error = authErrorMessage(e);
+            } finally {
+              if (ctx.mounted) setState(() => busy = false);
+            }
+          }
+
+          return AlertDialog(
+            backgroundColor: ColorsAmiin.darkMid,
+            title: Text(
+              'Mot de passe oublié',
+              style: TextStyle(fontFamily: FontFamily.geo, color: ColorsAmiin.onDark),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    codeSent
+                        ? (info ?? 'Saisissez le code reçu par e-mail et votre nouveau mot de passe.')
+                        : 'Nous allons vous envoyer un code de réinitialisation par e-mail.',
+                    style: textStyle.copyWith(color: ColorsAmiin.onDark.withValues(alpha: 0.7)),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  TextField(
+                    controller: emailCtrl,
+                    enabled: !codeSent && !busy,
+                    keyboardType: TextInputType.emailAddress,
+                    style: textStyle,
+                    decoration: deco('E-mail'),
+                  ),
+                  if (codeSent) ...[
+                    TextField(
+                      controller: codeCtrl,
+                      enabled: !busy,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      style: textStyle,
+                      decoration: deco('Code à 6 chiffres'),
+                    ),
+                    TextField(
+                      controller: passCtrl,
+                      enabled: !busy,
+                      obscureText: true,
+                      style: textStyle,
+                      decoration: deco('Nouveau mot de passe (8 caractères min.)'),
+                    ),
+                  ],
+                  if (error != null) ...[
+                    const SizedBox(height: Spacing.sm),
+                    Text(error!, style: textStyle.copyWith(color: Colors.redAccent)),
+                  ],
+                ],
               ),
             ),
-          ),
-        ],
+            actions: [
+              TextButton(
+                onPressed: busy ? null : () => Navigator.pop(ctx),
+                child: Text('Annuler',
+                    style: TextStyle(color: ColorsAmiin.onDark.withValues(alpha: 0.7))),
+              ),
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () {
+                        final email = emailCtrl.text.trim();
+                        if (!codeSent) {
+                          if (!email.contains('@')) {
+                            setState(() => error = 'Adresse e-mail invalide.');
+                            return;
+                          }
+                          run(() async {
+                            await authService.forgotPassword(email);
+                            codeSent = true;
+                            info = 'Si un compte existe pour $email, un code vient d\'y être '
+                                'envoyé (valable 30 min). Saisissez-le avec votre nouveau mot de passe.';
+                          });
+                        } else {
+                          if (passCtrl.text.length < 8) {
+                            setState(() => error = 'Le mot de passe doit comporter au moins 8 caractères.');
+                            return;
+                          }
+                          run(() async {
+                            await authService.resetPassword(
+                              email: email,
+                              code: codeCtrl.text.trim(),
+                              newPassword: passCtrl.text,
+                            );
+                            _emailCtrl.text = email;
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (mounted) {
+                              ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(
+                                content: Text('Mot de passe modifié — connectez-vous.'),
+                              ));
+                            }
+                          });
+                        }
+                      },
+                child: Text(
+                  codeSent ? 'Valider' : 'Envoyer le code',
+                  style: TextStyle(color: ColorsAmiin.turquoiseMid, fontFamily: FontFamily.geo),
+                ),
+              ),
+            ],
+          );
+        },
       ),
-    );
+    ).whenComplete(() {
+      emailCtrl.dispose();
+      codeCtrl.dispose();
+      passCtrl.dispose();
+    });
   }
 }

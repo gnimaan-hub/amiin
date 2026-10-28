@@ -45,6 +45,7 @@ dependencies:
   # Lecture audio (voix cloud Edge TTS)
   just_audio: ^0.9.46
   path_provider: ^2.1.4
+  share_plus: ^10.1.4         # export des données, partage de l'app
   home_widget: ^0.9.3
   workmanager: ^0.9.0+3
 

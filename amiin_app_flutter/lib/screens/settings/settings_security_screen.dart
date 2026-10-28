@@ -1,6 +1,7 @@
 // ─── SettingsSecurityScreen ───────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../widgets/header.dart';
@@ -25,73 +26,40 @@ class SettingsSecurityScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: Spacing.sm),
 
-                    const SettingsSection('Déverrouillage'),
+                    const SettingsSection('Protection des données'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.fingerprint,
-                        label: 'Biométrie',
-                        subtitle: 'Face ID ou empreinte digitale',
-                        toggle: true,
-                        toggleValue: false,
-                        onToggle: (_) => _stub(context),
+                        icon: Icons.enhanced_encryption_outlined,
+                        label: 'Chiffrement sur l\'appareil',
+                        subtitle: 'Conversations, notes, agenda et démarches chiffrés '
+                            '(AES-256, clé dans le stockage sécurisé du téléphone)',
+                        value: 'Actif',
                       ),
                       SettingRow(
-                        icon: Icons.pin_outlined,
-                        label: 'Code PIN',
-                        subtitle: 'Alternative à la biométrie',
-                        onTap: () => _stub(context),
-                      ),
-                      SettingRow(
-                        icon: Icons.lock_clock_outlined,
-                        label: 'Verrouillage automatique',
-                        value: 'Après 5 min',
-                        onTap: () => _showAutoLockPicker(context),
-                      ),
-                    ]),
-
-                    const SettingsSection('Confidentialité d\'affichage'),
-                    SettingCard(children: [
-                      SettingRow(
-                        icon: Icons.visibility_off_outlined,
-                        label: 'Masquer les infos sensibles',
-                        subtitle: 'Les données perso apparaissent masquées en aperçu',
-                        toggle: true,
-                        toggleValue: false,
-                        onToggle: (_) => _stub(context),
+                        icon: Icons.lock_outline,
+                        label: 'Connexion au serveur',
+                        subtitle: 'Échanges chiffrés (HTTPS), session renouvelée '
+                            'automatiquement',
                       ),
                     ]),
 
                     const SettingsSection('Autorisations système'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.location_on_outlined,
-                        label: 'Localisation',
-                        subtitle: 'Pour les services à proximité',
-                        value: 'En utilisation',
-                        onTap: () => _stub(context),
-                      ),
-                      SettingRow(
-                        icon: Icons.mic_outlined,
-                        label: 'Microphone',
-                        subtitle: 'Pour la dictée vocale',
-                        value: 'Autorisé',
-                        onTap: () => _stub(context),
-                      ),
-                      SettingRow(
-                        icon: Icons.notifications_outlined,
-                        label: 'Notifications',
-                        subtitle: 'Gérer dans les paramètres système',
-                        onTap: () => _stub(context),
+                        icon: Icons.tune_outlined,
+                        label: 'Gérer les autorisations',
+                        subtitle: 'Localisation, microphone, notifications',
+                        onTap: () => Geolocator.openAppSettings(),
                       ),
                     ]),
 
-                    const SettingsSection('Historique de connexion'),
+                    const SettingsSection('Sessions'),
                     SettingCard(children: [
                       SettingRow(
-                        icon: Icons.history_outlined,
-                        label: 'Dernières sessions',
-                        subtitle: 'Appareils et connexions récentes',
-                        onTap: () => _stub(context),
+                        icon: Icons.devices_outlined,
+                        label: 'Appareils connectés',
+                        subtitle: 'Pour fermer toutes vos sessions : '
+                            'Compte › Déconnecter tous mes appareils',
                       ),
                     ]),
 
@@ -101,35 +69,6 @@ class SettingsSecurityScreen extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _stub(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Fonctionnalité à venir'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _showAutoLockPicker(BuildContext context) {
-    const options = ['Jamais', 'Après 1 min', 'Après 5 min', 'Après 15 min'];
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: options
-              .map((o) => ListTile(
-                    title: Text(o),
-                    onTap: () => Navigator.pop(ctx),
-                  ))
-              .toList(),
         ),
       ),
     );

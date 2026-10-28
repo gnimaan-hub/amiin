@@ -24,7 +24,19 @@ services:
         sync: false
       - key: JWT_SECRET_KEY        # OBLIGATOIRE — l'API refuse de démarrer sans (openssl rand -hex 32)
         sync: false
-      - key: LOG_SECRET            # OBLIGATOIRE pour consulter /v1/logs (sinon endpoint fermé)
+      - key: LOG_SECRET            # OBLIGATOIRE pour consulter /v1/logs (en-tête X-Log-Secret, sinon endpoint fermé)
+        sync: false
+      # - key: LOG_QUERY_TEXT      # optionnel — "1" pour journaliser le texte des questions (diagnostic ponctuel)
+      # Mot de passe oublié (code par e-mail) — sans SMTP_HOST/SMTP_FROM, /auth/forgot-password répond 503
+      - key: SMTP_HOST             # ex. smtp-relay.brevo.com
+        sync: false
+      - key: SMTP_PORT             # 587 (STARTTLS) ou 465 (SSL)
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM             # ex. Amiin <no-reply@amiin.dj>
         sync: false
       # - key: CORS_ORIGINS        # optionnel — origines web autorisées, séparées par des virgules
 
