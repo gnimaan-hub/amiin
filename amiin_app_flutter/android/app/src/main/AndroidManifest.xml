@@ -25,8 +25,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
-            android:taskAffinity=""
+            android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -38,6 +37,14 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme"/>
+            <!-- La navigation du widget est gérée manuellement côté Dart
+                 (home_widget). Sans ceci, Flutter utilise l'Intent.data du tap
+                 widget (amiin://chat) comme route INITIALE du routeur au lieu
+                 de /splash, court-circuitant authService.init() et forçant un
+                 retour systématique à /login au lancement à froid. -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
