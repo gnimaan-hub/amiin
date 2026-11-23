@@ -135,7 +135,7 @@ final GoRouter appRouter = GoRouter(
                 child: navigationShell,
               ),
             ),
-            bottomNavigationBar: _AmiinNavBar(
+            bottomNavigationBar: AmiinNavBar(
               currentIndex: navigationShell.currentIndex,
               onTap: (index) => navigationShell.goBranch(
                 index,
@@ -294,17 +294,18 @@ final GoRouter appRouter = GoRouter(
 
 // ── Bottom navigation bar avec ligne d'horizon dynamique ──────────────────────
 
-class _AmiinNavBar extends StatefulWidget {
+/// Barre d'onglets principale (publique pour l'aperçu de développement).
+class AmiinNavBar extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _AmiinNavBar({required this.currentIndex, required this.onTap});
+  const AmiinNavBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
-  State<_AmiinNavBar> createState() => _AmiinNavBarState();
+  State<AmiinNavBar> createState() => AmiinNavBarState();
 }
 
-class _AmiinNavBarState extends State<_AmiinNavBar> {
+class AmiinNavBarState extends State<AmiinNavBar> {
   static const _items = [
     _NavItem(icon: Icons.home_outlined,         activeIcon: Icons.home_rounded,        label: 'Accueil'),
     _NavItem(icon: Icons.chat_bubble_outline,   activeIcon: Icons.chat_bubble_rounded, label: 'Amiin'),
