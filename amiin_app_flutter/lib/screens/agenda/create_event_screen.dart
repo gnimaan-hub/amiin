@@ -223,7 +223,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         label: Text(cat.label),
                         selected: _category == cat.category,
                         onSelected: (_) => setState(() => _category = cat.category),
-                        backgroundColor: Colors.white,
+                        backgroundColor: context.ac.surface,
                         selectedColor: cat.color,
                         checkmarkColor: Colors.white,
                         labelStyle: TextStyles.cardTitle(context).copyWith(color: _category == cat.category ? Colors.white : context.ac.midTone),
@@ -237,7 +237,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         label: Text(rem.label),
                         selected: _reminder == rem.value,
                         onSelected: (_) => setState(() => _reminder = rem.value),
-                        backgroundColor: Colors.white,
+                        backgroundColor: context.ac.surface,
                         selectedColor: context.ac.secretariatAccent,
                         labelStyle: TextStyles.cardTitle(context).copyWith(color: _reminder == rem.value ? Colors.white : context.ac.midTone),
                       )).toList(),
@@ -261,7 +261,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Widget _buildField(String label, Widget child) {
-    return Column(
+    // Pleine largeur : sinon le bloc se centre et se décale des champs.
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -271,6 +274,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         const SizedBox(height: 6),
         child,
       ],
+      ),
     );
   }
 
@@ -278,20 +282,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     hintText: hint,
     filled: true,
     fillColor: context.ac.surface,
+    // Même forme que le style global des champs (refonte « vitrine »).
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(RadiusAmiin.md),
-      borderSide: BorderSide(color: context.ac.border),
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: context.ac.border.withValues(alpha: 0.7)),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(RadiusAmiin.md),
-      borderSide: BorderSide(color: context.ac.border),
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: context.ac.border.withValues(alpha: 0.7)),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: 10),
   );
 
   BoxDecoration _boxDecoration() => BoxDecoration(
     color: context.ac.surface,
-    borderRadius: BorderRadius.circular(RadiusAmiin.md),
-    border: Border.all(color: context.ac.border),
+    borderRadius: BorderRadius.circular(14),
+    border: Border.all(color: context.ac.border.withValues(alpha: 0.7)),
   );
 }

@@ -59,7 +59,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Supprimer'),
           ),
         ],

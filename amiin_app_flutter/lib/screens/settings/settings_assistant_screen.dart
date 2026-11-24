@@ -328,7 +328,7 @@ class SettingsAssistantScreen extends StatelessWidget {
               Navigator.pop(ctx);
               AmiinToast.show(context, 'Mémoire effacée');
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Effacer'),
           ),
         ],

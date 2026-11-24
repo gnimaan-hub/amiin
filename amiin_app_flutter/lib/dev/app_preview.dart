@@ -17,6 +17,25 @@ import 'package:provider/provider.dart';
 
 import '../navigation/app_router.dart' show AmiinNavBar;
 import '../screens/agenda/agenda_screen.dart';
+import '../screens/agenda/create_event_screen.dart';
+import '../screens/agenda/event_detail_screen.dart';
+import '../screens/annuaire/service_detail_screen.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/register_screen.dart';
+import '../screens/demarches/demarche_detail_screen.dart';
+import '../screens/notes/note_detail_screen.dart';
+import '../screens/settings/settings_about_screen.dart';
+import '../screens/settings/settings_account_screen.dart';
+import '../screens/settings/settings_appearance_screen.dart';
+import '../screens/settings/settings_assistant_screen.dart';
+import '../screens/settings/settings_billing_screen.dart';
+import '../screens/settings/settings_language_screen.dart';
+import '../screens/settings/settings_notifications_screen.dart';
+import '../screens/settings/settings_privacy_screen.dart';
+import '../screens/settings/settings_profile_screen.dart';
+import '../screens/settings/settings_security_screen.dart';
+import '../screens/settings/settings_text_screen.dart';
+import '../services/annuaire_service.dart';
 import '../screens/annuaire/annuaire_screen.dart';
 import '../screens/chat/chat_screen.dart';
 import '../screens/demarches/demarches_screen.dart';
@@ -39,6 +58,9 @@ import '../services/notes_service.dart';
 import '../services/settings_service.dart';
 import '../theme/themes.dart';
 
+// Identifiants d'exemple, résolus au démarrage (routes /x/…).
+String _eventId = '', _noteId = '', _serviceId = '', _demarcheId = '';
+
 const _tabs = ['/home', '/chat', '/agenda', '/notes', '/annuaire', '/demarches'];
 
 Future<void> main() async {
@@ -56,11 +78,11 @@ Future<void> main() async {
     MemoryService().init(),
   ]);
   ApiClient.init();
-  try {
-    await demarchesService.init().timeout(const Duration(seconds: 5));
-  } catch (e) {
+  // L'initialisation des démarches peut ne jamais aboutir dans le
+  // navigateur (box chiffrée) : on ne l'attend pas.
+  demarchesService.init().catchError((Object e) {
     debugPrint('[preview] démarches indisponibles : $e');
-  }
+  });
   await _seed();
 
   final variant =
@@ -96,6 +118,37 @@ Future<void> main() async {
         ],
       ),
       GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+      for (final e in <String, Widget>{
+        'profile': const SettingsProfileScreen(),
+        'account': const SettingsAccountScreen(),
+        'security': const SettingsSecurityScreen(),
+        'assistant': const SettingsAssistantScreen(),
+        'appearance': const SettingsAppearanceScreen(),
+        'text': const SettingsTextScreen(),
+        'notifications': const SettingsNotificationsScreen(),
+        'language': const SettingsLanguageScreen(),
+        'privacy': const SettingsPrivacyScreen(),
+        'billing': const SettingsBillingScreen(),
+        'about': const SettingsAboutScreen(),
+      }.entries)
+        GoRoute(path: '/settings/${e.key}', builder: (_, __) => e.value),
+      // Écrans de détail et de création, avec des données d'exemple.
+      GoRoute(path: '/x/event', redirect: (_, __) => '/agenda/event/$_eventId'),
+      GoRoute(path: '/x/note', redirect: (_, __) => '/notes/$_noteId'),
+      GoRoute(path: '/x/service', redirect: (_, __) => '/annuaire/$_serviceId'),
+      GoRoute(path: '/x/demarche', redirect: (_, __) => '/demarches/$_demarcheId'),
+      GoRoute(path: '/agenda/create', builder: (_, __) => const CreateEventScreen()),
+      GoRoute(path: '/agenda/event/:id',
+          builder: (_, s) => EventDetailScreen(eventId: s.pathParameters['id']!)),
+      GoRoute(path: '/notes/create', builder: (_, __) => const CreateNoteScreen()),
+      GoRoute(path: '/notes/:id',
+          builder: (_, s) => NoteDetailScreen(noteId: s.pathParameters['id']!)),
+      GoRoute(path: '/annuaire/:id',
+          builder: (_, s) => ServiceDetailScreen(serviceId: s.pathParameters['id']!)),
+      GoRoute(path: '/demarches/:id',
+          builder: (_, s) => DemarcheDetailScreen(demarcheId: s.pathParameters['id']!)),
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
     ],
   );
 
@@ -126,6 +179,28 @@ Future<void> main() async {
 }
 
 Future<void> _seed() async {
+  await _seedData();
+  final now = DateTime.now();
+  final events = await agendaService.getEvents(
+      now.subtract(const Duration(days: 1)).toIso8601String(),
+      now.add(const Duration(days: 30)).toIso8601String());
+  if (events.isNotEmpty) _eventId = events.first.id;
+  final notes = await notesService.getNotes();
+  if (notes.isNotEmpty) _noteId = notes.last.id;
+  try {
+    final data = await annuaireService.loadLocal();
+    if (data.entries.isNotEmpty) _serviceId = data.entries.first.id;
+  } catch (e) {
+    debugPrint('[preview] annuaire indisponible : $e');
+  }
+  demarchesService.getCatalog().then((catalog) {
+    if (catalog.isNotEmpty) _demarcheId = catalog.first.id;
+  }).catchError((Object e) {
+    debugPrint('[preview] catalogue des démarches indisponible : $e');
+  });
+}
+
+Future<void> _seedData() async {
   final existing = await notesService.getNotes();
   if (existing.isNotEmpty) return;
 

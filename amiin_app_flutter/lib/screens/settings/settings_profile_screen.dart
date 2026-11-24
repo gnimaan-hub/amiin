@@ -243,7 +243,7 @@ class _BirthYearPicker extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                  title: const Text('Ne pas préciser', style: TextStyle(color: Colors.red)),
+                  title: Text('Ne pas préciser', style: TextStyle(color: context.ac.alertColor)),
                   onTap: () { onChanged(null); Navigator.pop(ctx); },
                 ),
               ],

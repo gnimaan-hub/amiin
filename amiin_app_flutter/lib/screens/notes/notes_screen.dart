@@ -212,7 +212,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   Navigator.pop(dialogCtx, true),
                                               style: TextButton.styleFrom(
                                                   foregroundColor:
-                                                      Colors.red),
+                                                      context.ac.alertColor),
                                               child:
                                                   const Text('Supprimer'),
                                             ),

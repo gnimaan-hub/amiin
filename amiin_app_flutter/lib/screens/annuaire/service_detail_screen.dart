@@ -64,7 +64,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       if (!mounted) return;
     } else {
       if (!mounted) return;
-      AmiinToast.show(context, 'Impossible dâ€™ouvrir le lien');
+      AmiinToast.show(context, 'Impossible d’ouvrir le lien');
     }
   }
 
@@ -103,7 +103,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(Spacing.xl),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // stretch : toutes les cartes prennent la largeur de l'écran.
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(s.name, style: TextStyles.cardTitle(context).copyWith(fontSize: 24, fontFamily: FontFamily.geo)),
                     const SizedBox(height: 4),
@@ -127,15 +128,15 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           Text('Contact', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                           const SizedBox(height: 8),
                           if (s.phone != null) ...[
-                            _contactRow('ðŸ“ž', s.phone!, () => _launchUrl('tel:${s.phone}')),
+                            _contactRow('📞', s.phone!, () => _launchUrl('tel:${s.phone}')),
                             const SizedBox(height: Spacing.sm),
                           ],
                           if (s.email != null) ...[
-                            _contactRow('âœ‰ï¸', s.email!, () => _launchUrl('mailto:${s.email}')),
+                            _contactRow('✉️', s.email!, () => _launchUrl('mailto:${s.email}')),
                             const SizedBox(height: Spacing.sm),
                           ],
                           if (s.website != null) ...[
-                            _contactRow('ðŸŒ', s.website!, () => _launchUrl(s.website!)),
+                            _contactRow('🌐', s.website!, () => _launchUrl(s.website!)),
                           ],
                         ],
                       ),
@@ -184,7 +185,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ã€ propos', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
+                            Text('À propos', style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold)),
                             const SizedBox(height: 8),
                             Text(s.description!, style: TextStyles.body(context).copyWith(color: context.ac.midTone)),
                           ],

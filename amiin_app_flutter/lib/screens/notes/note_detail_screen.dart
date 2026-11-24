@@ -239,7 +239,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         content: const Text('Êtes-vous sûr de vouloir supprimer cette note ?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-          TextButton(onPressed: () => Navigator.pop(context, true), style: TextButton.styleFrom(foregroundColor: Colors.red), child: const Text('Supprimer')),
+          TextButton(onPressed: () => Navigator.pop(context, true), style: TextButton.styleFrom(foregroundColor: context.ac.alertColor), child: const Text('Supprimer')),
         ],
       ),
     );

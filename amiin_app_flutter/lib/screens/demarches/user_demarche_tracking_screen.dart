@@ -123,7 +123,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
         content: const Text('Cette action supprime votre suivi de démarche. Le catalogue n\'est pas affecté.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Supprimer', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Supprimer', style: TextStyle(color: context.ac.alertColor))),
         ],
       ),
     );
@@ -788,8 +788,8 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Supprimer ce suivi', style: TextStyle(color: Colors.red)),
+              leading: Icon(Icons.delete_outline, color: context.ac.alertColor),
+              title: Text('Supprimer ce suivi', style: TextStyle(color: context.ac.alertColor)),
               onTap: () {
                 Navigator.pop(ctx);
                 _deleteDemarche();

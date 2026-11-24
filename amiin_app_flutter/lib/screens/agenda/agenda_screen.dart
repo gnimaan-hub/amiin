@@ -509,7 +509,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
                                     onPressed: () =>
                                         Navigator.pop(dialogCtx, true),
                                     style: TextButton.styleFrom(
-                                        foregroundColor: Colors.red),
+                                        foregroundColor: context.ac.alertColor),
                                     child: const Text('Supprimer'),
                                   ),
                                 ],

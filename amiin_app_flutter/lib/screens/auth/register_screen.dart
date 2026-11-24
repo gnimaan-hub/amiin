@@ -61,7 +61,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorsAmiin.encreNuit,
-      body: SafeArea(
+      body: AuthBackdrop(
+        child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: Spacing.xxxl),
           child: Form(
@@ -228,6 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
