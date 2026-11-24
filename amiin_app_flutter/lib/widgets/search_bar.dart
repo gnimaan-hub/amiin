@@ -81,7 +81,12 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyles.bodyMuted(context),
+                // Neutralise le style global des champs : la pilule porte
+                // déjà la forme et l'ombre.
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),

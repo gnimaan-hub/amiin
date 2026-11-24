@@ -2,6 +2,8 @@
 // Ombres douces à deux couches, liseré de lumière et voile de verre dépoli.
 // Référence : docs/REFONTE_VITRINE.md (étapes 1 à 4 et 10).
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'themes.dart';
 
@@ -69,4 +71,12 @@ LinearGradient surfaceGlass(BuildContext context, {double strength = 1}) {
       ac.surface.withValues(alpha: (dark ? 0.52 : 0.58) * strength),
     ],
   );
+}
+
+/// Hauteur à dégager au-dessus de la barre d'onglets flottante, pour les
+/// éléments que Flutter ne décale pas seul (boutons flottants des écrans
+/// d'onglet). Vaut 0 hors des onglets.
+double navBarClearance(BuildContext context) {
+  final mq = MediaQuery.of(context);
+  return math.max(0, mq.padding.bottom - mq.viewPadding.bottom);
 }

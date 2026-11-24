@@ -449,9 +449,8 @@ class _AgendaScreenState extends State<AgendaScreen> {
                       backgroundColor: context.ac.secretariatAccent,
                       foregroundColor: context.ac.onAccent,
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                      ),
+                      // Pilule « vitrine ».
+                      shape: const StadiumBorder(),
                     ),
                   ),
                 ],
