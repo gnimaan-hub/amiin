@@ -124,7 +124,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final end = DateTime.parse(_event!.endDate);
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

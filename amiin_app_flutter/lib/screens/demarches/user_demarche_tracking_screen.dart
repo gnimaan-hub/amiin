@@ -165,7 +165,7 @@ class _UserDemarcheTrackingScreenState extends State<UserDemarcheTrackingScreen>
     for (final doc in d.documents) { docsByCas.putIfAbsent(doc.cas, () => []).add(doc); }
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

@@ -556,7 +556,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final ac = context.ac;
 
     return Scaffold(
-      backgroundColor: ac.background,
+      backgroundColor: ac.page,
       body: Column(
         children: [
           _buildHeader(insets, chat, ac),

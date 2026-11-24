@@ -78,7 +78,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     final s = _service!;
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
-import '../../widgets/card.dart';
+import '../../widgets/grouped_list.dart';
 
 // ── Section label ─────────────────────────────────────────────────────────────
 
@@ -15,7 +15,7 @@ class SettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: Spacing.lg, bottom: Spacing.xs),
+      padding: const EdgeInsets.only(left: Spacing.xs, top: Spacing.xl, bottom: Spacing.sm),
       child: Text(
         title.toUpperCase(),
         style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 1.2, fontFamily: FontFamily.geoBold),
@@ -55,7 +55,7 @@ class SettingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    final labelColor = destructive ? Colors.red : context.ac.ink;
+    final labelColor = destructive ? context.ac.alertColor : context.ac.ink;
 
     return InkWell(
       onTap: toggle ? null : onTap,
@@ -72,14 +72,14 @@ class SettingRow extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 color: destructive
-                    ? Colors.red.withValues(alpha: 0.08)
-                    : primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(RadiusAmiin.sm),
+                    ? context.ac.alertColor.withValues(alpha: 0.10)
+                    : primary.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(9),
               ),
               child: Icon(
                 icon,
                 size: 17,
-                color: destructive ? Colors.red : primary,
+                color: destructive ? context.ac.alertColor : primary,
               ),
             ),
             const SizedBox(width: Spacing.md),
@@ -114,7 +114,7 @@ class SettingRow extends StatelessWidget {
                 activeThumbColor: primary,
               )
             else if (onTap != null && showChevron)
-              Icon(Icons.chevron_right, color: context.ac.muted, size: 18),
+              Icon(Icons.chevron_right_rounded, color: context.ac.muted.withValues(alpha: 0.6), size: 20),
           ],
         ),
       ),
@@ -129,7 +129,7 @@ class SettingDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Divider(color: context.ac.border, height: 1, indent: 60);
+      Divider(color: context.ac.border.withValues(alpha: 0.7), height: 0.5, thickness: 0.5, indent: 60);
 }
 
 // ── Card groupant des rows ────────────────────────────────────────────────────
@@ -140,12 +140,9 @@ class SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = <Widget>[];
-    for (var i = 0; i < children.length; i++) {
-      items.add(children[i]);
-      if (i < children.length - 1) items.add(const SettingDivider());
-    }
-    return AmiinCard(child: Column(children: items));
+    // Liste groupée « vitrine » : une carte flottante, filets alignés sur
+    // le texte (16 de marge + 32 d'icône + 12 d'espace).
+    return GroupedList(dividerIndent: 60, children: children);
   }
 }
 
@@ -178,8 +175,12 @@ class ChoiceSelector extends StatelessWidget {
               margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                color: selected ? primary : context.ac.surface2,
-                borderRadius: BorderRadius.circular(RadiusAmiin.md),
+                color: selected ? primary : context.ac.surface,
+                borderRadius: BorderRadius.circular(RadiusAmiin.full),
+                border: selected ? null : Border.all(color: context.ac.border.withValues(alpha: 0.7)),
+                boxShadow: selected
+                    ? [BoxShadow(color: primary.withValues(alpha: 0.30), blurRadius: 12, offset: const Offset(0, 4), spreadRadius: -4)]
+                    : null,
               ),
               child: Text(
                 labels[i],

@@ -219,7 +219,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
     final leadingEmpty = (firstWeekday - 1) % 7;
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

@@ -20,7 +20,7 @@ class SettingsAccountScreen extends StatelessWidget {
     final displayName = auth.currentUser?.displayName ?? '';
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

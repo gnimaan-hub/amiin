@@ -14,6 +14,7 @@ import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import '../../theme/elevation.dart';
 import '../../theme/spacing.dart';
 import '../../theme/themes.dart';
 import '../../theme/typography.dart';
@@ -22,58 +23,7 @@ import '../../services/chat_controller.dart';
 import '../../services/home_brief_service.dart';
 import '../../services/notes_service.dart';
 import '../../widgets/amiin_logo.dart';
-
-// ── Tokens locaux de la vitrine ──────────────────────────────────────────────
-
-/// Rayon des cartes flottantes.
-const double _kRadius = 18;
-
-/// Fond blanc cassé (thèmes clairs) ; les thèmes sombres gardent leur fond.
-Color _pageBackground(BuildContext context) {
-  final ac = context.ac;
-  if (ac.brightness == Brightness.dark) return ac.background;
-  return Color.lerp(ac.background, Colors.white, 0.62)!;
-}
-
-/// Ombre « flottante » : un contact net + une diffusion large et douce.
-/// [lift] de 0 (posé) à 1 (très soulevé) ; [tint] colore la diffusion.
-List<BoxShadow> _floatShadow(BuildContext context, {double lift = 0.5, Color? tint}) {
-  final dark = context.ac.brightness == Brightness.dark;
-  final base = dark ? Colors.black : context.ac.ink;
-  final diffuse = tint ?? base;
-  final k = dark ? 2.2 : 1.0;
-  return [
-    BoxShadow(
-      color: base.withValues(alpha: 0.04 * k),
-      blurRadius: 1.5,
-      offset: const Offset(0, 1),
-    ),
-    BoxShadow(
-      color: diffuse.withValues(alpha: (0.05 + 0.05 * lift) * k),
-      blurRadius: 10 + 26 * lift,
-      offset: Offset(0, 4 + 12 * lift),
-      spreadRadius: -4,
-    ),
-  ];
-}
-
-/// Liseré clair sur le bord des cartes : accroche la lumière.
-Border _hairline(BuildContext context) => Border.all(
-      color: context.ac.brightness == Brightness.dark
-          ? Colors.white.withValues(alpha: 0.06)
-          : Colors.white.withValues(alpha: 0.9),
-      width: 1,
-    );
-
-/// Vrai quand le bandeau est clair (thème Lacté) : texte foncé dessus.
-bool _lightHeader(BuildContext context) =>
-    context.ac.onHeader.computeLuminance() < 0.5;
-
-/// Voile « verre » posé sur le bandeau : blanc sur bandeau foncé,
-/// encre très légère sur bandeau clair.
-Color _glass(BuildContext context, double alpha) => _lightHeader(context)
-    ? context.ac.onHeader.withValues(alpha: alpha * 0.45)
-    : Colors.white.withValues(alpha: alpha);
+import '../../widgets/floating_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -163,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final insets = MediaQuery.of(context).padding;
 
     return Scaffold(
-      backgroundColor: _pageBackground(context),
+      backgroundColor: context.ac.page,
       body: RefreshIndicator(
         color: ac.secretariatAccent,
         backgroundColor: ac.surface,
@@ -235,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: Spacing.md),
-                    _FloatingCard(
+                    FloatingCard(
                       padding: EdgeInsets.zero,
                       child: Column(
                         children: [
@@ -272,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: Spacing.md),
                     ..._notes.map((note) => Padding(
                       padding: const EdgeInsets.only(bottom: Spacing.md),
-                      child: _FloatingCard(
+                      child: FloatingCard(
                         onTap: () => context.push('/notes/${note.id}'),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +279,7 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
-    final light = _lightHeader(context);
+    final light = context.ac.lightHeader;
     const radius = BorderRadius.vertical(bottom: Radius.circular(32));
 
     return Container(
@@ -563,11 +513,11 @@ class _GlassField extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      _glass(context, 0.12),
-                      _glass(context, 0.05),
+                      glass(context, 0.12),
+                      glass(context, 0.05),
                     ],
                   ),
-                  border: Border.all(color: _glass(context, 0.16)),
+                  border: Border.all(color: glass(context, 0.16)),
                   borderRadius: BorderRadius.circular(RadiusAmiin.full),
                 ),
                 child: Row(
@@ -617,80 +567,14 @@ class _GlassIconButton extends StatelessWidget {
             child: Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: _glass(context, 0.10),
+                color: glass(context, 0.10),
                 shape: BoxShape.circle,
-                border: Border.all(color: _glass(context, 0.16)),
+                border: Border.all(color: glass(context, 0.16)),
               ),
               child: Center(child: Icon(icon, size: 18, color: color)),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ── Carte flottante : surface, liseré clair, ombre douce, enfoncement ────────
-
-class _FloatingCard extends StatefulWidget {
-  final Widget child;
-  final EdgeInsets padding;
-  final VoidCallback? onTap;
-  final double lift;
-  final Color? color;
-  final Color? shadowTint;
-
-  const _FloatingCard({
-    required this.child,
-    this.padding = const EdgeInsets.all(Spacing.lg),
-    this.onTap,
-    this.lift = 0.5,
-    this.color,
-    this.shadowTint,
-  });
-
-  @override
-  State<_FloatingCard> createState() => _FloatingCardState();
-}
-
-class _FloatingCardState extends State<_FloatingCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final card = AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      decoration: BoxDecoration(
-        color: widget.color ?? context.ac.surface,
-        borderRadius: BorderRadius.circular(_kRadius),
-        border: _hairline(context),
-        boxShadow: _floatShadow(
-          context,
-          lift: _pressed ? widget.lift * 0.3 : widget.lift,
-          tint: widget.shadowTint,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_kRadius - 1),
-        child: Padding(padding: widget.padding, child: widget.child),
-      ),
-    );
-
-    if (widget.onTap == null) return card;
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTap: () {
-        HapticFeedback.selectionClick();
-        widget.onTap!();
-      },
-      child: AnimatedScale(
-        scale: _pressed ? 0.98 : 1,
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOut,
-        child: card,
       ),
     );
   }
@@ -782,7 +666,7 @@ class _QuickTileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = context.ac.brightness == Brightness.dark;
-    return _FloatingCard(
+    return FloatingCard(
       color: tile.bg,
       shadowTint: tile.accent,
       lift: 0.45,
@@ -947,7 +831,7 @@ class _DailyBriefCard extends StatelessWidget {
       children.add(Expanded(child: tiles[i]));
     }
 
-    return _FloatingCard(
+    return FloatingCard(
       lift: 1,
       padding: const EdgeInsets.fromLTRB(Spacing.sm, Spacing.md, Spacing.sm, Spacing.lg),
       child: Column(

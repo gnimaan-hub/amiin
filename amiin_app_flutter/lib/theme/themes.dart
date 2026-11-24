@@ -69,6 +69,15 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     required this.brightness,
   });
 
+  /// Fond des pages de la refonte « vitrine » : blanc cassé dérivé de
+  /// [background] sur les thèmes clairs, [background] tel quel en sombre.
+  Color get page => brightness == Brightness.dark
+      ? background
+      : Color.lerp(background, const Color(0xFFFFFFFF), 0.62)!;
+
+  /// Vrai quand le bandeau est clair (texte foncé dessus), comme dans Lacté.
+  bool get lightHeader => onHeader.computeLuminance() < 0.5;
+
   @override
   AmiinThemeColors copyWith({
     Color? primary, Color? primaryLight, Color? primaryDark, Color? primaryMid,
@@ -397,7 +406,7 @@ class AmiinThemes {
       colorScheme: colorScheme,
       brightness: c.brightness,
       fontFamily: ff,
-      scaffoldBackgroundColor: c.background,
+      scaffoldBackgroundColor: c.page,
       cardColor: c.surface,
       dividerColor: c.border,
       textTheme: baseTextTheme,
@@ -429,9 +438,10 @@ class AmiinThemes {
       cardTheme: CardThemeData(
         color: c.surface,
         elevation: 0,
+        // Refonte « vitrine » : rayon 18, filet très léger.
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: c.border.withValues(alpha: 0.5)),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -448,28 +458,28 @@ class AmiinThemes {
         fillColor: c.surface,
         hintStyle: TextStyle(color: c.muted, fontFamily: ff),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c.border.withValues(alpha: 0.7)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c.border.withValues(alpha: 0.7)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: c.primary, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       ),
 
-      dividerTheme: DividerThemeData(color: c.border, space: 1, thickness: 1),
+      dividerTheme: DividerThemeData(color: c.border.withValues(alpha: 0.7), space: 1, thickness: 0.5),
 
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: c.primary,
           foregroundColor: Colors.white,
           textStyle: TextStyle(fontFamily: _geoFamily(), fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
           minimumSize: const Size(double.infinity, 50),
         ),
       ),
@@ -479,7 +489,7 @@ class AmiinThemes {
           foregroundColor: Colors.white,
           elevation: 0,
           textStyle: TextStyle(fontFamily: _geoFamily(), fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -489,7 +499,7 @@ class AmiinThemes {
         style: OutlinedButton.styleFrom(
           foregroundColor: c.primary,
           side: BorderSide(color: c.primary),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
         ),
       ),
 
@@ -519,21 +529,34 @@ class AmiinThemes {
         backgroundColor: c.surface,
         titleTextStyle: TextStyle(fontSize: 18, color: c.ink, fontFamily: _geoFamily(), fontWeight: FontWeight.w600),
         contentTextStyle: TextStyle(fontSize: 14, color: c.ink, fontFamily: ff, height: 1.6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: c.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
       ),
 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: isDark ? c.surface2 : c.ink,
-        contentTextStyle: TextStyle(color: c.onHeader, fontFamily: ff),
+        // Texte de la couleur du fond de page : lisible sur l'encre (thèmes
+        // clairs, y compris Lacté dont le bandeau est clair) comme en sombre.
+        contentTextStyle: TextStyle(color: isDark ? c.ink : c.surface, fontFamily: ff),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
 
       popupMenuTheme: PopupMenuThemeData(
         color: c.surface,
+        elevation: 10,
+        shadowColor: (isDark ? Colors.black : c.ink).withValues(alpha: 0.25),
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: c.border.withValues(alpha: 0.5)),
         ),
         textStyle: TextStyle(color: c.ink, fontFamily: ff, fontSize: 14),
       ),

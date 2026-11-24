@@ -1,12 +1,13 @@
 // ─── Card ─────────────────────────────────────────────────────────────────────
-// Carte de marque. Les cartes tappables portent une micro-interaction
-// (léger recul 0.98 + haptique) — appliquée ici une seule fois, elle vaut
-// pour toutes les cartes de l'app.
+// Carte de marque, au style « vitrine » (docs/REFONTE_VITRINE.md, phase B) :
+// elle s'appuie sur [FloatingCard] — surface, liseré de lumière, ombre douce
+// et, si elle est tappable, enfoncement + haptique. Modifiée ici une seule
+// fois, elle vaut pour toutes les cartes de l'app.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../theme/spacing.dart';
 import '../theme/themes.dart';
+import 'floating_card.dart';
 
 enum CardVariant { default_, surface2, dark, info, secretariat }
 
@@ -31,63 +32,63 @@ class AmiinCard extends StatefulWidget {
 }
 
 class _AmiinCardState extends State<AmiinCard> {
-  bool _pressed = false;
-
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
     Color bgColor;
-    Color? accentBorderColor;
+    Color? accent;
+    var lift = widget.elevated ? 0.8 : 0.5;
 
     switch (widget.variant) {
       case CardVariant.default_:
         bgColor = ac.surface;
       case CardVariant.surface2:
+        // Carte secondaire : posée plutôt que flottante.
         bgColor = ac.surface2;
+        lift = 0.15;
       case CardVariant.dark:
         bgColor = ac.headerGradientEnd;
       case CardVariant.info:
         bgColor = ac.surface;
-        accentBorderColor = ac.infoAccent;
+        accent = ac.infoAccent;
       case CardVariant.secretariat:
         bgColor = ac.surface;
-        accentBorderColor = ac.secretariatAccent;
+        accent = ac.secretariatAccent;
     }
 
     final effectivePadding = widget.padding ?? const EdgeInsets.all(Spacing.lg);
 
-    Widget content = Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(RadiusAmiin.lg),
-        border: accentBorderColor != null
-            ? Border(left: BorderSide(color: accentBorderColor, width: 3))
-            : Border.all(color: ac.border),
-        boxShadow: widget.elevated ? ShadowAmiin.md : ShadowAmiin.sm,
-      ),
+    // Les variantes info / secrétariat gardent leur repère coloré, sous la
+    // forme d'une fine pastille verticale à l'intérieur de la carte (et non
+    // plus d'une bordure gauche).
+    final content = accent == null
+        ? widget.child
+        : Stack(
+            clipBehavior: Clip.none,
+            children: [
+              widget.child,
+              Positioned(
+                left: -effectivePadding.left + 6,
+                top: 4,
+                bottom: 4,
+                child: Container(
+                  width: 3,
+                  decoration: BoxDecoration(
+                    color: accent,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ],
+          );
+
+    return FloatingCard(
+      color: bgColor,
+      lift: lift,
       padding: effectivePadding,
-      child: widget.child,
+      onTap: widget.onTap,
+      child: content,
     );
-
-    if (widget.onTap != null) {
-      return GestureDetector(
-        onTapDown: (_) => setState(() => _pressed = true),
-        onTapCancel: () => setState(() => _pressed = false),
-        onTapUp: (_) => setState(() => _pressed = false),
-        onTap: () {
-          HapticFeedback.selectionClick();
-          widget.onTap!();
-        },
-        child: AnimatedScale(
-          scale: _pressed ? 0.98 : 1.0,
-          duration: const Duration(milliseconds: 110),
-          curve: Curves.easeOut,
-          child: content,
-        ),
-      );
-    }
-
-    return content;
   }
 }
 
