@@ -156,20 +156,8 @@ class SettingsScreen extends StatelessWidget {
     return '$f$l';
   }
 
-  String _themeLabel(String v) {
-    switch (v) {
-      case 'ocean':
-        return 'Océan';
-      case 'foret':
-        return 'Forêt';
-      case 'nuit':
-        return 'Nuit';
-      case 'lacte':
-        return 'Lacté';
-      default:
-        return 'Terre';
-    }
-  }
+  // Même libellé que dans le sélecteur de thème (anciens ids inclus).
+  String _themeLabel(String v) => AmiinThemeVariantExt.fromId(v).label;
 
   void _onLogout(BuildContext context) {
     showDialog(
@@ -187,7 +175,7 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(ctx);
               authService.logout();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Déconnexion'),
           ),
         ],

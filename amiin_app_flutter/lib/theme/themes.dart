@@ -1,5 +1,6 @@
 // ─── Amiin Theme System ───────────────────────────────────────────────────────
-// 4 variantes : deux claires (turquoise / ocre) + deux sombres (turquoise / ocre)
+// 3 variantes : Sel d'Assal (clair), Encre de Nuit (sombre) et Lacté (clair
+// monochrome). Aurore et Dusk ont été retirés (novembre 2026).
 // La dualité info (ocre) / secrétariat (turquoise) est lisible dans chaque variante.
 // context.ac donne accès à tous les tokens depuis n'importe quel widget.
 
@@ -190,70 +191,6 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     brightness:                 Brightness.light,
   );
 
-  // "Aurore" — jour clair, accent information (ocre)
-  static const ocean = AmiinThemeColors(
-    primary:                    Color(0xFFC8902F),
-    primaryLight:               Color(0xFFF5E8CC),
-    primaryDark:                Color(0xFF8F6520),
-    primaryMid:                 Color(0xFFDEA844),
-    infoAccent:                 Color(0xFFC8902F),
-    infoAccentLight:            Color(0xFFF5E8CC),
-    infoAccentDark:             Color(0xFF8F6520),
-    infoAccentMid:              Color(0xFFDEA844),
-    secretariatAccent:          Color(0xFF1E8A8A),
-    secretariatAccentLight:     Color(0xFFCCEBEB),
-    secretariatAccentDark:      Color(0xFF135E5E),
-    secretariatAccentMid:       Color(0xFF2AADAD),
-    alertColor:                 Color(0xFFC75145),
-    alertColorLight:            Color(0xFFF5D0CC),
-    success:                    Color(0xFF2A7A5A),
-    successLight:               Color(0xFFCCE8DD),
-    background:                 Color(0xFFF2EFE9),
-    surface:                    Color(0xFFFFFFFF),
-    surface2:                   Color(0xFFEDE8F5),
-    ink:                        Color(0xFF14213D),
-    midTone:                    Color(0xFF4A5A7A),
-    muted:                      Color(0xFF7A8BA8),
-    border:                     Color(0xFFD0D5E2),
-    onAccent:                   Color(0xFFFFFFFF),
-    headerGradientStart:        Color(0xFF2A1F0A),
-    headerGradientEnd:          Color(0xFF3A2D14),
-    onHeader:                   Color(0xFFF2EFE9),
-    brightness:                 Brightness.light,
-  );
-
-  // "Dusk" — nuit sombre, accent information (ocre)
-  static const foret = AmiinThemeColors(
-    primary:                    Color(0xFFC8902F),
-    primaryLight:               Color(0xFF3A2D14),
-    primaryDark:                Color(0xFF8F6520),
-    primaryMid:                 Color(0xFFDEA844),
-    infoAccent:                 Color(0xFFC8902F),
-    infoAccentLight:            Color(0xFF3A2D14),
-    infoAccentDark:             Color(0xFFDEA844),
-    infoAccentMid:              Color(0xFFDEA844),
-    secretariatAccent:          Color(0xFF1E8A8A),
-    secretariatAccentLight:     Color(0xFF1A3535),
-    secretariatAccentDark:      Color(0xFF2AADAD),
-    secretariatAccentMid:       Color(0xFF2AADAD),
-    alertColor:                 Color(0xFFC75145),
-    alertColorLight:            Color(0xFF3A211D),
-    success:                    Color(0xFF3FA47C),
-    successLight:               Color(0xFF16342A),
-    background:                 Color(0xFF14213D),
-    surface:                    Color(0xFF1C2E52),
-    surface2:                   Color(0xFF162038),
-    ink:                        Color(0xFFF2EFE9),
-    midTone:                    Color(0xFFAAB6CE),
-    muted:                      Color(0xFF8090B0),
-    border:                     Color(0xFF2A3A5A),
-    onAccent:                   Color(0xFFFFFFFF),
-    headerGradientStart:        Color(0xFF0D1526),
-    headerGradientEnd:          Color(0xFF14213D),
-    onHeader:                   Color(0xFFF2EFE9),
-    brightness:                 Brightness.dark,
-  );
-
   // "Encre de Nuit" — nuit sombre, accent secrétariat (turquoise)
   static const nuit = AmiinThemeColors(
     primary:                    Color(0xFF1E8A8A),
@@ -324,14 +261,12 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
 
 // ── Variantes disponibles ─────────────────────────────────────────────────────
 
-enum AmiinThemeVariant { terre, ocean, foret, nuit, lacte }
+enum AmiinThemeVariant { terre, nuit, lacte }
 
 extension AmiinThemeVariantExt on AmiinThemeVariant {
   String get id {
     switch (this) {
       case AmiinThemeVariant.terre: return 'terre';
-      case AmiinThemeVariant.ocean: return 'ocean';
-      case AmiinThemeVariant.foret: return 'foret';
       case AmiinThemeVariant.nuit:  return 'nuit';
       case AmiinThemeVariant.lacte: return 'lacte';
     }
@@ -340,8 +275,6 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
   String get label {
     switch (this) {
       case AmiinThemeVariant.terre: return "Sel d'Assal";
-      case AmiinThemeVariant.ocean: return 'Aurore';
-      case AmiinThemeVariant.foret: return 'Dusk';
       case AmiinThemeVariant.nuit:  return 'Encre de Nuit';
       case AmiinThemeVariant.lacte: return 'Lacté';
     }
@@ -350,8 +283,6 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
   AmiinThemeColors get colors {
     switch (this) {
       case AmiinThemeVariant.terre: return AmiinThemeColors.terre;
-      case AmiinThemeVariant.ocean: return AmiinThemeColors.ocean;
-      case AmiinThemeVariant.foret: return AmiinThemeColors.foret;
       case AmiinThemeVariant.nuit:  return AmiinThemeColors.nuit;
       case AmiinThemeVariant.lacte: return AmiinThemeColors.lacte;
     }
@@ -359,8 +290,8 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
 
   static AmiinThemeVariant fromId(String id) {
     switch (id) {
-      case 'ocean': return AmiinThemeVariant.ocean;
-      case 'foret': return AmiinThemeVariant.foret;
+      // Aurore et Dusk ont été retirés : on garde la luminosité choisie.
+      case 'foret': return AmiinThemeVariant.nuit;
       case 'nuit':  return AmiinThemeVariant.nuit;
       case 'lacte': return AmiinThemeVariant.lacte;
       default:      return AmiinThemeVariant.terre;

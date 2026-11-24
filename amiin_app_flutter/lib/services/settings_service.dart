@@ -97,7 +97,8 @@ class SettingsService extends ChangeNotifier {
 
   // ── Apparence ─────────────────────────────────────────────────────────────
 
-  /// 'terre' | 'ocean' | 'foret' | 'nuit' | 'lacte'
+  /// 'terre' | 'nuit' | 'lacte' (les anciens 'ocean' et 'foret' sont
+  /// ramenés à 'terre' et 'nuit' par AmiinThemeVariantExt.fromId)
   String get themeVariant => _get('theme_variant', 'terre');
   set themeVariant(String v) => _set('theme_variant', v);
 

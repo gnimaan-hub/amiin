@@ -66,7 +66,8 @@ class _ThemePicker extends StatelessWidget {
       childAspectRatio: 1.5,
       children: variants.map((v) {
         final c = v.colors;
-        final selected = v.id == current;
+        // fromId ramène les anciens thèmes (Aurore, Dusk) à leur remplaçant.
+        final selected = v == AmiinThemeVariantExt.fromId(current);
         return GestureDetector(
           onTap: () => settingsService.themeVariant = v.id,
           child: Container(

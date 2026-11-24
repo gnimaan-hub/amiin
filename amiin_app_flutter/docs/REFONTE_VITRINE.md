@@ -44,9 +44,9 @@ entièrement remplacé par `dc0e234` : ne pas s'en inspirer.
 ## 2. Thèmes « type Apple » clair et sombre (Sel d'Assal et Encre de Nuit)
 
 Aucun token de `themes.dart` n'a changé pour ces deux thèmes : le rendu
-vient du traitement « vitrine » appliqué à l'écran. Aurore et Dusk en
-bénéficient aussi automatiquement. Tout se trouve aujourd'hui dans
-`lib/screens/home/home_screen.dart` (helpers privés en tête de fichier).
+vient du traitement « vitrine » appliqué à l'écran. Les helpers, d'abord
+privés à `home_screen.dart`, sont désormais dans `lib/theme/elevation.dart`
+et `lib/widgets/floating_card.dart` (phase A, §5).
 
 Les étapes ci-dessous sont dans l'ordre logique de construction.
 
@@ -324,8 +324,9 @@ trois thèmes avant chaque commit.
 
 ## 6. Points ouverts
 
-- **Thèmes à garder** : Sel d'Assal, Encre de Nuit et Lacté sont validés ;
-  Aurore et Dusk sont encore présents (suppression à confirmer).
+- **Thèmes** : seuls Sel d'Assal, Encre de Nuit et Lacté sont gardés.
+  Aurore et Dusk ont été retirés ; les ids enregistrés `ocean` et `foret`
+  sont ramenés à `terre` et `nuit` par `AmiinThemeVariantExt.fromId`.
 - **Barre qui se réduit au défilement** : proposée, non faite.
 - **Widget Android** de l'écran d'accueil du téléphone : couleurs inchangées.
 - **Rendu réel** : tout a été vérifié dans un navigateur au format iPhone ;
