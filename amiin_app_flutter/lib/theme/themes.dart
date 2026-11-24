@@ -277,19 +277,20 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     brightness:                 Brightness.dark,
   );
 
-  // "Lacté" — monochrome : blancs cassés, gris et noir. Les couleurs de la
-  // palette n'apparaissent que ponctuellement (logo, alertes, succès, quelques
-  // pastilles de catégorie).
+  // "Lacté" — monochrome : blancs cassés, gris et noir pour les fonds, les
+  // surfaces et le texte. La couleur est réservée aux éléments essentiels :
+  // turquoise pour les actions (micro, liens, icônes secrétariat), ocre pour
+  // les repères d'information ; plus le logo, les alertes et les succès.
   static const lacte = AmiinThemeColors(
     primary:                    Color(0xFF1C1C1E),
     primaryLight:               Color(0xFFEBEAE6),
     primaryDark:                Color(0xFF000000),
     primaryMid:                 Color(0xFF3A3A3C),
-    infoAccent:                 Color(0xFF6E6E73),
+    infoAccent:                 Color(0xFFC8902F),
     infoAccentLight:            Color(0xFFF3F2EF),
     infoAccentDark:             Color(0xFF3A3A3C),
     infoAccentMid:              Color(0xFFC8902F),
-    secretariatAccent:          Color(0xFF1C1C1E),
+    secretariatAccent:          Color(0xFF1E8A8A),
     secretariatAccentLight:     Color(0xFFE9E8E4),
     secretariatAccentDark:      Color(0xFF1C1C1E),
     secretariatAccentMid:       Color(0xFF1E8A8A),
