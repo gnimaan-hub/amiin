@@ -34,6 +34,7 @@ import '../screens/settings/settings_about_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../widgets/connectivity_banner.dart';
+import '../config/demo.dart';
 import '../services/agenda_badge_notifier.dart';
 import '../services/auth_service.dart';
 import '../theme/typography.dart';
@@ -83,6 +84,9 @@ final GoRouter appRouter = GoRouter(
 
     // Splash gère elle-même la navigation après init
     if (loc == '/splash') return null;
+
+    // Démo : inscription fermée (accès sur invitation).
+    if (kAmiinDemo && loc == '/register') return '/login';
 
     // Écrans auth : redirige les utilisateurs connectés vers /home
     if (loc == '/login' || loc == '/register') {

@@ -11,12 +11,16 @@ Procédure pour recompiler la démo publiée dans le dépôt WebSense, dossier
   partir de celui de la démo en ligne (`public/demo-amiin/index.html` dans
   WebSense, avec le pré-loader « AMIIN » et `noindex`), en remettant
   `<base href="$FLUTTER_BASE_HREF">`.
-- Les adaptations web propres à la démo (connexion « accès sur invitation »,
-  dictée vocale et export compatibles navigateur, sans notifications locales)
-  doivent être présentes dans le code compilé.
+- `--dart-define=AMIIN_DEMO=true` active le mode démo (`lib/config/demo.dart`) :
+  inscription fermée, mention « Version de démonstration — accès sur
+  invitation » sur la connexion, `/register` renvoyé vers `/login`.
+- Les adaptations au navigateur sont automatiques (`kIsWeb`) : dictée vocale
+  envoyée depuis l'URL « blob: » de l'enregistrement, export « Mes données »
+  créé en mémoire, notifications locales et « Vider le cache » désactivés.
 
 ```bash
-flutter build web --release --base-href /demo-amiin/ -o /tmp/demo/demo-amiin
+flutter build web --release --base-href /demo-amiin/ \
+  --dart-define=AMIIN_DEMO=true -o /tmp/demo/demo-amiin
 ```
 
 ## 2. Alléger (comme la démo publiée)

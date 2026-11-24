@@ -1,6 +1,7 @@
 // ─── LoginScreen ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../../config/demo.dart';
 import '../../theme/spacing.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
@@ -169,28 +170,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 28),
 
-                // ── Divider ───────────────────────────────────────────────
-                const AuthDivider(),
-                const SizedBox(height: 24),
+                // Démo : inscription fermée, accès sur invitation.
+                if (kAmiinDemo)
+                  Text(
+                    'Version de démonstration — accès sur invitation.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: FontFamily.geoMedium,
+                      fontSize: 13,
+                      color: ColorsAmiin.onDark.withValues(alpha: 0.6),
+                    ),
+                  )
+                else ...[
+                  // ── Divider ───────────────────────────────────────────────
+                  const AuthDivider(),
+                  const SizedBox(height: 24),
 
-                // ── Lien créer un compte ──────────────────────────────────
-                TextButton(
-                  onPressed: () => context.go('/register'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: ColorsAmiin.onDark,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(RadiusAmiin.lg),
-                      side: BorderSide(
-                        color: ColorsAmiin.onDark.withValues(alpha: 0.18),
+                  // ── Lien créer un compte ──────────────────────────────────
+                  TextButton(
+                    onPressed: () => context.go('/register'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: ColorsAmiin.onDark,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(RadiusAmiin.lg),
+                        side: BorderSide(
+                          color: ColorsAmiin.onDark.withValues(alpha: 0.18),
+                        ),
                       ),
                     ),
+                    child: Text(
+                      'Créer un compte',
+                      style: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 15),
+                    ),
                   ),
-                  child: Text(
-                    'Créer un compte',
-                    style: TextStyle(fontFamily: FontFamily.geoMedium, fontSize: 15),
-                  ),
-                ),
+                ],
                 const SizedBox(height: 16),
               ],
             ),

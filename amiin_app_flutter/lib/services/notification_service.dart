@@ -29,6 +29,9 @@ class NotificationService {
 
   Future<void> init() async {
     if (_initialized) return;
+    // Pas de notifications locales dans le navigateur : le service reste
+    // inactif (scheduleReminder et cancel ne font alors rien).
+    if (kIsWeb) return;
     tz.initializeTimeZones();
 
     const android = AndroidInitializationSettings('@mipmap/launcher_icon');
