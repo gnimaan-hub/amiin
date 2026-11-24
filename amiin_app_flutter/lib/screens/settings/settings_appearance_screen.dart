@@ -48,7 +48,7 @@ class SettingsAppearanceScreen extends StatelessWidget {
   }
 }
 
-// ── Sélecteur de thème (4 cards visuelles) ───────────────────────────────────
+// ── Sélecteur de thème (une carte visuelle par variante) ───────────────────────────────────
 
 class _ThemePicker extends StatelessWidget {
   final String current;
@@ -78,7 +78,11 @@ class _ThemePicker extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(RadiusAmiin.lg),
               border: Border.all(
-                color: selected ? c.primary : Colors.transparent,
+                // Un bandeau clair (Lacté) a besoin d'un liseré pour se
+                // détacher du fond de l'écran.
+                color: selected
+                    ? c.primary
+                    : (c.onHeader.computeLuminance() < 0.5 ? c.border : Colors.transparent),
                 width: 2.5,
               ),
             ),

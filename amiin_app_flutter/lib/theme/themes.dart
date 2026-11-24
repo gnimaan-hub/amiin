@@ -276,11 +276,45 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     onHeader:                   Color(0xFFF2EFE9),
     brightness:                 Brightness.dark,
   );
+
+  // "Lacté" — monochrome : blancs cassés, gris et noir. Les couleurs de la
+  // palette n'apparaissent que ponctuellement (logo, alertes, succès, quelques
+  // pastilles de catégorie).
+  static const lacte = AmiinThemeColors(
+    primary:                    Color(0xFF1C1C1E),
+    primaryLight:               Color(0xFFEBEAE6),
+    primaryDark:                Color(0xFF000000),
+    primaryMid:                 Color(0xFF3A3A3C),
+    infoAccent:                 Color(0xFF6E6E73),
+    infoAccentLight:            Color(0xFFF3F2EF),
+    infoAccentDark:             Color(0xFF3A3A3C),
+    infoAccentMid:              Color(0xFFC8902F),
+    secretariatAccent:          Color(0xFF1C1C1E),
+    secretariatAccentLight:     Color(0xFFE9E8E4),
+    secretariatAccentDark:      Color(0xFF1C1C1E),
+    secretariatAccentMid:       Color(0xFF1E8A8A),
+    alertColor:                 Color(0xFFC75145),
+    alertColorLight:            Color(0xFFF5D0CC),
+    success:                    Color(0xFF2A7A5A),
+    successLight:               Color(0xFFCCE8DD),
+    background:                 Color(0xFFF4F3F0),
+    surface:                    Color(0xFFFFFFFF),
+    surface2:                   Color(0xFFEDECE8),
+    ink:                        Color(0xFF1C1C1E),
+    midTone:                    Color(0xFF48484A),
+    muted:                      Color(0xFF8E8E93),
+    border:                     Color(0xFFE3E2DE),
+    onAccent:                   Color(0xFFFFFFFF),
+    headerGradientStart:        Color(0xFFFFFFFF),
+    headerGradientEnd:          Color(0xFFF0EFEB),
+    onHeader:                   Color(0xFF1C1C1E),
+    brightness:                 Brightness.light,
+  );
 }
 
 // ── Variantes disponibles ─────────────────────────────────────────────────────
 
-enum AmiinThemeVariant { terre, ocean, foret, nuit }
+enum AmiinThemeVariant { terre, ocean, foret, nuit, lacte }
 
 extension AmiinThemeVariantExt on AmiinThemeVariant {
   String get id {
@@ -289,6 +323,7 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
       case AmiinThemeVariant.ocean: return 'ocean';
       case AmiinThemeVariant.foret: return 'foret';
       case AmiinThemeVariant.nuit:  return 'nuit';
+      case AmiinThemeVariant.lacte: return 'lacte';
     }
   }
 
@@ -298,6 +333,7 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
       case AmiinThemeVariant.ocean: return 'Aurore';
       case AmiinThemeVariant.foret: return 'Dusk';
       case AmiinThemeVariant.nuit:  return 'Encre de Nuit';
+      case AmiinThemeVariant.lacte: return 'Lacté';
     }
   }
 
@@ -307,6 +343,7 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
       case AmiinThemeVariant.ocean: return AmiinThemeColors.ocean;
       case AmiinThemeVariant.foret: return AmiinThemeColors.foret;
       case AmiinThemeVariant.nuit:  return AmiinThemeColors.nuit;
+      case AmiinThemeVariant.lacte: return AmiinThemeColors.lacte;
     }
   }
 
@@ -315,6 +352,7 @@ extension AmiinThemeVariantExt on AmiinThemeVariant {
       case 'ocean': return AmiinThemeVariant.ocean;
       case 'foret': return AmiinThemeVariant.foret;
       case 'nuit':  return AmiinThemeVariant.nuit;
+      case 'lacte': return AmiinThemeVariant.lacte;
       default:      return AmiinThemeVariant.terre;
     }
   }

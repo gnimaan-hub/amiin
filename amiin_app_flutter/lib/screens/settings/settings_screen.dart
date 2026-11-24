@@ -164,6 +164,8 @@ class SettingsScreen extends StatelessWidget {
         return 'Forêt';
       case 'nuit':
         return 'Nuit';
+      case 'lacte':
+        return 'Lacté';
       default:
         return 'Terre';
     }

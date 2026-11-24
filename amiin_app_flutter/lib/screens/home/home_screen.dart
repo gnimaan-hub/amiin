@@ -65,6 +65,16 @@ Border _hairline(BuildContext context) => Border.all(
       width: 1,
     );
 
+/// Vrai quand le bandeau est clair (thème Lacté) : texte foncé dessus.
+bool _lightHeader(BuildContext context) =>
+    context.ac.onHeader.computeLuminance() < 0.5;
+
+/// Voile « verre » posé sur le bandeau : blanc sur bandeau foncé,
+/// encre très légère sur bandeau clair.
+Color _glass(BuildContext context, double alpha) => _lightHeader(context)
+    ? context.ac.onHeader.withValues(alpha: alpha * 0.45)
+    : Colors.white.withValues(alpha: alpha);
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -317,6 +327,7 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
+    final light = _lightHeader(context);
     const radius = BorderRadius.vertical(bottom: Radius.circular(32));
 
     return Container(
@@ -324,7 +335,9 @@ class _Hero extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: ac.headerGradientStart.withValues(alpha: 0.28),
+            color: light
+                ? ac.ink.withValues(alpha: 0.10)
+                : ac.headerGradientStart.withValues(alpha: 0.28),
             blurRadius: 40,
             offset: const Offset(0, 18),
             spreadRadius: -12,
@@ -347,15 +360,20 @@ class _Hero extends StatelessWidget {
                 ),
               ),
             ),
-            // Halo turquoise, en haut à droite
+            // Halo turquoise, en haut à droite. Sur bandeau clair (Lacté),
+            // c'est l'une des rares touches de couleur : à peine perceptible.
             Positioned(
               top: -120, right: -90,
-              child: _Glow(color: ac.secretariatAccent, size: 300, alpha: 0.30),
+              child: light
+                  ? _Glow(color: ac.secretariatAccentMid, size: 300, alpha: 0.12)
+                  : _Glow(color: ac.secretariatAccent, size: 300, alpha: 0.30),
             ),
             // Halo ocre, plus discret, en bas à gauche
             Positioned(
               bottom: -140, left: -110,
-              child: _Glow(color: ac.infoAccent, size: 280, alpha: 0.14),
+              child: light
+                  ? _Glow(color: ac.infoAccentMid, size: 280, alpha: 0.07)
+                  : _Glow(color: ac.infoAccent, size: 280, alpha: 0.14),
             ),
 
             Column(
@@ -543,11 +561,11 @@ class _GlassField extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0.05),
+                      _glass(context, 0.12),
+                      _glass(context, 0.05),
                     ],
                   ),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                  border: Border.all(color: _glass(context, 0.16)),
                   borderRadius: BorderRadius.circular(RadiusAmiin.full),
                 ),
                 child: Row(
@@ -597,9 +615,9 @@ class _GlassIconButton extends StatelessWidget {
             child: Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.10),
+                color: _glass(context, 0.10),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                border: Border.all(color: _glass(context, 0.16)),
               ),
               child: Center(child: Icon(icon, size: 18, color: color)),
             ),
