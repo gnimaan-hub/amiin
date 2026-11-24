@@ -31,9 +31,11 @@ class CloudSttService {
     if (!await _recorder.hasPermission()) {
       throw StateError('Permission microphone refusée.');
     }
-    final dir = await getTemporaryDirectory();
-    final path =
-        '${dir.path}/amiin_stt_${DateTime.now().millisecondsSinceEpoch}.wav';
+    // Web : pas de système de fichiers ; le chemin est ignoré et stop()
+    // renvoie une URL « blob: » vers l'enregistrement.
+    final path = kIsWeb
+        ? 'amiin_stt.wav'
+        : '${(await getTemporaryDirectory()).path}/amiin_stt_${DateTime.now().millisecondsSinceEpoch}.wav';
     await _recorder.start(
       // WAV/PCM non compressé (pas d'artefacts de codec comme avec AAC) à
       // 16 kHz — la fréquence native attendue par Whisper, inutile de capter
@@ -74,7 +76,9 @@ class CloudSttService {
     try {
       final form = FormData.fromMap({
         'lang': lang,
-        'file': await MultipartFile.fromFile(path, filename: 'audio.wav'),
+        'file': kIsWeb
+            ? MultipartFile.fromBytes(await _readBlob(path), filename: 'audio.wav')
+            : await MultipartFile.fromFile(path, filename: 'audio.wav'),
       });
       final resp = await api.post<Map<String, dynamic>>('/stt', data: form);
       return (resp.data?['text'] as String?)?.trim() ?? '';
@@ -82,6 +86,15 @@ class CloudSttService {
       debugPrint('[CloudStt] échec transcription : ${e.error ?? e.message}');
       rethrow;
     }
+  }
+
+  /// Web : lit les octets de l'enregistrement à partir de son URL « blob: ».
+  Future<List<int>> _readBlob(String url) async {
+    final resp = await Dio().get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return resp.data ?? const <int>[];
   }
 
   /// Abandonne l'enregistrement en cours sans transcrire.

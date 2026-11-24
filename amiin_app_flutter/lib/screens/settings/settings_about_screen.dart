@@ -1,5 +1,6 @@
 // ─── SettingsAboutScreen ── À propos & Support ────────────────────────────────
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -115,16 +116,19 @@ class SettingsAboutScreen extends StatelessWidget {
                       ),
                     ]),
 
-                    const SettingsSection('Avancé'),
-                    SettingCard(children: [
-                      SettingRow(
-                        icon: Icons.cleaning_services_outlined,
-                        label: 'Vider le cache',
-                        subtitle: 'Libère l\'espace de stockage temporaire',
-                        showChevron: false,
-                        onTap: () => _confirmClearCache(context),
-                      ),
-                    ]),
+                    // Pas de dossier temporaire à vider dans le navigateur.
+                    if (!kIsWeb) ...[
+                      const SettingsSection('Avancé'),
+                      SettingCard(children: [
+                        SettingRow(
+                          icon: Icons.cleaning_services_outlined,
+                          label: 'Vider le cache',
+                          subtitle: 'Libère l\'espace de stockage temporaire',
+                          showChevron: false,
+                          onTap: () => _confirmClearCache(context),
+                        ),
+                      ]),
+                    ],
 
                     const SizedBox(height: Spacing.xxxl),
 

@@ -6,6 +6,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -49,10 +52,24 @@ class ExportService {
   /// Écrit le fichier dans le dossier temporaire puis ouvre le partage.
   Future<void> exportAndShare() async {
     final data = await buildExport();
-    final dir = await getTemporaryDirectory();
     final stamp = DateTime.now().toIso8601String().substring(0, 10);
-    final file = File('${dir.path}/amiin-mes-donnees-$stamp.json');
-    await file.writeAsString(const JsonEncoder.withIndent('  ').convert(data));
+    final json = const JsonEncoder.withIndent('  ').convert(data);
+    final name = 'amiin-mes-donnees-$stamp.json';
+
+    // Web : pas de dossier temporaire ; le fichier est créé en mémoire et
+    // partagé (ou téléchargé quand le navigateur ne sait pas partager).
+    if (kIsWeb) {
+      await Share.shareXFiles(
+        [XFile.fromData(Uint8List.fromList(utf8.encode(json)), name: name, mimeType: 'application/json')],
+        fileNameOverrides: [name],
+        subject: 'Mes données Amiin',
+      );
+      return;
+    }
+
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$name');
+    await file.writeAsString(json);
     await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
       subject: 'Mes données Amiin',
