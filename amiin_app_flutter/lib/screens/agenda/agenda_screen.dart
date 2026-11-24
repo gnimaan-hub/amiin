@@ -12,6 +12,7 @@ import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../widgets/header.dart';
 import '../../widgets/card.dart';
+import '../../widgets/floating_card.dart';
 import '../../widgets/skeleton.dart';
 import '../../widgets/toast.dart';
 import '../../services/agenda_service.dart';
@@ -263,22 +264,6 @@ class _AgendaScreenState extends State<AgendaScreen> {
             ),
             _ViewToggle(view: _view, onChanged: _switchView),
             const SizedBox(height: Spacing.sm),
-            // Weekday headers (vue mensuelle uniquement)
-            if (_view == _AgendaView.month)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-              child: Row(
-                children: ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']
-                    .map((d) => Expanded(
-                          child: Text(
-                            d,
-                            textAlign: TextAlign.center,
-                            style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 0.5, fontFamily: FontFamily.geoBold),
-                          ),
-                        ))
-                    .toList(),
-              ),
-            ),
             const SizedBox(height: 4),
             // Bande hebdomadaire (vue semaine)
             if (_view == _AgendaView.week)
@@ -346,64 +331,89 @@ class _AgendaScreenState extends State<AgendaScreen> {
                   ],
                 ),
               ),
-            // Calendar grid (vue mensuelle)
+            // Calendrier mensuel « vitrine » : jours de la semaine et grille
+            // réunis dans une carte flottante.
             if (_view == _AgendaView.month)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-              child: GridView.count(
-                shrinkWrap: true,
-                crossAxisCount: 7,
-                mainAxisSpacing: 2,
-                childAspectRatio: 1,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  for (int i = 0; i < leadingEmpty; i++) const SizedBox(),
-                  for (var day in days)
-                    GestureDetector(
-                      onTap: () => setState(() => _selectedDay = day),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _isSameDay(day, _selectedDay)
-                              ? context.ac.secretariatAccent
-                              : _isToday(day)
-                                  ? context.ac.secretariatAccentLight
-                                  : null,
-                          borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              day.day.toString(),
-                              style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: _isSameDay(day, _selectedDay)
-                                    ? context.ac.onAccent
-                                    : _isToday(day)
-                                        ? context.ac.secretariatAccent
-                                        : context.ac.ink),
-                            ),
-                            if (_eventsForDay(day).isNotEmpty)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: _eventsForDay(day)
-                                    .take(3)
-                                    .map((e) => Container(
-                                          width: 4,
-                                          height: 4,
-                                          margin: const EdgeInsets.symmetric(horizontal: 1),
-                                          decoration: BoxDecoration(
-                                            color: _categoryColor(e.category),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ))
-                                    .toList(),
-                              ),
-                          ],
-                        ),
-                      ),
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+              child: FloatingCard(
+                padding: const EdgeInsets.fromLTRB(Spacing.sm, Spacing.md, Spacing.sm, Spacing.sm),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di']
+                          .map((d) => Expanded(
+                                child: Text(
+                                  d,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyles.cardTitle(context).copyWith(fontSize: 10, color: context.ac.muted, letterSpacing: 0.5, fontFamily: FontFamily.geoBold),
+                                ),
+                              ))
+                          .toList(),
                     ),
-                ],
+                    const SizedBox(height: Spacing.sm),
+                    GridView.count(
+                      shrinkWrap: true,
+                      crossAxisCount: 7,
+                      mainAxisSpacing: 2,
+                      childAspectRatio: 1,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        for (int i = 0; i < leadingEmpty; i++) const SizedBox(),
+                        for (var day in days)
+                          GestureDetector(
+                            onTap: () => setState(() => _selectedDay = day),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _isSameDay(day, _selectedDay)
+                                    ? context.ac.secretariatAccent
+                                    : _isToday(day)
+                                        ? context.ac.secretariatAccentLight
+                                        : null,
+                                shape: BoxShape.circle,
+                                boxShadow: _isSameDay(day, _selectedDay)
+                                    ? [BoxShadow(color: context.ac.secretariatAccent.withValues(alpha: 0.35), blurRadius: 10, offset: const Offset(0, 4), spreadRadius: -3)]
+                                    : null,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    day.day.toString(),
+                                    style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: _isSameDay(day, _selectedDay)
+                                          ? context.ac.onAccent
+                                          : _isToday(day)
+                                              ? context.ac.secretariatAccent
+                                              : context.ac.ink),
+                                  ),
+                                  if (_eventsForDay(day).isNotEmpty)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: _eventsForDay(day)
+                                          .take(3)
+                                          .map((e) => Container(
+                                                width: 4,
+                                                height: 4,
+                                                margin: const EdgeInsets.symmetric(horizontal: 1),
+                                                decoration: BoxDecoration(
+                                                  color: _categoryColor(e.category),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ))
+                                          .toList(),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+            const SizedBox(height: Spacing.sm),
             // Selected day events with pull-to-refresh
             Expanded(
               child: _buildSelectedDayEvents(),
