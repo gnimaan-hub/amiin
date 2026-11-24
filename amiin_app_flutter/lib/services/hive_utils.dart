@@ -59,6 +59,16 @@ Future<Box<T>> openBoxMigratingToEncrypted<T>(
   if (amiinCipher == null) return Hive.openBox<T>(name);
   if (migrated) return openBoxSafe<T>(name);
 
+  // Web : aucune ancienne box en clair à migrer, et la suppression d'une base
+  // IndexedDB juste après l'avoir ouverte peut rester bloquée indéfiniment
+  // (le démarrage ne se terminait jamais dans la démo web). On ouvre
+  // directement la box chiffrée.
+  if (kIsWeb) {
+    final box = await openBoxSafe<T>(name);
+    await markMigrated();
+    return box;
+  }
+
   final plain = await Hive.openBox<T>(name);
   final entries = Map<dynamic, T>.from(plain.toMap());
   await plain.deleteFromDisk();
