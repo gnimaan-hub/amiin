@@ -59,6 +59,11 @@ Future<Box<T>> openBoxMigratingToEncrypted<T>(
   if (amiinCipher == null) return Hive.openBox<T>(name);
   if (migrated) return openBoxSafe<T>(name);
 
+  // Web : la suppression d'une base IndexedDB juste après l'avoir ouverte
+  // peut rester bloquée indéfiniment (le démarrage ne se terminait jamais
+  // dans la démo web). On migre donc sans jamais supprimer la base.
+  if (kIsWeb) return _migrateOnWeb<T>(name, markMigrated);
+
   final plain = await Hive.openBox<T>(name);
   final entries = Map<dynamic, T>.from(plain.toMap());
   await plain.deleteFromDisk();
@@ -66,6 +71,46 @@ Future<Box<T>> openBoxMigratingToEncrypted<T>(
   await box.putAll(entries);
   await markMigrated();
   return box;
+}
+
+/// Migration vers le chiffrement sans `deleteFromDisk` (web).
+///
+/// 1. Ouverture avec le cipher : réussit si la box est vide, déjà chiffrée,
+///    ou ne contient que des valeurs simples (réécrites chiffrées).
+/// 2. Sinon, la box est en clair (sur le web, Hive refuse alors de l'ouvrir
+///    avec le cipher plutôt que d'écarter des entrées) : on la lit sans
+///    cipher, on la vide sans la supprimer, puis on réécrit ses entrées
+///    chiffrées.
+/// 3. En dernier recours seulement, [openBoxSafe] (comportement précédent).
+Future<Box<T>> _migrateOnWeb<T>(
+  String name,
+  Future<void> Function() markMigrated,
+) async {
+  try {
+    final box = await Hive.openBox<T>(name, encryptionCipher: amiinCipher);
+    // Les valeurs simples (textes, nombres) d'une ancienne box en clair sont
+    // lues telles quelles : on les réécrit pour qu'elles soient chiffrées.
+    if (box.isNotEmpty) await box.putAll(Map<dynamic, T>.from(box.toMap()));
+    await markMigrated();
+    return box;
+  } catch (e) {
+    debugPrint('Box "$name" en clair sur le web, migration : $e');
+  }
+  try {
+    final plain = await Hive.openBox<T>(name);
+    final entries = Map<dynamic, T>.from(plain.toMap());
+    await plain.clear();
+    await plain.close();
+    final box = await Hive.openBox<T>(name, encryptionCipher: amiinCipher);
+    await box.putAll(entries);
+    await markMigrated();
+    return box;
+  } catch (e) {
+    debugPrint('Migration web de "$name" impossible : $e');
+    final box = await openBoxSafe<T>(name);
+    await markMigrated();
+    return box;
+  }
 }
 
 /// Efface toutes les données utilisateur stockées sur l'appareil

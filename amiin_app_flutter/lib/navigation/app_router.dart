@@ -1,6 +1,9 @@
 // ─── GoRouter configuration with StatefulShellRoute (6 tabs) ─────────────────
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/home/home_screen.dart';
@@ -31,7 +34,6 @@ import '../screens/settings/settings_about_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../widgets/connectivity_banner.dart';
-import '../widgets/horizon_line.dart';
 import '../services/agenda_badge_notifier.dart';
 import '../services/auth_service.dart';
 import '../theme/typography.dart';
@@ -43,15 +45,6 @@ final GlobalKey<NavigatorState> _agendaNavKey    = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _annuaireNavKey  = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _demarchesNavKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _notesNavKey     = GlobalKey<NavigatorState>();
-
-// Couleur de la ligne d'horizon selon l'onglet actif
-// 0=Accueil(neutre) 1=Chat(secr) 2=Agenda(secr) 3=Notes(secr) 4=Annuaire(info) 5=Démarches(info)
-Color _horizonColor(BuildContext context, int index) {
-  if (index >= 4) return context.ac.infoAccent;
-  if (index >= 1) return context.ac.secretariatAccent;
-  return context.ac.muted;
-}
-
 
 // ── Transitions de pages de la marque ─────────────────────────────────────────
 // Sous-écrans (détail, création, réglages) : glissement montant + fondu,
@@ -129,13 +122,15 @@ final GoRouter appRouter = GoRouter(
             if (!didPop) navigationShell.goBranch(0);
           },
           child: Scaffold(
+            // La barre d'onglets flotte : le contenu défile dessous.
+            extendBody: true,
             body: ConnectivityBanner(
               child: _AnimatedShell(
                 currentIndex: navigationShell.currentIndex,
                 child: navigationShell,
               ),
             ),
-            bottomNavigationBar: _AmiinNavBar(
+            bottomNavigationBar: AmiinNavBar(
               currentIndex: navigationShell.currentIndex,
               onTap: (index) => navigationShell.goBranch(
                 index,
@@ -292,108 +287,225 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
-// ── Bottom navigation bar avec ligne d'horizon dynamique ──────────────────────
+// ── Barre d'onglets flottante en verre dépoli ────────────────────────────────
+// Détachée des bords, elle flotte au-dessus du contenu qui défile dessous,
+// flouté. Une capsule teintée de la couleur du mode (encre pour l'accueil,
+// turquoise pour le secrétariat, ocre pour l'information) glisse d'un onglet
+// à l'autre.
 
-class _AmiinNavBar extends StatefulWidget {
+/// Barre d'onglets principale (publique pour l'aperçu de développement).
+class AmiinNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _AmiinNavBar({required this.currentIndex, required this.onTap});
+  const AmiinNavBar({super.key, required this.currentIndex, required this.onTap});
 
-  @override
-  State<_AmiinNavBar> createState() => _AmiinNavBarState();
-}
-
-class _AmiinNavBarState extends State<_AmiinNavBar> {
   static const _items = [
-    _NavItem(icon: Icons.home_outlined,         activeIcon: Icons.home_rounded,        label: 'Accueil'),
-    _NavItem(icon: Icons.chat_bubble_outline,   activeIcon: Icons.chat_bubble_rounded, label: 'Amiin'),
-    _NavItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today,    label: 'Agenda',    hasBadge: true),
-    _NavItem(icon: Icons.edit_note_outlined,    activeIcon: Icons.edit_note,           label: 'Notes'),
-    _NavItem(icon: Icons.people_outline,        activeIcon: Icons.people,              label: 'Annuaire'),
-    _NavItem(icon: Icons.assignment_outlined,   activeIcon: Icons.assignment_rounded,  label: 'Démarches'),
+    _NavItem(icon: Icons.home_outlined,           activeIcon: Icons.home_rounded,        label: 'Accueil'),
+    _NavItem(icon: Icons.chat_bubble_outline,     activeIcon: Icons.chat_bubble_rounded, label: 'Amiin'),
+    _NavItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today,      label: 'Agenda',    hasBadge: true),
+    _NavItem(icon: Icons.edit_note_outlined,      activeIcon: Icons.edit_note,           label: 'Notes'),
+    _NavItem(icon: Icons.people_outline,          activeIcon: Icons.people,              label: 'Annuaire'),
+    _NavItem(icon: Icons.assignment_outlined,     activeIcon: Icons.assignment_rounded,  label: 'Démarches'),
   ];
+
+  static const double _height = 62;
+  static const double _radius = 26;
+  static const _curve = Cubic(0.2, 0.8, 0.2, 1);
+  static const _duration = Duration(milliseconds: 340);
 
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
-    final horizonColor = _horizonColor(context, widget.currentIndex);
+    final dark = ac.brightness == Brightness.dark;
+    final modeColor = _tabColor(context, currentIndex);
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    final duration = reduceMotion ? Duration.zero : _duration;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: ac.surface,
-        border: Border(top: BorderSide(color: ac.border, width: 0.5)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Ligne d'horizon — change de couleur selon le mode actif
-          HorizonLine(
-            color: horizonColor,
-            height: 2,
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: DecoratedBox(
+          // Ombre portée hors du découpage : la barre flotte au-dessus du contenu.
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(_radius),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: dark ? 0.35 : 0.06),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+              BoxShadow(
+                color: (dark ? Colors.black : ac.ink).withValues(alpha: dark ? 0.45 : 0.14),
+                blurRadius: 32,
+                offset: const Offset(0, 12),
+                spreadRadius: -8,
+              ),
+            ],
           ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-              child: Row(
-                children: List.generate(_items.length, (i) {
-                  final item = _items[i];
-                  final selected = i == widget.currentIndex;
-                  final itemColor = selected
-                      ? (i >= 4 ? context.ac.infoAccent : i >= 1 ? context.ac.secretariatAccent : ac.ink)
-                      : ac.muted;
-
-                  return Expanded(
-                    child: InkWell(
-                      onTap: () => widget.onTap(i),
-                      borderRadius: BorderRadius.circular(10),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            item.hasBadge
-                                ? ValueListenableBuilder<int>(
-                                    valueListenable: agendaTodayCount,
-                                    builder: (_, count, __) => Badge(
-                                      isLabelVisible: count > 0,
-                                      label: Text('$count',
-                                          style: const TextStyle(fontSize: 9)),
-                                      backgroundColor: context.ac.alertColor,
-                                      child: Icon(
-                                        selected ? item.activeIcon : item.icon,
-                                        size: 22,
-                                        color: itemColor,
-                                      ),
-                                    ),
-                                  )
-                                : Icon(
-                                    selected ? item.activeIcon : item.icon,
-                                    size: 22,
-                                    color: itemColor,
-                                  ),
-                            const SizedBox(height: 2),
-                            AnimatedDefaultTextStyle(
-                              duration: const Duration(milliseconds: 200),
-                              style: TextStyle(
-                                fontFamily: FontFamily.geo,
-                                fontSize: 10,
-                                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                                color: itemColor,
-                              ),
-                              child: Text(item.label),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_radius),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Container(
+                height: _height,
+                decoration: BoxDecoration(
+                  // Verre : voile de surface translucide, plus clair en haut.
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      ac.surface.withValues(alpha: dark ? 0.66 : 0.72),
+                      ac.surface.withValues(alpha: dark ? 0.52 : 0.58),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(_radius),
+                  border: Border.all(
+                    color: dark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    const inset = 5.0;
+                    final slot = (constraints.maxWidth - 2 * inset) / _items.length;
+                    return Stack(
+                      children: [
+                        // Capsule de sélection qui glisse
+                        AnimatedPositioned(
+                          duration: duration,
+                          curve: _curve,
+                          left: inset + slot * currentIndex + 2,
+                          width: slot - 4,
+                          top: inset,
+                          bottom: inset,
+                          child: AnimatedContainer(
+                            duration: duration,
+                            curve: _curve,
+                            decoration: BoxDecoration(
+                              color: modeColor.withValues(alpha: dark ? 0.22 : 0.12),
+                              borderRadius: BorderRadius.circular(_radius - inset),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: inset),
+                          child: Row(
+                            children: [
+                              for (var i = 0; i < _items.length; i++)
+                                Expanded(
+                                  child: _NavButton(
+                                    item: _items[i],
+                                    selected: i == currentIndex,
+                                    color: i == currentIndex ? modeColor : ac.muted,
+                                    duration: duration,
+                                    onTap: () {
+                                      if (i != currentIndex) HapticFeedback.selectionClick();
+                                      onTap(i);
+                                    },
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Couleur du mode de l'onglet : encre (accueil), turquoise (secrétariat),
+/// ocre (information).
+Color _tabColor(BuildContext context, int index) {
+  if (index >= 4) return context.ac.infoAccent;
+  if (index >= 1) return context.ac.secretariatAccent;
+  return context.ac.ink;
+}
+
+class _NavButton extends StatefulWidget {
+  final _NavItem item;
+  final bool selected;
+  final Color color;
+  final Duration duration;
+  final VoidCallback onTap;
+
+  const _NavButton({
+    required this.item,
+    required this.selected,
+    required this.color,
+    required this.duration,
+    required this.onTap,
+  });
+
+  @override
+  State<_NavButton> createState() => _NavButtonState();
+}
+
+class _NavButtonState extends State<_NavButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+    final icon = Icon(
+      widget.selected ? item.activeIcon : item.icon,
+      size: 22,
+      color: widget.color,
+    );
+
+    return Semantics(
+      button: true,
+      selected: widget.selected,
+      label: item.label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTap: widget.onTap,
+        child: AnimatedScale(
+          scale: _pressed ? 0.9 : 1,
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOut,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              item.hasBadge
+                  ? ValueListenableBuilder<int>(
+                      valueListenable: agendaTodayCount,
+                      builder: (_, count, __) => Badge(
+                        isLabelVisible: count > 0,
+                        label: Text('$count', style: const TextStyle(fontSize: 9)),
+                        backgroundColor: context.ac.alertColor,
+                        child: icon,
+                      ),
+                    )
+                  : icon,
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: widget.duration,
+                style: TextStyle(
+                  fontFamily: FontFamily.geo,
+                  fontSize: 10,
+                  fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w500,
+                  color: widget.color,
+                  letterSpacing: -0.1,
+                ),
+                child: Text(item.label, maxLines: 1, overflow: TextOverflow.visible, softWrap: false),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

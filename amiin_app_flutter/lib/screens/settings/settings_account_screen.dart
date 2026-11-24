@@ -20,7 +20,7 @@ class SettingsAccountScreen extends StatelessWidget {
     final displayName = auth.currentUser?.displayName ?? '';
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -154,7 +154,7 @@ class SettingsAccountScreen extends StatelessWidget {
                 ),
               if (error != null) ...[
                 const SizedBox(height: Spacing.sm),
-                Text(error!, style: const TextStyle(color: Colors.red)),
+                Text(error!, style: TextStyle(color: context.ac.alertColor)),
               ],
             ],
           ),
@@ -218,7 +218,7 @@ class SettingsAccountScreen extends StatelessWidget {
               Navigator.pop(ctx);
               authService.logoutAll();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Tout déconnecter'),
           ),
         ],
@@ -287,7 +287,7 @@ class SettingsAccountScreen extends StatelessWidget {
                         });
                       }
                     },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
               child: busy
                   ? const SizedBox(
                       width: 16,
@@ -318,7 +318,7 @@ class SettingsAccountScreen extends StatelessWidget {
               Navigator.pop(ctx);
               authService.logout();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Déconnexion'),
           ),
         ],

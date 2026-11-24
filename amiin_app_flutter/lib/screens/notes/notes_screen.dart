@@ -8,6 +8,7 @@ import '../../widgets/horizon_line.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../theme/elevation.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -120,7 +121,7 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -211,7 +212,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                                   Navigator.pop(dialogCtx, true),
                                               style: TextButton.styleFrom(
                                                   foregroundColor:
-                                                      Colors.red),
+                                                      context.ac.alertColor),
                                               child:
                                                   const Text('Supprimer'),
                                             ),
@@ -314,30 +315,34 @@ class _NotesScreenState extends State<NotesScreen> {
           ],
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedScale(
-            scale: _showBackToTop ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 200),
-            child: FloatingActionButton.small(
-              heroTag: 'notesScrollTop',
-              onPressed: _scrollToTop,
-              backgroundColor: context.ac.surface,
-              foregroundColor: context.ac.secretariatAccent,
-              elevation: 2,
-              child: const Icon(Icons.keyboard_arrow_up),
+      // Dégage la barre d'onglets flottante.
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: navBarClearance(context)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: _showBackToTop ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: FloatingActionButton.small(
+                heroTag: 'notesScrollTop',
+                onPressed: _scrollToTop,
+                backgroundColor: context.ac.surface,
+                foregroundColor: context.ac.secretariatAccent,
+                elevation: 2,
+                child: const Icon(Icons.keyboard_arrow_up),
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            heroTag: 'notesCreate',
-            onPressed: () =>
-                context.push('/notes/create').then((_) => _loadData()),
-            backgroundColor: context.ac.secretariatAccent,
-            child: Icon(Icons.add, color: context.ac.onAccent),
-          ),
-        ],
+            const SizedBox(height: 10),
+            FloatingActionButton(
+              heroTag: 'notesCreate',
+              onPressed: () =>
+                  context.push('/notes/create').then((_) => _loadData()),
+              backgroundColor: context.ac.secretariatAccent,
+              child: Icon(Icons.add, color: context.ac.onAccent),
+            ),
+          ],
+        ),
       ),
     );
   }

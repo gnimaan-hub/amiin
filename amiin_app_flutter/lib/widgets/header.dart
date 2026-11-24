@@ -1,6 +1,7 @@
 // ─── AmiinHeader ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import '../theme/elevation.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 import '../theme/themes.dart';
@@ -29,10 +30,12 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final ac = context.ac;
-    final bgColor = dark ? ac.headerGradientEnd : ac.surface;
+    // Style « vitrine » : l'en-tête clair se fond dans le fond de page ;
+    // la variante sombre garde le bandeau encre de nuit.
+    final bgColor = dark ? ac.headerGradientEnd : ac.page;
     final textColor = dark ? ac.onHeader : ac.ink;
     final subColor = dark
-        ? ac.onHeader.withValues(alpha: 0.45)
+        ? ac.onHeader.withValues(alpha: 0.55)
         : ac.muted;
 
     final paddingTop = MediaQuery.of(context).padding.top;
@@ -54,14 +57,15 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                     width: 36,
                     height: 36,
                     child: back
-                        ? IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
+                        ? _RoundButton(
+                            dark: dark,
+                            semanticLabel: 'Retour',
+                            onTap: onBack ?? () => Navigator.of(context).pop(),
+                            child: Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              size: 18,
+                              size: 16,
                               color: textColor,
                             ),
-                            onPressed: onBack ?? () => Navigator.of(context).pop(),
                           )
                         : null,
                   ),
@@ -71,7 +75,7 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
                       children: [
                         Text(
                           title,
-                          style: TextStyles.cardTitle(context).copyWith(fontSize: 16, color: textColor, fontWeight: FontWeight.w600, letterSpacing: -0.2, fontFamily: FontFamily.geo),
+                          style: TextStyles.cardTitle(context).copyWith(fontSize: 17, color: textColor, fontWeight: FontWeight.w600, letterSpacing: -0.3, fontFamily: FontFamily.geo),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -97,11 +101,17 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           const SizedBox(height: 6),
-          HorizonLine(
-            color: mode == AmiinMode.neutral
-                ? (dark ? ac.onHeader.withValues(alpha: 0.12) : ac.border)
-                : mode.color(context),
-          ),
+          // Ligne d'horizon conservée pour les écrans en mode secrétariat /
+          // information ; en mode neutre, un simple filet très léger.
+          if (mode == AmiinMode.neutral)
+            Container(
+              height: 0.5,
+              color: dark
+                  ? ac.onHeader.withValues(alpha: 0.10)
+                  : ac.border.withValues(alpha: 0.6),
+            )
+          else
+            HorizonLine(color: mode.color(context), height: 1.5),
         ],
       ),
     );
@@ -109,4 +119,47 @@ class AmiinHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(72);
+}
+
+/// Bouton rond de l'en-tête : surface flottante (clair) ou verre (sombre).
+class _RoundButton extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final bool dark;
+  final String semanticLabel;
+
+  const _RoundButton({
+    required this.child,
+    required this.onTap,
+    required this.dark,
+    required this.semanticLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: dark ? glass(context, 0.10) : ac.surface,
+          border: dark
+              ? Border.all(color: glass(context, 0.16))
+              : hairline(context),
+          boxShadow: dark ? null : floatShadow(context, lift: 0.15),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Center(child: child),
+          ),
+        ),
+      ),
+    );
+  }
 }

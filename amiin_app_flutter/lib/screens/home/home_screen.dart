@@ -1,10 +1,20 @@
 // ─── HomeScreen ──────────────────────────────────────────────────────────────
+//
+// Design d'origine (bandeau encre de nuit, micro central, labels de section
+// en capitales, tuiles turquoise/ocre) retravaillé dans un esprit « vitrine » :
+// fond blanc cassé, éléments qui flottent sur des ombres douces à plusieurs
+// couches, carte « Aujourd'hui » posée à cheval sur le bandeau, halo autour
+// du micro, champ de saisie en verre dépoli, cartes qui s'enfoncent au toucher.
+
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import '../../theme/elevation.dart';
 import '../../theme/spacing.dart';
 import '../../theme/themes.dart';
 import '../../theme/typography.dart';
@@ -13,8 +23,7 @@ import '../../services/chat_controller.dart';
 import '../../services/home_brief_service.dart';
 import '../../services/notes_service.dart';
 import '../../widgets/amiin_logo.dart';
-import '../../widgets/card.dart';
-import '../../widgets/horizon_line.dart';
+import '../../widgets/floating_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,10 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Tuiles d'accès rapide — turquoise pour secretariat, ocre pour info
   List<_QuickTile> get _quickTiles => [
-    _QuickTile(label: 'Agenda',     tab: 'agenda',    bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, isInfo: false),
-    _QuickTile(label: 'Notes',      tab: 'notes',     bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, isInfo: false),
-    _QuickTile(label: 'Annuaire',   tab: 'annuaire',  bg: context.ac.infoAccentLight,      text: context.ac.infoAccentDark,      isInfo: true),
-    _QuickTile(label: 'Démarches',  tab: 'demarches', bg: context.ac.infoAccentLight,      text: context.ac.infoAccentDark,      isInfo: true),
+    _QuickTile(label: 'Agenda',    tab: 'agenda',    icon: Icons.calendar_today_rounded, accent: context.ac.secretariatAccent, bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark),
+    _QuickTile(label: 'Notes',     tab: 'notes',     icon: Icons.edit_note_rounded,      accent: context.ac.secretariatAccent, bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark),
+    _QuickTile(label: 'Annuaire',  tab: 'annuaire',  icon: Icons.people_rounded,         accent: context.ac.infoAccent,        bg: context.ac.infoAccentLight,        text: context.ac.infoAccentDark),
+    _QuickTile(label: 'Démarches', tab: 'demarches', icon: Icons.assignment_rounded,     accent: context.ac.infoAccent,        bg: context.ac.infoAccentLight,        text: context.ac.infoAccentDark),
   ];
 
   @override
@@ -104,131 +113,50 @@ class _HomeScreenState extends State<HomeScreen> {
     final insets = MediaQuery.of(context).padding;
 
     return Scaffold(
-      backgroundColor: ac.background,
+      backgroundColor: context.ac.page,
       body: RefreshIndicator(
         color: ac.secretariatAccent,
         backgroundColor: ac.surface,
         onRefresh: _onRefresh,
         child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
             // ── Hero header ───────────────────────────────────────────────────
+            // Bandeau + carte « Aujourd'hui » dans le même bloc : la carte,
+            // peinte après le bandeau, flotte par-dessus son bord inférieur.
             SliverToBoxAdapter(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [ac.headerGradientStart, ac.headerGradientEnd],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Hero(
+                    topInset: insets.top,
+                    greeting: _greeting,
+                    onSettings: () => context.push('/settings'),
+                    onMic: () {
+                      chatListenRequest.value++;
+                      context.go('/chat');
+                    },
+                    onAsk: () => context.go('/chat'),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: insets.top + 12),
-                    // Top bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-                      child: Row(
-                        children: [
-                          const AmiinLogo(size: 32, variant: AmiinLogoVariant.turquoise),
-                          const SizedBox(width: Spacing.sm),
-                          Expanded(
-                            child: Text(
-                              'Amiin',
-                              style: TextStyles.screenTitle(context).copyWith(color: ac.onHeader, letterSpacing: 0.5),
-                            ),
-                          ),
-                          _HeaderIconButton(
-                            icon: Icons.settings_outlined,
-                            color: ac.onHeader,
-                            onTap: () => context.push('/settings'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: Spacing.xxxl),
-                    // Greeting
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-                      child: Text(
-                        _greeting,
-                        style: TextStyle(
-                          fontFamily: FontFamily.sansLight,
-                          fontSize: 15,
-                          color: ac.onHeader.withValues(alpha: 0.55),
-                          height: 1.6,
+                  ValueListenableBuilder<HomeBrief?>(
+                    valueListenable: homeBriefService.brief,
+                    builder: (context, brief, _) {
+                      // Sans brief, simple espace sous le bandeau.
+                      if (brief == null || brief.isEmpty) {
+                        return const SizedBox(height: Spacing.xxl);
+                      }
+                      // Le décalage vers le haut laisse sous la carte un espace
+                      // égal à [_Hero.overlap] avant la section suivante.
+                      return Transform.translate(
+                        offset: const Offset(0, -_Hero.overlap),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                          child: _DailyBriefCard(brief: brief),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: Spacing.xl),
-                    // Bouton micro
-                    Center(
-                      child: Semantics(
-                        button: true,
-                        label: 'Parler à Amiin',
-                        child: GestureDetector(
-                          onTap: () {
-                            chatListenRequest.value++;
-                            context.go('/chat');
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 60, height: 60,
-                                decoration: BoxDecoration(
-                                  color: ac.secretariatAccent,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: ac.secretariatAccent.withValues(alpha: 0.35),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 6),
-                                    )
-                                  ],
-                                ),
-                                child: Center(
-                                  child: SvgPicture.string(AmiinSvgIcons.mic, width: 22, height: 26),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Parler à Amiin',
-                                style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: ac.onHeader.withValues(alpha: 0.45), fontWeight: FontWeight.w500, letterSpacing: 0.5, fontFamily: FontFamily.geo),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: Spacing.xl),
-                    // Barre de saisie rapide
-                    GestureDetector(
-                      onTap: () => context.go('/chat'),
-                      child: Container(
-                        height: 44,
-                        margin: const EdgeInsets.symmetric(horizontal: Spacing.xl),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.06),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-                          borderRadius: BorderRadius.circular(RadiusAmiin.full),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Écrivez votre question…',
-                            style: TextStyles.body(context).copyWith(fontSize: 13, color: ac.onHeader.withValues(alpha: 0.30)),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: Spacing.xxxl),
-                    // Ligne d'horizon — au bas du header
-                    HorizonLine(color: context.ac.secretariatAccent, height: 1.5),
-                  ],
-                ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
 
@@ -237,26 +165,12 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  const SizedBox(height: Spacing.xxl),
-
-                  // Brief du jour — masqué tant qu'aucune donnée n'est disponible
-                  ValueListenableBuilder<HomeBrief?>(
-                    valueListenable: homeBriefService.brief,
-                    builder: (context, brief, _) {
-                      if (brief == null || brief.isEmpty) return const SizedBox.shrink();
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: Spacing.xxl),
-                        child: _DailyBriefStrip(brief: brief),
-                      );
-                    },
-                  ),
-
                   // Accès rapide
                   _SectionLabel(
                     label: 'Accès rapide',
                     modeColor: ac.secretariatAccent,
                   ),
-                  const SizedBox(height: Spacing.sm),
+                  const SizedBox(height: Spacing.md),
                   _QuickTilesGrid(tiles: _quickTiles),
 
                   // Événements
@@ -270,38 +184,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => context.push('/agenda'),
                       ),
                     ),
-                    const SizedBox(height: Spacing.sm),
-                    ..._events.map((ev) => Padding(
-                      padding: const EdgeInsets.only(bottom: Spacing.sm),
-                      child: AmiinCard(
-                        variant: CardVariant.secretariat,
-                        onTap: () => context.push('/agenda/event/${ev.id}'),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 6, height: 6,
-                              decoration: BoxDecoration(
-                                color: _categoryColor(ev.category.name),
-                                shape: BoxShape.circle,
+                    const SizedBox(height: Spacing.md),
+                    FloatingCard(
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < _events.length; i++) ...[
+                            if (i > 0)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 38),
+                                child: Divider(height: 0.5, thickness: 0.5, color: ac.border.withValues(alpha: 0.7)),
                               ),
+                            _EventRow(
+                              title: _events[i].title,
+                              when: _formatEventDate(_events[i].startDate),
+                              dotColor: _categoryColor(_events[i].category.name),
+                              byAgent: _events[i].createdByAgent == true,
+                              onTap: () => context.push('/agenda/event/${_events[i].id}'),
                             ),
-                            const SizedBox(width: Spacing.md),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(ev.title, style: TextStyles.cardTitle(context)),
-                                  const SizedBox(height: 2),
-                                  Text(_formatEventDate(ev.startDate), style: TextStyles.caption(context)),
-                                ],
-                              ),
-                            ),
-                            if (ev.createdByAgent == true)
-                              _AgentBadge(color: ac.secretariatAccent),
                           ],
-                        ),
+                        ],
                       ),
-                    )),
+                    ),
                   ],
 
                   // Notes récentes
@@ -315,10 +219,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => context.go('/notes'),
                       ),
                     ),
-                    const SizedBox(height: Spacing.sm),
+                    const SizedBox(height: Spacing.md),
                     ..._notes.map((note) => Padding(
-                      padding: const EdgeInsets.only(bottom: Spacing.sm),
-                      child: AmiinCard(
+                      padding: const EdgeInsets.only(bottom: Spacing.md),
+                      child: FloatingCard(
                         onTap: () => context.push('/notes/${note.id}'),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +241,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     )),
                   ],
 
-                  const SizedBox(height: Spacing.huge),
+                  // Dégage la barre d'onglets flottante (incluse dans
+                  // padding.bottom quand le Scaffold parent a extendBody).
+                  SizedBox(height: Spacing.xxl + insets.bottom),
                 ]),
               ),
             ),
@@ -346,34 +252,335 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }
 
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
+// ── Bandeau héros ─────────────────────────────────────────────────────────────
+// Encre de nuit, coins bas arrondis, ombre portée sur la page, halos diffus
+// turquoise et ocre pour la profondeur.
 
-class _HeaderIconButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
+class _Hero extends StatelessWidget {
+  /// Hauteur dont la carte « Aujourd'hui » chevauche le bandeau.
+  static const double overlap = 36;
 
-  const _HeaderIconButton({required this.icon, required this.color, required this.onTap});
+  final double topInset;
+  final String greeting;
+  final VoidCallback onSettings;
+  final VoidCallback onMic;
+  final VoidCallback onAsk;
+
+  const _Hero({
+    required this.topInset,
+    required this.greeting,
+    required this.onSettings,
+    required this.onMic,
+    required this.onAsk,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 34, height: 34,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+    final ac = context.ac;
+    final light = context.ac.lightHeader;
+    const radius = BorderRadius.vertical(bottom: Radius.circular(32));
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: light
+                ? ac.ink.withValues(alpha: 0.10)
+                : ac.headerGradientStart.withValues(alpha: 0.28),
+            blurRadius: 40,
+            offset: const Offset(0, 18),
+            spreadRadius: -12,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: [
+            // Dégradé de fond
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [ac.headerGradientStart, ac.headerGradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
+            // Halo turquoise, en haut à droite. Sur bandeau clair (Lacté),
+            // c'est l'une des rares touches de couleur : à peine perceptible.
+            Positioned(
+              top: -120, right: -90,
+              child: light
+                  ? _Glow(color: ac.secretariatAccentMid, size: 300, alpha: 0.12)
+                  : _Glow(color: ac.secretariatAccent, size: 300, alpha: 0.30),
+            ),
+            // Halo ocre, plus discret, en bas à gauche
+            Positioned(
+              bottom: -140, left: -110,
+              child: light
+                  ? _Glow(color: ac.infoAccentMid, size: 280, alpha: 0.07)
+                  : _Glow(color: ac.infoAccent, size: 280, alpha: 0.14),
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: topInset + 12),
+                // Top bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                  child: Row(
+                    children: [
+                      const AmiinLogo(size: 32, variant: AmiinLogoVariant.turquoise),
+                      const SizedBox(width: Spacing.sm),
+                      Expanded(
+                        child: Text(
+                          'Amiin',
+                          style: TextStyles.screenTitle(context).copyWith(color: ac.onHeader, letterSpacing: 0.5),
+                        ),
+                      ),
+                      _GlassIconButton(
+                        icon: Icons.settings_outlined,
+                        color: ac.onHeader,
+                        onTap: onSettings,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: Spacing.xxxl),
+                // Greeting
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+                  child: Text(
+                    greeting,
+                    style: TextStyle(
+                      fontFamily: FontFamily.sansLight,
+                      fontSize: 17,
+                      color: ac.onHeader.withValues(alpha: 0.72),
+                      height: 1.5,
+                      letterSpacing: -0.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: Spacing.xxl),
+                Center(child: _MicButton(onTap: onMic)),
+                const SizedBox(height: Spacing.xxl),
+                // Barre de saisie — verre dépoli
+                _GlassField(onTap: onAsk),
+                // Réserve la place de la carte qui chevauche le bandeau
+                const SizedBox(height: Spacing.xxl + _Hero.overlap),
+              ],
+            ),
+          ],
         ),
-        child: Center(child: Icon(icon, size: 17, color: color)),
       ),
     );
   }
 }
+
+class _Glow extends StatelessWidget {
+  final Color color;
+  final double size;
+  final double alpha;
+
+  const _Glow({required this.color, required this.size, required this.alpha});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size, height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(colors: [
+          color.withValues(alpha: alpha),
+          color.withValues(alpha: 0.0),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Micro flottant : anneau concentrique, dégradé, ombre teintée.
+class _MicButton extends StatefulWidget {
+  final VoidCallback onTap;
+  const _MicButton({required this.onTap});
+
+  @override
+  State<_MicButton> createState() => _MicButtonState();
+}
+
+class _MicButtonState extends State<_MicButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    final accent = ac.secretariatAccent;
+    return Semantics(
+      button: true,
+      label: 'Parler à Amiin',
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          widget.onTap();
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: _pressed ? 0.94 : 1,
+              duration: const Duration(milliseconds: 160),
+              curve: Curves.easeOut,
+              child: Container(
+                width: 96, height: 96,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accent.withValues(alpha: 0.08),
+                  border: Border.all(color: accent.withValues(alpha: 0.18)),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 64, height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color.lerp(accent, Colors.white, 0.18)!, accent],
+                      ),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.55),
+                          blurRadius: 28,
+                          offset: const Offset(0, 10),
+                          spreadRadius: -6,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: SvgPicture.string(AmiinSvgIcons.mic, width: 22, height: 26),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Parler à Amiin',
+              style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: ac.onHeader.withValues(alpha: 0.55), fontWeight: FontWeight.w500, letterSpacing: 0.6, fontFamily: FontFamily.geo),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassField extends StatelessWidget {
+  final VoidCallback onTap;
+  const _GlassField({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
+      child: Semantics(
+        button: true,
+        label: 'Écrire une question à Amiin',
+        child: GestureDetector(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(RadiusAmiin.full),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                height: 50,
+                padding: const EdgeInsets.only(left: Spacing.lg, right: 6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      glass(context, 0.12),
+                      glass(context, 0.05),
+                    ],
+                  ),
+                  border: Border.all(color: glass(context, 0.16)),
+                  borderRadius: BorderRadius.circular(RadiusAmiin.full),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Écrivez votre question…',
+                        style: TextStyles.body(context).copyWith(fontSize: 14, color: ac.onHeader.withValues(alpha: 0.45)),
+                      ),
+                    ),
+                    Container(
+                      width: 38, height: 38,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: ac.onHeader.withValues(alpha: 0.92),
+                      ),
+                      child: Icon(Icons.arrow_upward_rounded, size: 20, color: ac.headerGradientStart),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _GlassIconButton({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Réglages',
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              width: 38, height: 38,
+              decoration: BoxDecoration(
+                color: glass(context, 0.10),
+                shape: BoxShape.circle,
+                border: Border.all(color: glass(context, 0.16)),
+              ),
+              child: Center(child: Icon(icon, size: 18, color: color)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Sub-widgets ───────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String label;
@@ -401,7 +608,7 @@ class _SectionLabel extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: Spacing.xs),
               child: Text(
-                action!.label,
+                '${action!.label} ›',
                 style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: modeColor),
               ),
             ),
@@ -420,10 +627,11 @@ class _SectionAction {
 class _QuickTile {
   final String label;
   final String tab;
+  final IconData icon;
+  final Color accent;
   final Color bg;
   final Color text;
-  final bool isInfo;
-  const _QuickTile({required this.label, required this.tab, required this.bg, required this.text, required this.isInfo});
+  const _QuickTile({required this.label, required this.tab, required this.icon, required this.accent, required this.bg, required this.text});
 }
 
 class _QuickTilesGrid extends StatelessWidget {
@@ -432,39 +640,121 @@ class _QuickTilesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final w = (MediaQuery.of(context).size.width - 2 * Spacing.xl - Spacing.sm) / 2;
-    return Wrap(
-      spacing: Spacing.sm,
-      runSpacing: Spacing.sm,
-      children: tiles.map((tile) {
-        return Material(
-          color: tile.bg,
-          borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          child: InkWell(
-            onTap: () => context.go('/${tile.tab}'),
-            borderRadius: BorderRadius.circular(RadiusAmiin.md),
-            child: SizedBox(
-              width: w,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.md),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 4, height: 4,
-                      decoration: BoxDecoration(color: tile.text, shape: BoxShape.circle),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      tile.label,
-                      style: TextStyles.cardTitle(context).copyWith(fontSize: 13, color: tile.text, fontFamily: FontFamily.geoBold),
-                    ),
-                  ],
+    return Column(
+      children: [
+        for (var row = 0; row < 2; row++) ...[
+          if (row > 0) const SizedBox(height: Spacing.md),
+          Row(
+            children: [
+              Expanded(child: _QuickTileCard(tile: tiles[row * 2])),
+              const SizedBox(width: Spacing.md),
+              Expanded(child: _QuickTileCard(tile: tiles[row * 2 + 1])),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Tuile teintée qui flotte : ombre colorée de son accent et pastille
+/// d'icône blanche en relief.
+class _QuickTileCard extends StatelessWidget {
+  final _QuickTile tile;
+  const _QuickTileCard({required this.tile});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.ac.brightness == Brightness.dark;
+    return FloatingCard(
+      color: tile.bg,
+      shadowTint: tile.accent,
+      lift: 0.45,
+      padding: const EdgeInsets.all(Spacing.md),
+      onTap: () => context.go('/${tile.tab}'),
+      child: Row(
+        children: [
+          Container(
+            width: 34, height: 34,
+            decoration: BoxDecoration(
+              color: dark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: tile.accent.withValues(alpha: 0.22),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                  spreadRadius: -2,
                 ),
-              ),
+              ],
+            ),
+            child: Icon(tile.icon, size: 18, color: tile.accent),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              tile.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyles.cardTitle(context).copyWith(fontSize: 14, color: tile.text, fontFamily: FontFamily.geoBold),
             ),
           ),
-        );
-      }).toList(),
+          Icon(Icons.chevron_right_rounded, size: 18, color: tile.text.withValues(alpha: 0.5)),
+        ],
+      ),
+    );
+  }
+}
+
+class _EventRow extends StatelessWidget {
+  final String title;
+  final String when;
+  final Color dotColor;
+  final bool byAgent;
+  final VoidCallback onTap;
+
+  const _EventRow({
+    required this.title,
+    required this.when,
+    required this.dotColor,
+    required this.byAgent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ac = context.ac;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.lg, 14, Spacing.md, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 8, height: 8,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: dotColor.withValues(alpha: 0.45), blurRadius: 6)],
+              ),
+            ),
+            const SizedBox(width: Spacing.md + 2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyles.cardTitle(context)),
+                  const SizedBox(height: 2),
+                  Text(when, style: TextStyles.caption(context)),
+                ],
+              ),
+            ),
+            if (byAgent) _AgentBadge(color: ac.secretariatAccent),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, size: 18, color: ac.muted.withValues(alpha: 0.6)),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -487,14 +777,14 @@ class _AgentBadge extends StatelessWidget {
   }
 }
 
-// ── Bande « Aujourd'hui » : météo, prochaine prière, taux FDJ ────────────────
-// Discrète par construction : une seule carte, uniquement les tuiles dont la
-// donnée existe, et rien du tout si le brief est vide ou indisponible.
+// ── Carte « Aujourd'hui » : météo, prochaine prière, taux FDJ ────────────────
+// Flotte à cheval sur le bandeau ; uniquement les tuiles dont la donnée
+// existe, et rien du tout si le brief est vide ou indisponible.
 
-class _DailyBriefStrip extends StatelessWidget {
+class _DailyBriefCard extends StatelessWidget {
   final HomeBrief brief;
 
-  const _DailyBriefStrip({required this.brief});
+  const _DailyBriefCard({required this.brief});
 
   @override
   Widget build(BuildContext context) {
@@ -536,23 +826,27 @@ class _DailyBriefStrip extends StatelessWidget {
     final children = <Widget>[];
     for (var i = 0; i < tiles.length; i++) {
       if (i > 0) {
-        children.add(Container(width: 1, height: 28, color: ac.border));
+        children.add(Container(width: 0.5, height: 32, color: ac.border));
       }
       children.add(Expanded(child: tiles[i]));
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _SectionLabel(label: "Aujourd'hui", modeColor: ac.infoAccent),
-        const SizedBox(height: Spacing.sm),
-        AmiinCard(
-          variant: CardVariant.info,
-          padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.md, vertical: Spacing.md),
-          child: Row(children: children),
-        ),
-      ],
+    return FloatingCard(
+      lift: 1,
+      padding: const EdgeInsets.fromLTRB(Spacing.sm, Spacing.md, Spacing.sm, Spacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: Spacing.sm, bottom: Spacing.md),
+            child: Text(
+              "AUJOURD'HUI",
+              style: TextStyles.sectionLabel(context).copyWith(letterSpacing: 1.2, color: ac.infoAccent),
+            ),
+          ),
+          Row(children: children),
+        ],
+      ),
     );
   }
 }
@@ -580,7 +874,7 @@ class _BriefTile extends StatelessWidget {
               Text(value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold)),
+                  style: TextStyles.cardTitle(context).copyWith(fontFamily: FontFamily.geoBold, fontSize: 15)),
               Text(label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

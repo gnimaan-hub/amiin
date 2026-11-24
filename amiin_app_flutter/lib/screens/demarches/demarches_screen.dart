@@ -119,7 +119,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -410,7 +410,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: Spacing.lg),
             decoration: BoxDecoration(
-              color: Colors.red.shade600,
+              color: context.ac.alertColor,
               borderRadius: BorderRadius.circular(RadiusAmiin.md),
             ),
             child: const Icon(Icons.delete_outline, color: Colors.white, size: 22),
@@ -427,7 +427,7 @@ class _DemarchesScreenState extends State<DemarchesScreen> {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+                  child: Text('Supprimer', style: TextStyle(color: context.ac.alertColor)),
                 ),
               ],
             ),

@@ -9,6 +9,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../theme/colors.dart';
+import '../../theme/elevation.dart';
+import '../../widgets/floating_card.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -231,7 +233,7 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -242,17 +244,21 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
           ],
         ),
       ),
-      floatingActionButton: AnimatedScale(
-        scale: _showTop ? 1 : 0,
-        duration: const Duration(milliseconds: 180),
-        child: FloatingActionButton.small(
-          heroTag: 'annTop',
-          onPressed: () => _scroll.animateTo(0,
-              duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
-          backgroundColor: context.ac.surface,
-          foregroundColor: context.ac.infoAccent,
-          elevation: 2,
-          child: const Icon(Icons.keyboard_arrow_up),
+      // Dégage la barre d'onglets flottante.
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: navBarClearance(context)),
+        child: AnimatedScale(
+          scale: _showTop ? 1 : 0,
+          duration: const Duration(milliseconds: 180),
+          child: FloatingActionButton.small(
+            heroTag: 'annTop',
+            onPressed: () => _scroll.animateTo(0,
+                duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
+            backgroundColor: context.ac.surface,
+            foregroundColor: context.ac.infoAccent,
+            elevation: 2,
+            child: const Icon(Icons.keyboard_arrow_up),
+          ),
         ),
       ),
     );
@@ -391,9 +397,9 @@ class _AnnuaireScreenState extends State<AnnuaireScreen> {
         padding: const EdgeInsets.all(Spacing.lg),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: Spacing.sm,
-          crossAxisSpacing: Spacing.sm,
-          childAspectRatio: 1.55,
+          mainAxisSpacing: Spacing.md,
+          crossAxisSpacing: Spacing.md,
+          childAspectRatio: 1.35,
         ),
         itemCount: cats.length,
         itemBuilder: (_, i) {
@@ -514,33 +520,40 @@ class _CategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    // Tuile « vitrine » : carte blanche flottante, ombre teintée de la
+    // couleur de la catégorie, emoji dans une pastille colorée.
+    return FloatingCard(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        padding: const EdgeInsets.all(Spacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyles.cardTitle(context).copyWith(fontSize: 12, color: color, height: 1.2, fontFamily: FontFamily.geoBold)),
-                Text('$count entrées',
-                    style: TextStyles.body(context).copyWith(fontSize: 10, color: color.withValues(alpha: 0.7))),
-              ],
+      lift: 0.4,
+      shadowTint: color,
+      padding: const EdgeInsets.all(Spacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(RadiusVitrine.chip),
             ),
-          ],
-        ),
+            child: Text(emoji, style: const TextStyle(fontSize: 20)),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyles.cardTitle(context).copyWith(fontSize: 13, height: 1.2, fontFamily: FontFamily.geoBold)),
+              const SizedBox(height: 2),
+              Text('$count entrées',
+                  style: TextStyles.caption(context).copyWith(fontSize: 11, color: color)),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -569,7 +582,10 @@ class _FilterChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? c : context.ac.surface,
           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-          border: Border.all(color: selected ? c : context.ac.border),
+          border: selected ? null : hairline(context),
+          boxShadow: selected
+              ? [BoxShadow(color: c.withValues(alpha: 0.30), blurRadius: 10, offset: const Offset(0, 3), spreadRadius: -3)]
+              : floatShadow(context, lift: 0.1),
         ),
         child: Text(label,
             style: TextStyles.cardTitle(context).copyWith(fontSize: 11, color: selected ? context.ac.onAccent : context.ac.midTone)),
@@ -594,7 +610,8 @@ class _NearbyButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? context.ac.infoAccentLight : context.ac.surface,
           borderRadius: BorderRadius.circular(RadiusAmiin.full),
-          border: Border.all(color: context.ac.border),
+          border: hairline(context),
+          boxShadow: floatShadow(context, lift: 0.25),
         ),
         child: Row(
           children: [

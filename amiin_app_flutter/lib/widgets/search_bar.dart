@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/amiin_svg_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/themes.dart';
+import '../theme/elevation.dart';
 import '../theme/spacing.dart';
 import '../theme/typography.dart';
 
@@ -56,11 +57,13 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 46,
       decoration: BoxDecoration(
         color: context.ac.surface,
         borderRadius: BorderRadius.circular(RadiusAmiin.full),
-        border: Border.all(color: context.ac.border),
+        // Style « vitrine » : liseré de lumière + ombre douce, plus de bordure grise.
+        border: hairline(context),
+        boxShadow: floatShadow(context, lift: 0.25),
       ),
       padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
       child: Row(
@@ -78,7 +81,12 @@ class _AmiinSearchBarState extends State<AmiinSearchBar> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyles.bodyMuted(context),
+                // Neutralise le style global des champs : la pilule porte
+                // déjà la forme et l'ombre.
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),

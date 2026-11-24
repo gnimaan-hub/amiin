@@ -23,7 +23,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
     final settings = context.watch<SettingsService>();
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -152,7 +152,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
               await action();
               if (context.mounted) AmiinToast.show(context, 'Données supprimées');
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Supprimer'),
           ),
         ],

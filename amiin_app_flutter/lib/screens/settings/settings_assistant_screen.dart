@@ -37,7 +37,7 @@ class SettingsAssistantScreen extends StatelessWidget {
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -328,7 +328,7 @@ class SettingsAssistantScreen extends StatelessWidget {
               Navigator.pop(ctx);
               AmiinToast.show(context, 'Mémoire effacée');
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Effacer'),
           ),
         ],

@@ -3,6 +3,7 @@
 // Toute l'orchestration agentique vit dans ChatController.
 
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart' hide TextDirection;
 import '../../widgets/amiin_svg_icons.dart';
@@ -20,10 +21,12 @@ import '../../services/cloud_tts_service.dart';
 import '../../services/cloud_stt_service.dart';
 import '../../services/settings_service.dart';
 
+import '../../theme/elevation.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../theme/themes.dart';
 import '../../widgets/amiin_logo.dart';
+import '../../widgets/floating_card.dart';
 import '../../widgets/horizon_line.dart';
 import '../../services/chat_controller.dart';
 import '../../services/connectivity_service.dart';
@@ -556,7 +559,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final ac = context.ac;
 
     return Scaffold(
-      backgroundColor: ac.background,
+      backgroundColor: ac.page,
       body: Column(
         children: [
           _buildHeader(insets, chat, ac),
@@ -607,55 +610,128 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     ChatController chat,
     AmiinThemeColors ac,
   ) {
+    // En-tête « vitrine » : bandeau aux coins bas arrondis qui projette son
+    // ombre, halo turquoise, bouton en verre dépoli. La ligne d'horizon reste
+    // l'indicateur d'activité d'Amiin.
+    const radius = BorderRadius.vertical(bottom: Radius.circular(24));
+    final canReset = chat.messages.isNotEmpty;
     return Container(
-      color: ac.headerGradientEnd,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: insets.top + 8),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(Spacing.xl, 0, Spacing.md, 12),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.go('/home'),
-                  child: const AmiinLogo(
-                    size: 30,
-                    variant: AmiinLogoVariant.turquoise,
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: ac.lightHeader
+                ? ac.ink.withValues(alpha: 0.08)
+                : ac.headerGradientStart.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
+            spreadRadius: -10,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [ac.headerGradientStart, ac.headerGradientEnd],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                 ),
-                const SizedBox(width: Spacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            Positioned(
+              top: -110,
+              right: -80,
+              child: Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(colors: [
+                    (ac.lightHeader ? ac.secretariatAccentMid : ac.secretariatAccent)
+                        .withValues(alpha: ac.lightHeader ? 0.12 : 0.28),
+                    ac.secretariatAccent.withValues(alpha: 0),
+                  ]),
+                ),
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: insets.top + 8),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(Spacing.xl, 0, Spacing.lg, 12),
+                  child: Row(
                     children: [
-                      Text(
-                        'Amiin',
-                        style: TextStyles.cardTitle(context).copyWith(fontSize: 15, color: ac.onHeader, letterSpacing: 0.3, fontFamily: FontFamily.geoBold),
+                      GestureDetector(
+                        onTap: () => context.go('/home'),
+                        child: const AmiinLogo(
+                          size: 30,
+                          variant: AmiinLogoVariant.turquoise,
+                        ),
                       ),
-                      _buildHeaderStatus(chat, ac),
+                      const SizedBox(width: Spacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Amiin',
+                              style: TextStyles.cardTitle(context).copyWith(fontSize: 16, color: ac.onHeader, letterSpacing: 0.3, fontFamily: FontFamily.geoBold),
+                            ),
+                            _buildHeaderStatus(chat, ac),
+                          ],
+                        ),
+                      ),
+                      Tooltip(
+                        message: 'Nouvelle conversation',
+                        child: Semantics(
+                          button: true,
+                          enabled: canReset,
+                          label: 'Nouvelle conversation',
+                          child: GestureDetector(
+                            onTap: canReset ? _confirmNewConversation : null,
+                            child: ClipOval(
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                child: Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: glass(context, 0.10),
+                                    border: Border.all(color: glass(context, 0.16)),
+                                  ),
+                                  child: Icon(
+                                    Icons.add_comment_outlined,
+                                    size: 18,
+                                    color: ac.onHeader.withValues(alpha: canReset ? 0.85 : 0.25),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: chat.messages.isEmpty
-                      ? null
-                      : _confirmNewConversation,
-                  tooltip: 'Nouvelle conversation',
-                  icon: Icon(
-                    Icons.add_comment_outlined,
-                    size: 20,
-                    color: chat.messages.isEmpty
-                        ? ac.onHeader.withValues(alpha: 0.2)
-                        : ac.onHeader.withValues(alpha: 0.7),
-                  ),
+                // Ligne d'horizon — chargement ou état stable, en retrait des
+                // coins arrondis.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
+                  child: HorizonLine(color: ac.secretariatAccent, animating: chat.isBusy),
                 ),
+                const SizedBox(height: 4),
               ],
             ),
-          ),
-          // Ligne d'horizon — chargement ou état stable
-          HorizonLine(color: ac.secretariatAccent, animating: chat.isBusy),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -767,16 +843,21 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       color: isUser ? ac.secretariatAccent : ac.surface,
                       borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(RadiusAmiin.lg),
-                        topRight: const Radius.circular(RadiusAmiin.lg),
+                        topLeft: const Radius.circular(RadiusVitrine.card),
+                        topRight: const Radius.circular(RadiusVitrine.card),
                         bottomLeft: isUser
-                            ? const Radius.circular(RadiusAmiin.lg)
-                            : const Radius.circular(4),
+                            ? const Radius.circular(RadiusVitrine.card)
+                            : const Radius.circular(6),
                         bottomRight: isUser
-                            ? const Radius.circular(4)
-                            : const Radius.circular(RadiusAmiin.lg),
+                            ? const Radius.circular(6)
+                            : const Radius.circular(RadiusVitrine.card),
                       ),
-                      border: isUser ? null : Border.all(color: ac.border),
+                      // Bulles « vitrine » : liseré de lumière et ombre douce,
+                      // teintée de l'accent pour les messages de l'utilisateur.
+                      border: isUser ? null : hairline(context),
+                      boxShadow: isUser
+                          ? [BoxShadow(color: ac.secretariatAccent.withValues(alpha: 0.28), blurRadius: 14, offset: const Offset(0, 5), spreadRadius: -5)]
+                          : floatShadow(context, lift: 0.2),
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: Spacing.md,
@@ -953,16 +1034,23 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     ChatController chat,
     AmiinThemeColors ac,
   ) {
-    return Container(
+    // Barre de saisie « vitrine » : une pilule flottante (surface, liseré,
+    // ombre douce) qui contient le champ, le micro et l'envoi, posée
+    // au-dessus de la barre d'onglets.
+    return Padding(
       padding: EdgeInsets.only(
         left: Spacing.md,
         right: Spacing.md,
-        top: Spacing.sm,
+        top: Spacing.xs,
         bottom: insets.bottom + 8,
       ),
+      child: Container(
+      padding: const EdgeInsets.fromLTRB(Spacing.xs, 5, 5, 5),
       decoration: BoxDecoration(
         color: ac.surface,
-        border: Border(top: BorderSide(color: ac.border, width: 0.5)),
+        borderRadius: BorderRadius.circular(26),
+        border: hairline(context),
+        boxShadow: floatShadow(context, lift: 0.6),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -985,10 +1073,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(RadiusAmiin.xl),
                   borderSide: BorderSide.none,
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(RadiusAmiin.xl),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(RadiusAmiin.xl),
+                  borderSide: BorderSide.none,
+                ),
                 filled: true,
                 fillColor: _isListening
                     ? context.ac.secretariatAccentLight.withValues(alpha: 0.5)
-                    : ac.surface2,
+                    : Colors.transparent,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: Spacing.md,
                   vertical: Spacing.sm,
@@ -1101,6 +1197,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             ),
         ],
+      ),
       ),
     );
   }
@@ -1222,39 +1319,30 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ..._starterQuestions.map(
               (q) => Padding(
                 padding: const EdgeInsets.only(bottom: Spacing.sm),
-                child: Material(
-                  color: ac.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
-                    side: BorderSide(color: ac.border),
+                child: FloatingCard(
+                  onTap: () => _sendMessage(q),
+                  lift: 0.3,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.lg,
+                    vertical: Spacing.md,
                   ),
-                  child: InkWell(
-                    onTap: () => _sendMessage(q),
-                    borderRadius: BorderRadius.circular(RadiusAmiin.md),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: Spacing.lg,
-                        vertical: Spacing.sm + 2,
+                  child: Row(
+                    children: [
+                      Icon(
+                        lang == 'ar'
+                            ? Icons.arrow_back_ios_rounded
+                            : Icons.arrow_forward_ios_rounded,
+                        size: 11,
+                        color: ac.secretariatAccent,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            lang == 'ar'
-                                ? Icons.arrow_back_ios_rounded
-                                : Icons.arrow_forward_ios_rounded,
-                            size: 11,
-                            color: ac.secretariatAccent,
-                          ),
-                          const SizedBox(width: Spacing.sm),
-                          Flexible(
-                            child: Text(
-                              q,
-                              style: TextStyles.body(context).copyWith(fontSize: 13),
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: Spacing.sm),
+                      Flexible(
+                        child: Text(
+                          q,
+                          style: TextStyles.body(context).copyWith(fontSize: 13),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

@@ -103,8 +103,20 @@ class AuthPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    // Pilule flottante : ombre turquoise diffuse sous le bouton.
+    return Container(
       height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(RadiusAmiin.full),
+        boxShadow: [
+          BoxShadow(
+            color: ColorsAmiin.turquoise.withValues(alpha: loading ? 0.0 : 0.45),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+            spreadRadius: -8,
+          ),
+        ],
+      ),
       child: ElevatedButton(
         onPressed: loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -112,7 +124,7 @@ class AuthPrimaryButton extends StatelessWidget {
           foregroundColor: ColorsAmiin.onTurquoise,
           disabledBackgroundColor: ColorsAmiin.turquoise.withValues(alpha: 0.5),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RadiusAmiin.lg)),
+          shape: const StadiumBorder(),
         ),
         child: loading
             ? const SizedBox(
@@ -199,6 +211,48 @@ class AuthDivider extends StatelessWidget {
             thickness: 0.5,
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Fond des écrans d'authentification : encre de nuit avec les deux halos
+/// diffus de l'accueil (turquoise en haut à droite, ocre en bas à gauche).
+class AuthBackdrop extends StatelessWidget {
+  final Widget child;
+  const AuthBackdrop({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget glow(Color color, double size, double alpha) => Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(colors: [
+              color.withValues(alpha: alpha),
+              color.withValues(alpha: 0),
+            ]),
+          ),
+        );
+    // expand : le fond couvre tout l'écran, pas seulement le formulaire.
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [ColorsAmiin.encreNuit, Color(0xFF1C2E52)],
+              ),
+            ),
+          ),
+        ),
+        Positioned(top: -140, right: -120, child: glow(ColorsAmiin.turquoise, 380, 0.28)),
+        Positioned(bottom: -160, left: -140, child: glow(ColorsAmiin.ocre, 360, 0.12)),
+        child,
       ],
     );
   }

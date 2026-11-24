@@ -21,11 +21,11 @@ class AmiinTag extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = _getConfig(context, variant);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: config.bg,
-        borderRadius: BorderRadius.circular(RadiusAmiin.sm),
-        border: Border.all(color: config.border),
+        // Pastille en pilule, sans contour (refonte « vitrine »).
+        borderRadius: BorderRadius.circular(RadiusAmiin.full),
       ),
       child: Text(
         label,
@@ -37,7 +37,12 @@ class AmiinTag extends StatelessWidget {
   _TagConfig _getConfig(BuildContext context, TagVariant v) {
     switch (v) {
       case TagVariant.default_:
-        return _TagConfig(bg: context.ac.background, text: context.ac.midTone, border: context.ac.border);
+        // surface2 se confond avec le fond en sombre : on y prend la surface.
+        return _TagConfig(
+          bg: context.ac.brightness == Brightness.dark ? context.ac.surface : context.ac.surface2,
+          text: context.ac.midTone,
+          border: context.ac.border,
+        );
       case TagVariant.turquoise:
         return _TagConfig(bg: context.ac.secretariatAccentLight, text: context.ac.secretariatAccentDark, border: context.ac.secretariatAccentLight);
       case TagVariant.ocre:

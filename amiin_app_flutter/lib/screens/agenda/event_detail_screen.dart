@@ -59,7 +59,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: context.ac.alertColor),
             child: const Text('Supprimer'),
           ),
         ],
@@ -124,7 +124,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final end = DateTime.parse(_event!.endDate);
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

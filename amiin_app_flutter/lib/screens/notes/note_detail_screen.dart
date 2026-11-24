@@ -66,7 +66,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [
@@ -239,7 +239,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         content: const Text('Êtes-vous sûr de vouloir supprimer cette note ?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-          TextButton(onPressed: () => Navigator.pop(context, true), style: TextButton.styleFrom(foregroundColor: Colors.red), child: const Text('Supprimer')),
+          TextButton(onPressed: () => Navigator.pop(context, true), style: TextButton.styleFrom(foregroundColor: context.ac.alertColor), child: const Text('Supprimer')),
         ],
       ),
     );
@@ -257,7 +257,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (_note == null) return const SizedBox();
 
     return Scaffold(
-      backgroundColor: context.ac.background,
+      backgroundColor: context.ac.page,
       body: SafeArea(
         child: Column(
           children: [

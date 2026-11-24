@@ -1,5 +1,6 @@
 // ─── Amiin Theme System ───────────────────────────────────────────────────────
-// 4 variantes : deux claires (turquoise / ocre) + deux sombres (turquoise / ocre)
+// 3 variantes : Sel d'Assal (clair), Encre de Nuit (sombre) et Lacté (clair
+// monochrome). Aurore et Dusk ont été retirés (novembre 2026).
 // La dualité info (ocre) / secrétariat (turquoise) est lisible dans chaque variante.
 // context.ac donne accès à tous les tokens depuis n'importe quel widget.
 
@@ -68,6 +69,15 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     required this.onHeader,
     required this.brightness,
   });
+
+  /// Fond des pages de la refonte « vitrine » : blanc cassé dérivé de
+  /// [background] sur les thèmes clairs, [background] tel quel en sombre.
+  Color get page => brightness == Brightness.dark
+      ? background
+      : Color.lerp(background, const Color(0xFFFFFFFF), 0.62)!;
+
+  /// Vrai quand le bandeau est clair (texte foncé dessus), comme dans Lacté.
+  bool get lightHeader => onHeader.computeLuminance() < 0.5;
 
   @override
   AmiinThemeColors copyWith({
@@ -181,70 +191,6 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     brightness:                 Brightness.light,
   );
 
-  // "Aurore" — jour clair, accent information (ocre)
-  static const ocean = AmiinThemeColors(
-    primary:                    Color(0xFFC8902F),
-    primaryLight:               Color(0xFFF5E8CC),
-    primaryDark:                Color(0xFF8F6520),
-    primaryMid:                 Color(0xFFDEA844),
-    infoAccent:                 Color(0xFFC8902F),
-    infoAccentLight:            Color(0xFFF5E8CC),
-    infoAccentDark:             Color(0xFF8F6520),
-    infoAccentMid:              Color(0xFFDEA844),
-    secretariatAccent:          Color(0xFF1E8A8A),
-    secretariatAccentLight:     Color(0xFFCCEBEB),
-    secretariatAccentDark:      Color(0xFF135E5E),
-    secretariatAccentMid:       Color(0xFF2AADAD),
-    alertColor:                 Color(0xFFC75145),
-    alertColorLight:            Color(0xFFF5D0CC),
-    success:                    Color(0xFF2A7A5A),
-    successLight:               Color(0xFFCCE8DD),
-    background:                 Color(0xFFF2EFE9),
-    surface:                    Color(0xFFFFFFFF),
-    surface2:                   Color(0xFFEDE8F5),
-    ink:                        Color(0xFF14213D),
-    midTone:                    Color(0xFF4A5A7A),
-    muted:                      Color(0xFF7A8BA8),
-    border:                     Color(0xFFD0D5E2),
-    onAccent:                   Color(0xFFFFFFFF),
-    headerGradientStart:        Color(0xFF2A1F0A),
-    headerGradientEnd:          Color(0xFF3A2D14),
-    onHeader:                   Color(0xFFF2EFE9),
-    brightness:                 Brightness.light,
-  );
-
-  // "Dusk" — nuit sombre, accent information (ocre)
-  static const foret = AmiinThemeColors(
-    primary:                    Color(0xFFC8902F),
-    primaryLight:               Color(0xFF3A2D14),
-    primaryDark:                Color(0xFF8F6520),
-    primaryMid:                 Color(0xFFDEA844),
-    infoAccent:                 Color(0xFFC8902F),
-    infoAccentLight:            Color(0xFF3A2D14),
-    infoAccentDark:             Color(0xFFDEA844),
-    infoAccentMid:              Color(0xFFDEA844),
-    secretariatAccent:          Color(0xFF1E8A8A),
-    secretariatAccentLight:     Color(0xFF1A3535),
-    secretariatAccentDark:      Color(0xFF2AADAD),
-    secretariatAccentMid:       Color(0xFF2AADAD),
-    alertColor:                 Color(0xFFC75145),
-    alertColorLight:            Color(0xFF3A211D),
-    success:                    Color(0xFF3FA47C),
-    successLight:               Color(0xFF16342A),
-    background:                 Color(0xFF14213D),
-    surface:                    Color(0xFF1C2E52),
-    surface2:                   Color(0xFF162038),
-    ink:                        Color(0xFFF2EFE9),
-    midTone:                    Color(0xFFAAB6CE),
-    muted:                      Color(0xFF8090B0),
-    border:                     Color(0xFF2A3A5A),
-    onAccent:                   Color(0xFFFFFFFF),
-    headerGradientStart:        Color(0xFF0D1526),
-    headerGradientEnd:          Color(0xFF14213D),
-    onHeader:                   Color(0xFFF2EFE9),
-    brightness:                 Brightness.dark,
-  );
-
   // "Encre de Nuit" — nuit sombre, accent secrétariat (turquoise)
   static const nuit = AmiinThemeColors(
     primary:                    Color(0xFF1E8A8A),
@@ -276,45 +222,78 @@ class AmiinThemeColors extends ThemeExtension<AmiinThemeColors> {
     onHeader:                   Color(0xFFF2EFE9),
     brightness:                 Brightness.dark,
   );
+
+  // "Lacté" — monochrome : blancs cassés, gris et noir pour les fonds, les
+  // surfaces et le texte. La couleur est réservée aux éléments essentiels :
+  // turquoise pour les actions (micro, liens, icônes secrétariat), ocre pour
+  // les repères d'information ; plus le logo, les alertes et les succès.
+  static const lacte = AmiinThemeColors(
+    primary:                    Color(0xFF1C1C1E),
+    primaryLight:               Color(0xFFEBEAE6),
+    primaryDark:                Color(0xFF000000),
+    primaryMid:                 Color(0xFF3A3A3C),
+    infoAccent:                 Color(0xFFC8902F),
+    infoAccentLight:            Color(0xFFF3F2EF),
+    infoAccentDark:             Color(0xFF3A3A3C),
+    infoAccentMid:              Color(0xFFC8902F),
+    secretariatAccent:          Color(0xFF1E8A8A),
+    secretariatAccentLight:     Color(0xFFE9E8E4),
+    secretariatAccentDark:      Color(0xFF1C1C1E),
+    secretariatAccentMid:       Color(0xFF1E8A8A),
+    alertColor:                 Color(0xFFC75145),
+    alertColorLight:            Color(0xFFF5D0CC),
+    success:                    Color(0xFF2A7A5A),
+    successLight:               Color(0xFFCCE8DD),
+    background:                 Color(0xFFF4F3F0),
+    surface:                    Color(0xFFFFFFFF),
+    surface2:                   Color(0xFFEDECE8),
+    ink:                        Color(0xFF1C1C1E),
+    midTone:                    Color(0xFF48484A),
+    muted:                      Color(0xFF8E8E93),
+    border:                     Color(0xFFE3E2DE),
+    onAccent:                   Color(0xFFFFFFFF),
+    headerGradientStart:        Color(0xFFFFFFFF),
+    headerGradientEnd:          Color(0xFFF0EFEB),
+    onHeader:                   Color(0xFF1C1C1E),
+    brightness:                 Brightness.light,
+  );
 }
 
 // ── Variantes disponibles ─────────────────────────────────────────────────────
 
-enum AmiinThemeVariant { terre, ocean, foret, nuit }
+enum AmiinThemeVariant { terre, nuit, lacte }
 
 extension AmiinThemeVariantExt on AmiinThemeVariant {
   String get id {
     switch (this) {
       case AmiinThemeVariant.terre: return 'terre';
-      case AmiinThemeVariant.ocean: return 'ocean';
-      case AmiinThemeVariant.foret: return 'foret';
       case AmiinThemeVariant.nuit:  return 'nuit';
+      case AmiinThemeVariant.lacte: return 'lacte';
     }
   }
 
   String get label {
     switch (this) {
       case AmiinThemeVariant.terre: return "Sel d'Assal";
-      case AmiinThemeVariant.ocean: return 'Aurore';
-      case AmiinThemeVariant.foret: return 'Dusk';
       case AmiinThemeVariant.nuit:  return 'Encre de Nuit';
+      case AmiinThemeVariant.lacte: return 'Lacté';
     }
   }
 
   AmiinThemeColors get colors {
     switch (this) {
       case AmiinThemeVariant.terre: return AmiinThemeColors.terre;
-      case AmiinThemeVariant.ocean: return AmiinThemeColors.ocean;
-      case AmiinThemeVariant.foret: return AmiinThemeColors.foret;
       case AmiinThemeVariant.nuit:  return AmiinThemeColors.nuit;
+      case AmiinThemeVariant.lacte: return AmiinThemeColors.lacte;
     }
   }
 
   static AmiinThemeVariant fromId(String id) {
     switch (id) {
-      case 'ocean': return AmiinThemeVariant.ocean;
-      case 'foret': return AmiinThemeVariant.foret;
+      // Aurore et Dusk ont été retirés : on garde la luminosité choisie.
+      case 'foret': return AmiinThemeVariant.nuit;
       case 'nuit':  return AmiinThemeVariant.nuit;
+      case 'lacte': return AmiinThemeVariant.lacte;
       default:      return AmiinThemeVariant.terre;
     }
   }
@@ -358,7 +337,7 @@ class AmiinThemes {
       colorScheme: colorScheme,
       brightness: c.brightness,
       fontFamily: ff,
-      scaffoldBackgroundColor: c.background,
+      scaffoldBackgroundColor: c.page,
       cardColor: c.surface,
       dividerColor: c.border,
       textTheme: baseTextTheme,
@@ -390,9 +369,10 @@ class AmiinThemes {
       cardTheme: CardThemeData(
         color: c.surface,
         elevation: 0,
+        // Refonte « vitrine » : rayon 18, filet très léger.
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: c.border.withValues(alpha: 0.5)),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -409,28 +389,28 @@ class AmiinThemes {
         fillColor: c.surface,
         hintStyle: TextStyle(color: c.muted, fontFamily: ff),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c.border.withValues(alpha: 0.7)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c.border.withValues(alpha: 0.7)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: c.primary, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       ),
 
-      dividerTheme: DividerThemeData(color: c.border, space: 1, thickness: 1),
+      dividerTheme: DividerThemeData(color: c.border.withValues(alpha: 0.7), space: 1, thickness: 0.5),
 
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: c.primary,
           foregroundColor: Colors.white,
           textStyle: TextStyle(fontFamily: _geoFamily(), fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
           minimumSize: const Size(double.infinity, 50),
         ),
       ),
@@ -440,7 +420,7 @@ class AmiinThemes {
           foregroundColor: Colors.white,
           elevation: 0,
           textStyle: TextStyle(fontFamily: _geoFamily(), fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -450,7 +430,7 @@ class AmiinThemes {
         style: OutlinedButton.styleFrom(
           foregroundColor: c.primary,
           side: BorderSide(color: c.primary),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: const StadiumBorder(),
         ),
       ),
 
@@ -480,21 +460,34 @@ class AmiinThemes {
         backgroundColor: c.surface,
         titleTextStyle: TextStyle(fontSize: 18, color: c.ink, fontFamily: _geoFamily(), fontWeight: FontWeight.w600),
         contentTextStyle: TextStyle(fontSize: 14, color: c.ink, fontFamily: ff, height: 1.6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: c.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
       ),
 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: isDark ? c.surface2 : c.ink,
-        contentTextStyle: TextStyle(color: c.onHeader, fontFamily: ff),
+        // Texte de la couleur du fond de page : lisible sur l'encre (thèmes
+        // clairs, y compris Lacté dont le bandeau est clair) comme en sombre.
+        contentTextStyle: TextStyle(color: isDark ? c.ink : c.surface, fontFamily: ff),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
 
       popupMenuTheme: PopupMenuThemeData(
         color: c.surface,
+        elevation: 10,
+        shadowColor: (isDark ? Colors.black : c.ink).withValues(alpha: 0.25),
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: c.border),
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: c.border.withValues(alpha: 0.5)),
         ),
         textStyle: TextStyle(color: c.ink, fontFamily: ff, fontSize: 14),
       ),
