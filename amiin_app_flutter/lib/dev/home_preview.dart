@@ -46,6 +46,7 @@ Future<void> main() async {
     routes: [
       ShellRoute(
         builder: (context, state, child) => Scaffold(
+          extendBody: true,
           body: child,
           bottomNavigationBar: AmiinNavBar(currentIndex: 0, onTap: (_) {}),
         ),

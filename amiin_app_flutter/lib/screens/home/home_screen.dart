@@ -291,7 +291,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     )),
                   ],
 
-                  const SizedBox(height: Spacing.huge),
+                  // Dégage la barre d'onglets flottante (incluse dans
+                  // padding.bottom quand le Scaffold parent a extendBody).
+                  SizedBox(height: Spacing.xxl + insets.bottom),
                 ]),
               ),
             ),
