@@ -37,6 +37,7 @@ import '../widgets/connectivity_banner.dart';
 import '../config/demo.dart';
 import '../services/agenda_badge_notifier.dart';
 import '../services/auth_service.dart';
+import '../services/bootstrap.dart';
 import '../theme/typography.dart';
 import '../theme/themes.dart';
 
@@ -84,6 +85,12 @@ final GoRouter appRouter = GoRouter(
 
     // Splash gère elle-même la navigation après init
     if (loc == '/splash') return null;
+
+    // Ouverture directe d'une adresse (lien, rechargement de la page web
+    // sur #/login…) : le splash n'a pas tourné, les boxes Hive et l'auth ne
+    // sont pas prêtes — les écrans planteraient (LateInitializationError).
+    // On passe d'abord par le splash, qui redirige ensuite.
+    if (!isBootstrapped) return '/splash';
 
     // Démo : inscription fermée (accès sur invitation).
     if (kAmiinDemo && loc == '/register') return '/login';

@@ -24,10 +24,19 @@ import 'settings_service.dart';
 import 'widget_bridge.dart';
 
 Future<void>? _bootstrapFuture;
+bool _bootstrapped = false;
+
+/// Vrai une fois les boxes Hive ouvertes et les services initialisés.
+/// Le routeur s'en sert pour faire passer toute première navigation par le
+/// splash (qui attend [ensureBootstrap]).
+bool get isBootstrapped => _bootstrapped;
 
 /// Idempotent : le travail n'est fait qu'une fois, les appels suivants
 /// retournent le même Future (hot reload, splash reconstruit…).
-Future<void> ensureBootstrap() => _bootstrapFuture ??= _bootstrap();
+// whenComplete : même en cas d'échec, on considère le démarrage terminé
+// pour ne jamais renvoyer le routeur en boucle vers le splash.
+Future<void> ensureBootstrap() => _bootstrapFuture ??=
+    _bootstrap().whenComplete(() => _bootstrapped = true);
 
 Future<void> _bootstrap() async {
   await initializeDateFormatting('fr_FR', null);
