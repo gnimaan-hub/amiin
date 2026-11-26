@@ -10,7 +10,7 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 2. **Comptes** — vérification e-mail, compte admin, contrôle `is_active`, limites persistantes ✅
    - 2b. **Données locales propres à chaque compte** — aujourd'hui, en changeant de compte sur
      le même téléphone, on voit les discussions, notes, agenda, démarches et profil du compte
-     précédent (stockage Hive commun à tous les comptes). Signalé le 2026-11-26. ⏳ prochaine tâche
+     précédent (stockage Hive commun à tous les comptes). Signalé le 2026-11-26. ✅
 3. Quotas — table `usage`, colonne `plan`, `GET /v1/me/usage`, jauge dans l'app
 4. Paramètres — brancher ou retirer les réglages sans effet, i18n anglais, sessions par appareil,
    bouton « Rappels à l'heure exacte » (cf. étape 1, §6)
@@ -31,6 +31,10 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 - [ ] Parcours inscription → écran « Vérifiez votre e-mail » → code reçu → accès à l'app ;
       « Renvoyer le code » ; mauvais code ; « Utiliser une autre adresse » (étape 2)
 - [ ] Se connecter avec le compte admin : Réglages › Compte affiche « Administrateur » (étape 2)
+- [ ] Mettre à jour l'app sur ton téléphone EN RESTANT CONNECTÉ à ton compte principal : tes
+      conversations, notes, agenda et démarches lui seront rattachés. Ensuite, compte A → déconnexion →
+      compte B : B ne voit rien de A ; retour sur A : tout est là. Vérifier aussi les rappels
+      d'agenda et le widget après le changement de compte (étape 2b)
 
 **Publication**
 - [ ] Confirmer l'identifiant `dj.amiin.app` avant la première publication (étape 1)
@@ -204,3 +208,66 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 `lib/services/auth_service.dart`, `lib/navigation/app_router.dart`,
 `lib/screens/auth/verify_email_screen.dart` (nouveau), `lib/services/chat_controller.dart`,
 `lib/screens/settings/settings_account_screen.dart`.
+
+---
+
+## 2026-11-26 — Étape 2b : données locales propres à chaque compte
+
+### Le problème
+Sur le téléphone, toutes les données personnelles étaient enregistrées dans des « boîtes » Hive
+communes à tous les comptes : conversations, mémoire d'Amiin, notes, agenda, démarches suivies,
+profil et préférences d'Amiin. En changeant de compte, on voyait donc celles du compte précédent.
+
+### La solution
+- **Une boîte par compte.** Chaque boîte porte l'identifiant du compte, par exemple
+  `notes_box_u_<id>`, et elles sont toutes chiffrées. Hors connexion, l'app pointe vers un
+  espace « invité » vide.
+- **Rien n'est perdu à la déconnexion.** Les données d'un compte restent sur le téléphone (chiffrées)
+  et réapparaissent quand ce compte se reconnecte. Un autre compte ne les voit jamais.
+- **Ce qui reste commun à l'appareil** : thème, taille du texte, police, langue de l'interface,
+  voix, réglages des notifications, catalogue des démarches et brief d'accueil (météo, prières, taux).
+- **Ce qui devient propre au compte** : profil (prénom, nom, année de naissance, profession…),
+  comportement d'Amiin (ton, longueur, expertise, mémoire, sujets favoris), langue des réponses,
+  devise, affichage des sources, mode vocal par défaut.
+- **Au changement de compte** :
+  - les rappels programmés (agenda, relances de démarches) de l'ancien compte sont annulés,
+    puis ceux du nouveau sont reprogrammés ;
+  - le widget d'accueil est mis à jour ;
+  - le chat affiche l'historique du nouveau compte.
+
+### Données existantes (première ouverture de cette version)
+- Si un compte est **connecté au lancement**, les anciennes données communes lui sont attribuées.
+  C'est presque toujours le propriétaire du téléphone.
+- Si **personne n'est connecté**, on ne peut pas savoir à qui elles appartiennent : elles sont
+  **effacées** plutôt que risquer de les montrer au mauvais compte.
+- Conséquence pratique : mettre à jour l'app en restant connecté à son compte principal (voir la liste).
+
+### Bug corrigé au passage
+- « Supprimer toutes mes données » (Confidentialité) et l'effacement local lors de la
+  suppression du compte **plantaient** dès la première boîte : `Hive.box<dynamic>` refuse une
+  boîte ouverte avec un type précis. Les données n'étaient donc pas effacées. L'effacement passe
+  maintenant par chaque service et ne touche que le compte actif.
+
+### Technique
+- Nouveau `lib/services/user_scope.dart` :
+  - `UserScope.activate(userId)` bascule toutes les données ;
+  - `ScopedBox` se rouvre sur la boîte du compte actif ;
+  - `BoxChanges` est un « listenable » stable qui notifie aussi au changement de compte ;
+  - contient aussi la migration et `wipeLocalUserData()`.
+- `AuthService` appelle la bascule à chaque changement d'utilisateur : démarrage, connexion,
+  inscription, déconnexion, suppression du compte, session expirée. Jamais dans la tâche de fond
+  du widget, qui ne touche pas à Hive.
+- `SettingsService` : `accountKeys` liste les préférences propres au compte, stockées dans
+  `settings_account_<compte>` ; les autres restent dans `settings`.
+- `MemoryService`, `NotesService`, `AgendaService`, `DemarchesService` : boîtes par compte.
+  `ChatController` recharge l'historique au changement de compte.
+- `bootstrap.dart` n'ouvre plus les données personnelles : c'est la bascule de compte qui s'en charge.
+
+### Tests
+- `test/user_scope_test.dart` (nouveau, 3 tests) :
+  - deux comptes sur le même téléphone ne partagent ni notes, ni messages, ni profil, alors
+    que le thème reste commun ;
+  - reprise des anciennes données par le compte connecté au lancement, effacement si personne
+    n'est connecté ;
+  - « Supprimer toutes mes données » n'efface que le compte actif.
+- `flutter analyze` : aucune erreur, rien sur les fichiers modifiés. `flutter test` : 22/22.

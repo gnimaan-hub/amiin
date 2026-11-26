@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
-import 'hive_utils.dart';
+import 'user_scope.dart';
 
 // Base URL partagée sans importer api_client (évite la dépendance circulaire)
 const _kBaseUrl = String.fromEnvironment(
@@ -94,6 +94,7 @@ class AuthService extends ChangeNotifier {
     // que la session soit invalide pour autant — _validateSession tentera un
     // refresh dans ce cas plutôt que de forcer un retour au login.
     if (refreshToken == null) {
+      await _syncScope(atStartup: true);
       _initialized = true;
       debugPrint('[AUTH] init() : pas de refresh token → non connecté');
       notifyListeners();
@@ -105,6 +106,7 @@ class AuthService extends ChangeNotifier {
     // (Render free tier) peut mettre 30 s à se réveiller — hors de question
     // de bloquer le démarrage là-dessus.
     _user = await _cachedUser();
+    if (_user != null) await _syncScope(atStartup: true);
     _initialized = true;
     debugPrint('[AUTH] init() : cachedUser=${_user != null} → isLoggedIn=$isLoggedIn');
     notifyListeners();
@@ -113,16 +115,18 @@ class AuthService extends ChangeNotifier {
       unawaited(_validateSession(accessToken, refreshToken));
     } else {
       // Tokens présents mais pas de cache : il faut le réseau pour savoir
-      await _validateSession(accessToken, refreshToken);
+      await _validateSession(accessToken, refreshToken, atStartup: true);
     }
   }
 
   /// Vérifie la session auprès du backend. Sur 401 (ou pas d'accessToken du
   /// tout) → tentative de refresh (échec = déconnexion). Sur erreur réseau →
   /// on garde la session locale.
-  Future<void> _validateSession(String? accessToken, String refreshToken) async {
+  Future<void> _validateSession(String? accessToken, String refreshToken,
+      {bool atStartup = false}) async {
     if (accessToken == null) {
       await _tryRefresh(refreshToken);
+      await _syncScope(atStartup: atStartup);
       notifyListeners();
       return;
     }
@@ -144,6 +148,7 @@ class AuthService extends ChangeNotifier {
       debugPrint('[AUTH] _validateSession : erreur inattendue $e');
       // Jamais de crash au démarrage pour une erreur de validation
     }
+    await _syncScope(atStartup: atStartup);
     notifyListeners();
   }
 
@@ -204,6 +209,7 @@ class AuthService extends ChangeNotifier {
     }
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
   }
 
@@ -242,6 +248,7 @@ class AuthService extends ChangeNotifier {
     } catch (_) {}
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
   }
 
@@ -282,6 +289,7 @@ class AuthService extends ChangeNotifier {
     await wipeLocalUserData();
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
   }
 
@@ -346,6 +354,7 @@ class AuthService extends ChangeNotifier {
       if (current == refreshToken) {
         _user = null;
         await _clearAll();
+        await _syncScope();
         notifyListeners();
       }
       return null;
@@ -367,7 +376,20 @@ class AuthService extends ChangeNotifier {
     );
     _user = _parseUser(meResp.data as Map<String, dynamic>);
     await _cacheUser(_user!);
+    await _syncScope();
     notifyListeners();
+  }
+
+  /// Bascule les données locales (conversations, notes, agenda, démarches,
+  /// profil) sur celles du compte connecté — ou sur l'espace invité vide.
+  /// Jamais dans l'isolate WorkManager, qui ne touche pas à Hive.
+  Future<void> _syncScope({bool atStartup = false}) async {
+    if (_isBackgroundIsolate) return;
+    try {
+      await userScope.activate(_user?.id, atStartup: atStartup);
+    } catch (e) {
+      debugPrint('[AUTH] bascule des données locales échouée : $e');
+    }
   }
 
   Future<void> _storeTokens({

@@ -13,11 +13,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'api_client.dart';
 import 'hive_utils.dart';
-import 'memory_service.dart';
 import 'agenda_service.dart';
 import 'agenda_badge_notifier.dart';
-import 'notes_service.dart';
-import 'demarches_service.dart';
 import 'notification_service.dart';
 import 'connectivity_service.dart';
 import 'settings_service.dart';
@@ -45,14 +42,10 @@ Future<void> _bootstrap() async {
   await Hive.initFlutter();
   await initHiveCipher();
 
-  // Boxes nécessaires dès le premier écran — ouvertes en parallèle
-  await Future.wait([
-    settingsService.init(),
-    agendaService.init(),
-    notesService.init(),
-    demarchesService.init(),
-    MemoryService().init(),
-  ]);
+  // Préférences de l'appareil. Les données personnelles (conversations,
+  // notes, agenda, démarches, profil) sont ouvertes par compte, quand
+  // AuthService connaît l'utilisateur : voir user_scope.dart.
+  await settingsService.init();
 
   ApiClient.init();
 

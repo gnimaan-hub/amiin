@@ -8,7 +8,7 @@ import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
 import '../../services/chat_controller.dart';
 import '../../services/export_service.dart';
-import '../../services/hive_utils.dart';
+import '../../services/user_scope.dart';
 import '../../services/memory_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/header.dart';

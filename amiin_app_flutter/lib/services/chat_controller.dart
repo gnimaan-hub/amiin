@@ -27,6 +27,7 @@ import 'connectivity_service.dart';
 import 'demarches_service.dart';
 import 'location_service.dart';
 import 'memory_service.dart';
+import 'user_scope.dart';
 import 'notes_service.dart';
 import 'settings_service.dart';
 
@@ -55,7 +56,26 @@ class ChatController extends ChangeNotifier {
   ChatController({AmiinApiService? api}) : _api = api ?? AmiinApiService() {
     _messages.addAll(
         MemoryService().getRecentMessages(limit: loadedHistoryLimit));
+    userScope.addListener(_onAccountChanged);
     unawaited(_refreshEnvContextIfStale());
+  }
+
+  /// Changement de compte : on quitte la conversation affichée (celle de
+  /// l'ancien compte) et on charge l'historique du compte actif.
+  void _onAccountChanged() {
+    _api.cancelStream();
+    _messages
+      ..clear()
+      ..addAll(MemoryService().getRecentMessages(limit: loadedHistoryLimit));
+    noteResults.clear();
+    eventResults.clear();
+    _clearNoteSuggestion(notify: false);
+    pendingDeletions.clear();
+    pendingDeletionMsgId = null;
+    _loading = false;
+    _streaming = false;
+    _streamStatus = '';
+    notifyListeners();
   }
 
   final AmiinApiService _api;
@@ -113,6 +133,7 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    userScope.removeListener(_onAccountChanged);
     _notices.close();
     _api.cancelStream();
     super.dispose();

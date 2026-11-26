@@ -2,33 +2,35 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../models/chat_message.dart';
 import '../models/user_action.dart';
-import 'hive_utils.dart';
+import 'user_scope.dart';
 
 class MemoryService {
   static final MemoryService _instance = MemoryService._internal();
   factory MemoryService() => _instance;
   MemoryService._internal();
 
-  late Box<ChatMessage> _chatBox;
-  late Box<UserAction> _actionBox;
+  // Boxes du compte actif (voir user_scope.dart). Accès synchrones : tant
+  // qu'elles ne sont pas ouvertes, lectures vides et écritures ignorées.
+  final _chat = ScopedBox<ChatMessage>('chat_messages');
+  final _actions = ScopedBox<UserAction>('user_actions');
+  Box<ChatMessage>? get _chatBox => _chat.current;
+  Box<UserAction>? get _actionBox => _actions.current;
 
   /// Bornes de rétention : évite que les boxes grossissent sans limite
   /// (démarrage lent, mémoire) après des mois d'utilisation.
   static const int maxStoredMessages = 500;
   static const int maxStoredActions = 200;
 
+  /// Ouvre les boxes du compte actif (appelé par UserScope).
   Future<void> init() async {
-    if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(ChatMessageAdapter());
-    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(AgentActionAdapter());
-    if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(UserActionAdapter());
-    _chatBox = await openBoxSafe<ChatMessage>('chat_messages');
-    _actionBox = await openBoxSafe<UserAction>('user_actions');
+    registerUserDataAdapters();
+    await Future.wait([_chat.box, _actions.box]);
   }
 
   // ----- Messages -----
 
   List<ChatMessage> getAllMessages() {
-    final messages = _chatBox.values.toList();
+    final messages = _chatBox?.values.toList() ?? <ChatMessage>[];
     messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return messages;
   }
@@ -41,27 +43,36 @@ class MemoryService {
   }
 
   void saveMessage(ChatMessage message) {
-    _chatBox.put(message.id, message);
+    final box = _chatBox;
+    if (box == null) return;
+    box.put(message.id, message);
     _pruneMessages();
   }
 
   void deleteAllMessages() {
-    _chatBox.clear();
+    _chatBox?.clear();
+  }
+
+  /// Efface conversations et mémoire d'actions du compte actif.
+  Future<void> clearAll() async {
+    await init();
+    await Future.wait([_chatBox!.clear(), _actionBox!.clear()]);
   }
 
   void _pruneMessages() {
-    if (_chatBox.length <= maxStoredMessages) return;
+    final box = _chatBox;
+    if (box == null || box.length <= maxStoredMessages) return;
     final all = getAllMessages();
     final excess = all.length - maxStoredMessages;
     for (var i = 0; i < excess; i++) {
-      _chatBox.delete(all[i].id);
+      box.delete(all[i].id);
     }
   }
 
   // ----- Actions utilisateur -----
 
   List<UserAction> getAllActions() {
-    final actions = _actionBox.values.toList();
+    final actions = _actionBox?.values.toList() ?? <UserAction>[];
     actions.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return actions;
   }
@@ -74,18 +85,21 @@ class MemoryService {
   }
 
   void recordAction(UserAction action) {
-    _actionBox.put(const Uuid().v4(), action);
+    final box = _actionBox;
+    if (box == null) return;
+    box.put(const Uuid().v4(), action);
     _pruneActions();
   }
 
   void _pruneActions() {
-    if (_actionBox.length <= maxStoredActions) return;
+    final box = _actionBox;
+    if (box == null || box.length <= maxStoredActions) return;
     // Supprimer les plus anciennes
-    final entries = _actionBox.toMap().entries.toList()
+    final entries = box.toMap().entries.toList()
       ..sort((a, b) => a.value.timestamp.compareTo(b.value.timestamp));
     final excess = entries.length - maxStoredActions;
     for (var i = 0; i < excess; i++) {
-      _actionBox.delete(entries[i].key);
+      box.delete(entries[i].key);
     }
   }
 
