@@ -377,9 +377,7 @@ class ChatController extends ChangeNotifier {
       _addMessage(ChatMessage(
         id: _uuid.v4(),
         role: 'agent',
-        content:
-            "Désolé, je n'arrive pas à joindre le service Amiin pour le moment. "
-            'Vérifiez votre connexion et réessayez.',
+        content: _errorMessageFor(e),
         timestamp: DateTime.now(),
       ));
       _loading = false;
@@ -387,6 +385,22 @@ class ChatController extends ChangeNotifier {
       _streamStatus = '';
       notifyListeners();
       return null;
+    }
+  }
+
+  /// Message affiché dans le fil quand l'appel au serveur échoue.
+  static String _errorMessageFor(Object e) {
+    final status = e is DioException ? e.response?.statusCode : null;
+    switch (status) {
+      case 403:
+        return "Votre adresse e-mail n'est pas encore vérifiée. "
+            "Saisissez le code reçu par e-mail pour discuter avec Amiin.";
+      case 429:
+        return 'Vous avez envoyé beaucoup de messages en peu de temps. '
+            'Patientez un instant puis réessayez.';
+      default:
+        return "Désolé, je n'arrive pas à joindre le service Amiin pour le moment. "
+            'Vérifiez votre connexion et réessayez.';
     }
   }
 

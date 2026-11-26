@@ -71,11 +71,37 @@ def test_ip_client_derriere_proxy():
 
 
 def test_plafond_echecs_login_par_email():
-    email = f"x{time.monotonic()}@b.dj"
-    for _ in range(10):
-        auth._auth_buckets[f"login_fail:{email}"].append(time.monotonic())
-    assert auth._login_failures_exceeded(email)
-    assert not auth._login_failures_exceeded("autre@b.dj")
+    # Compteur en base (voir test_auth_db.py) ; ici, seulement le seuil.
+    class Cur:
+        def __init__(self, n): self.n = n
+        def execute(self, *a): pass
+        def fetchone(self): return {"n": self.n}
+    assert auth._login_failures_exceeded(Cur(auth.LOGIN_FAIL_MAX), "a@b.dj")
+    assert not auth._login_failures_exceeded(Cur(auth.LOGIN_FAIL_MAX - 1), "a@b.dj")
+
+
+def test_mode_verification_email(monkeypatch):
+    for var in ("EMAIL_VERIFICATION", "SMTP_HOST", "SMTP_FROM", "BREVO_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    assert not auth.email_verification_required()       # pas d'envoi possible
+    monkeypatch.setenv("SMTP_FROM", "Amiin <a@b.dj>")
+    monkeypatch.setenv("BREVO_API_KEY", "x")
+    assert auth.email_verification_required()
+    monkeypatch.setenv("EMAIL_VERIFICATION", "off")
+    assert not auth.email_verification_required()
+    assert auth._effective_verified({"email_verified": False})
+    monkeypatch.setenv("EMAIL_VERIFICATION", "required")
+    assert not auth._effective_verified({"email_verified": False, "role": "user"})
+    assert auth._effective_verified({"email_verified": False, "role": "admin"})
+
+
+def test_liste_admins(monkeypatch):
+    monkeypatch.setenv("ADMIN_EMAILS", " Moi@Amiin.dj, ,autre@b.dj ")
+    assert auth.admin_emails() == ["autre@b.dj", "moi@amiin.dj"]
+
+
+def test_codes_separes_par_usage():
+    assert auth._hash_code("verify", "u1", "123456") != auth._hash_reset_code("u1", "123456")
 
 
 # ── Profil, changement et réinitialisation du mot de passe ────────────────────

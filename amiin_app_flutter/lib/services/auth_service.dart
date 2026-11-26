@@ -19,6 +19,8 @@ const _kRefreshToken = 'refresh_token';
 const _kUserId       = 'user_id';
 const _kEmail        = 'user_email';
 const _kDisplayName  = 'user_display_name';
+const _kEmailVerified = 'user_email_verified';
+const _kRole          = 'user_role';
 
 // ── Modèle utilisateur ────────────────────────────────────────────────────────
 
@@ -26,7 +28,20 @@ class AuthUser {
   final String id;
   final String email;
   final String displayName;
-  const AuthUser({required this.id, required this.email, required this.displayName});
+  /// Adresse vérifiée (ou vérification non exigée par le serveur). Tant que
+  /// c'est faux, le routeur envoie sur /verify-email.
+  final bool emailVerified;
+  /// 'user' | 'admin' (admin : aucune limite d'usage côté serveur).
+  final String role;
+  const AuthUser({
+    required this.id,
+    required this.email,
+    required this.displayName,
+    this.emailVerified = true,
+    this.role = 'user',
+  });
+
+  bool get isAdmin => role == 'admin';
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -230,6 +245,21 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Vérifie l'adresse e-mail avec le code à 6 chiffres reçu à l'inscription.
+  /// Lève une DioException si le code est refusé (400).
+  Future<void> verifyEmail(String code) async {
+    final resp = await _authDio.post('/auth/verify-email',
+        data: {'code': code}, options: await _authed());
+    _user = _parseUser(resp.data as Map<String, dynamic>);
+    await _cacheUser(_user!);
+    notifyListeners();
+  }
+
+  /// Redemande un code de vérification (le serveur limite à 1/min, 5/h).
+  Future<void> resendVerificationCode() async {
+    await _authDio.post('/auth/verify-email/send', options: await _authed());
+  }
+
   /// Demande l'envoi d'un code à 6 chiffres par e-mail (réponse identique que
   /// le compte existe ou non).
   Future<void> forgotPassword(String email) =>
@@ -352,14 +382,26 @@ class AuthService extends ChangeNotifier {
     await _storage.write(key: _kUserId,      value: u.id);
     await _storage.write(key: _kEmail,       value: u.email);
     await _storage.write(key: _kDisplayName, value: u.displayName);
+    await _storage.write(key: _kEmailVerified, value: u.emailVerified ? '1' : '0');
+    await _storage.write(key: _kRole,          value: u.role);
   }
 
   Future<AuthUser?> _cachedUser() async {
     final id    = await _storage.read(key: _kUserId);
     final email = await _storage.read(key: _kEmail);
     final name  = await _storage.read(key: _kDisplayName);
+    final verified = await _storage.read(key: _kEmailVerified);
+    final role  = await _storage.read(key: _kRole);
     if (id == null || email == null) return null;
-    return AuthUser(id: id, email: email, displayName: name ?? email.split('@')[0]);
+    return AuthUser(
+      id: id,
+      email: email,
+      displayName: name ?? email.split('@')[0],
+      // Absent (cache d'une version précédente) : considéré vérifié, la
+      // validation de session en arrière-plan corrige aussitôt.
+      emailVerified: verified != '0',
+      role: role ?? 'user',
+    );
   }
 
   // Supprime uniquement les clés d'auth, jamais deleteAll() : ce storage est
@@ -371,12 +413,17 @@ class AuthService extends ChangeNotifier {
     _storage.delete(key: _kUserId),
     _storage.delete(key: _kEmail),
     _storage.delete(key: _kDisplayName),
+    _storage.delete(key: _kEmailVerified),
+    _storage.delete(key: _kRole),
   ]);
 
   AuthUser _parseUser(Map<String, dynamic> d) => AuthUser(
-    id:          d['id']           as String,
-    email:       d['email']        as String,
-    displayName: d['display_name'] as String,
+    id:            d['id']           as String,
+    email:         d['email']        as String,
+    displayName:   d['display_name'] as String,
+    // Champs absents sur un serveur plus ancien : comportement d'avant.
+    emailVerified: d['email_verified'] as bool? ?? true,
+    role:          d['role']         as String? ?? 'user',
   );
 }
 

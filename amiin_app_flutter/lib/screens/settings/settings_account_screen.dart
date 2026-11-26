@@ -54,6 +54,13 @@ class SettingsAccountScreen extends StatelessWidget {
                           submit: (v) => authService.updateDisplayName(v[0].trim()),
                         ),
                       ),
+                      if (auth.currentUser?.isAdmin ?? false)
+                        const SettingRow(
+                          icon: Icons.verified_user_outlined,
+                          label: 'Type de compte',
+                          subtitle: 'Accès complet, sans limite d\'utilisation',
+                          value: 'Administrateur',
+                        ),
                     ]),
 
                     const SettingsSection('Sécurité du compte'),

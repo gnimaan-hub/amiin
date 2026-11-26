@@ -33,6 +33,7 @@ import '../screens/settings/settings_billing_screen.dart';
 import '../screens/settings/settings_about_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
+import '../screens/auth/verify_email_screen.dart';
 import '../widgets/connectivity_banner.dart';
 import '../config/demo.dart';
 import '../services/agenda_badge_notifier.dart';
@@ -95,13 +96,20 @@ final GoRouter appRouter = GoRouter(
     // Démo : inscription fermée (accès sur invitation).
     if (kAmiinDemo && loc == '/register') return '/login';
 
+    final unverified = loggedIn && !authService.currentUser!.emailVerified;
+
     // Écrans auth : redirige les utilisateurs connectés vers /home
     if (loc == '/login' || loc == '/register') {
-      return loggedIn ? '/home' : null;
+      if (!loggedIn) return null;
+      return unverified ? '/verify-email' : '/home';
     }
 
     // Routes protégées : redirige si non connecté
     if (!loggedIn) return '/login';
+
+    // Adresse e-mail à vérifier avant d'utiliser l'application
+    if (unverified) return loc == '/verify-email' ? null : '/verify-email';
+    if (loc == '/verify-email') return '/home';
     return null;
   },
   routes: [
@@ -119,6 +127,11 @@ final GoRouter appRouter = GoRouter(
       path: '/register',
       name: 'register',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/verify-email',
+      name: 'verifyEmail',
+      builder: (context, state) => const VerifyEmailScreen(),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

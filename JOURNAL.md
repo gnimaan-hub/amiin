@@ -7,10 +7,44 @@ reste à vérifier** et **les actions manuelles** éventuelles.
 Feuille de route en cours (priorités avant l'intégration des paiements) :
 
 1. **APK publiable** — identifiant, signature, R8, sauvegardes, permissions ✅ (code fait, build à valider)
-2. Comptes — vérification e-mail, contrôle `is_active`, rate limiting persistant
+2. **Comptes** — vérification e-mail, compte admin, contrôle `is_active`, limites persistantes ✅
+   - 2b. **Données locales propres à chaque compte** — aujourd'hui, en changeant de compte sur
+     le même téléphone, on voit les discussions, notes, agenda, démarches et profil du compte
+     précédent (stockage Hive commun à tous les comptes). Signalé le 2026-11-26. ⏳ prochaine tâche
 3. Quotas — table `usage`, colonne `plan`, `GET /v1/me/usage`, jauge dans l'app
-4. Paramètres — brancher ou retirer les réglages sans effet, i18n anglais, sessions par appareil
+4. Paramètres — brancher ou retirer les réglages sans effet, i18n anglais, sessions par appareil,
+   bouton « Rappels à l'heure exacte » (cf. étape 1, §6)
 5. Play Integrity + revue de sécurité, puis paiements
+
+---
+
+## ✅ À faire de mon côté (liste unique, mise à jour à chaque étape)
+
+À faire en une seule fois. Chaque ligne renvoie à l'étape qui l'a ajoutée.
+
+**Build et tests de l'app**
+- [ ] `flutter clean && flutter pub get && flutter analyze` (étape 1)
+- [ ] Désinstaller l'ancienne app (`com.example…`) des téléphones de test (étape 1)
+- [ ] `tool/build_release.sh apk` avec `key.properties` : l'app démarre, un rappel d'agenda
+      s'affiche avec son icône, le widget d'accueil s'ajoute et se met à jour (étape 1)
+- [ ] Sans `key.properties`, le build release doit échouer avec le message prévu (étape 1)
+- [ ] Parcours inscription → écran « Vérifiez votre e-mail » → code reçu → accès à l'app ;
+      « Renvoyer le code » ; mauvais code ; « Utiliser une autre adresse » (étape 2)
+- [ ] Se connecter avec le compte admin : Réglages › Compte affiche « Administrateur » (étape 2)
+
+**Publication**
+- [ ] Confirmer l'identifiant `dj.amiin.app` avant la première publication (étape 1)
+- [ ] Générer la clé d'upload, la sauvegarder hors du dépôt, créer `android/key.properties` :
+      `keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload` (étape 1)
+- [ ] Play Console : activer Play App Signing (étape 1)
+
+**Serveur (Render › amiin-api › Environment)**
+- [ ] `ADMIN_EMAILS` = ton adresse e-mail (étape 2). Si le compte existe déjà, il devient admin
+      au redéploiement ; sinon, il le devient dès l'inscription avec cette adresse.
+- [ ] Créer un compte Brevo (gratuit, 300 e-mails/jour), valider l'adresse d'expédition,
+      créer une clé API, puis renseigner `BREVO_API_KEY` et `SMTP_FROM` (ex. `Amiin <adresse@validée>`) (étape 2)
+- [ ] Après le déploiement : la vérification devient active toute seule. Les comptes existants
+      (hors admin) devront saisir un code une fois à leur prochaine ouverture de l'app (étape 2)
 
 ---
 
@@ -80,16 +114,90 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
   (paramètres) : un bouton « Rappels à l'heure exacte » qui appelle
   `requestExactAlarmsPermission()`.
 
-### À vérifier localement (pas de SDK Flutter ni Android dans l'environnement où ces changements ont été faits)
-- [ ] `flutter clean && flutter pub get && flutter analyze`
-- [ ] `flutter run` en debug : démarrage, widget d'accueil, notification d'agenda
-- [ ] `tool/build_release.sh apk` avec `key.properties` : le build R8 passe, l'app
-      démarre, un rappel d'agenda programmé s'affiche bien (avec son icône)
-- [ ] Sans `key.properties` : le build release doit **échouer** avec le message prévu
-- [ ] Ajouter le widget sur l'écran d'accueil après installation (le nom du package a changé)
+→ Vérifications et actions manuelles : voir la liste « À faire de mon côté » en haut.
 
-### Actions manuelles
-- [ ] Confirmer l'identifiant `dj.amiin.app` avant la première publication
-- [ ] Générer la clé d'upload, la sauvegarder hors du dépôt et créer `android/key.properties` :
-      `keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`
-- [ ] Play Console : activer la signature par Google Play (Play App Signing)
+---
+
+## 2026-11-26 — Étape 2 : comptes (vérification d'e-mail, admin, comptes désactivés, limites)
+
+### 1. Vérification de l'adresse e-mail par code à 6 chiffres
+- **Principe** : même mécanique que « mot de passe oublié ». À l'inscription, le serveur envoie
+  un code (valable 30 min, 5 essais) ; l'app affiche l'écran **« Vérifiez votre e-mail »**
+  (`lib/screens/auth/verify_email_screen.dart`) jusqu'à ce que le code soit saisi.
+  « Renvoyer le code » est possible une fois par minute, 5 fois par heure. Un lien
+  « Utiliser une autre adresse » déconnecte l'utilisateur.
+- **Serveur** (`auth.py`) :
+  - `POST /v1/auth/verify-email` (code) et `POST /v1/auth/verify-email/send` ;
+  - `/auth/me` renvoie `email_verified` et `role` ;
+  - nouvelle table `email_verification_codes` (code stocké en HMAC, séparé des codes de
+    réinitialisation : un code de vérification ne peut pas servir à changer le mot de passe).
+- **Ce qui est bloqué tant que l'adresse n'est pas vérifiée** : côté serveur, le chat, la
+  synthèse et la reconnaissance vocales (`/v1/chat*`, `/v1/tts`, `/v1/stt` → 403). Ce sont les
+  fonctions qui coûtent de l'argent. Côté app, l'utilisateur reste sur l'écran de vérification.
+- **Activation** (`EMAIL_VERIFICATION`) : par défaut, la vérification est exigée **dès qu'un envoi
+  d'e-mails est configuré**. Sans envoi configuré, elle est désactivée, pour que personne ne
+  reste bloqué. `EMAIL_VERIFICATION=off` ou `required` force l'un ou l'autre.
+- **Comptes existants** : colonne `email_verified` ajoutée à `FALSE`. Ils saisiront un code une
+  fois, quand la vérification sera active.
+- **Envoi des e-mails** : nouvelle fonction `_send_email`, utilisée aussi par « mot de passe
+  oublié ». Elle passe par l'**API HTTP Brevo** si `BREVO_API_KEY` est définie, sinon par SMTP
+  comme avant. L'API HTTP fonctionne même si l'hébergeur bloque les ports SMTP.
+- **Prototype puis production** :
+  - *Prototype (maintenant)* : Brevo gratuit (300 e-mails/jour), expéditeur = une adresse que tu
+    valides chez Brevo (Gmail possible). Les e-mails risquent d'arriver dans les indésirables,
+    d'où la mention dans l'écran.
+  - *Production* : domaine à nous (ex. `amiin.dj`) authentifié chez Brevo (SPF, DKIM, DMARC),
+    expéditeur `no-reply@amiin.dj`, e-mail HTML soigné aux couleurs d'Amiin, blocage des
+    adresses jetables, suivi des rebonds. Plus tard, éventuellement, un code par SMS (plus
+    naturel à Djibouti), le jour où un fournisseur SMS local est choisi.
+
+### 2. Compte administrateur
+- Colonne `role` (`user` | `admin`) sur `users`. **`ADMIN_EMAILS`** (variable Render, adresses
+  séparées par des virgules) est la source de vérité : au démarrage, ces comptes passent admin,
+  et un e-mail retiré de la liste redevient simple utilisateur. Une inscription avec une adresse
+  de la liste est admin immédiatement.
+- Un admin a une adresse réputée vérifiée (aucun code demandé) et **aucune limite d'usage**
+  (plus de plafond par minute sur le chat et la voix ; les quotas de l'étape 3 l'excluront aussi).
+- Dans l'app, Réglages › Compte affiche « Type de compte : Administrateur ».
+- Aucun mot de passe admin dans le code ni dans les variables : on promeut un compte normal.
+
+### 3. Compte désactivé ou supprimé : accès coupé en 1 minute au lieu de 30
+- **Avant** : le jeton d'accès (JWT) suffisait. Un compte désactivé ou supprimé gardait l'accès
+  jusqu'à l'expiration du jeton (30 min).
+- **Après** : `get_current_user` relit l'état du compte en base (`is_active`, `email_verified`,
+  `role`) avec un cache de 60 s par processus. Le renouvellement de session (`/auth/refresh`) est
+  aussi refusé pour un compte désactivé.
+- Si la base est momentanément injoignable, on garde le dernier état connu, ou on laisse passer
+  un jeton valide, plutôt que de couper toute l'application.
+
+### 4. Limites persistantes
+- Nouvelle table `auth_rate_events`. Les limites **par compte** sont désormais en base et
+  survivent aux redémarrages et aux mises en veille de Render :
+  - 10 échecs de connexion par e-mail en 15 min ;
+  - 3 demandes « mot de passe oublié » par heure ;
+  - envois de codes de vérification (1 par minute, 5 par heure).
+- Restent en mémoire, volontairement :
+  - les plafonds grossiers **par IP** (beaucoup d'utilisateurs partagent la même IP à Djibouti) ;
+  - l'anti-rafale par minute sur le chat et la voix : il protège seulement d'une boucle, et
+    une remise à zéro au redéploiement ne pose pas de problème.
+
+  Les vrais plafonds d'usage seront les quotas journaliers en base, à l'étape 3.
+- Les événements de plus de 2 jours sont purgés au démarrage.
+
+### 5. App : messages d'erreur du chat
+- 403 → « Votre adresse e-mail n'est pas encore vérifiée… » ; 429 → « Patientez un instant… »,
+  au lieu du message générique « impossible de joindre le service ».
+
+### Tests
+- `tests/test_auth_db.py` (nouveau) : 10 tests contre une vraie base PostgreSQL (inscription →
+  code → accès, tentatives limitées, renvoi limité, code de vérification refusé pour un reset,
+  admin sans limite, admin retiré de la liste, compte désactivé coupé, échecs de connexion
+  conservés après redémarrage, mode `off`, suppression du compte). Ces tests sont ignorés sans
+  `TEST_DATABASE_URL`.
+- Résultat : **55 tests passent** (PostgreSQL 16 local).
+
+### Fichiers
+`auth.py`, `amiin_api.py`, `render.yaml`, `tests/test_auth.py`, `tests/test_auth_db.py`,
+`lib/services/auth_service.dart`, `lib/navigation/app_router.dart`,
+`lib/screens/auth/verify_email_screen.dart` (nouveau), `lib/services/chat_controller.dart`,
+`lib/screens/settings/settings_account_screen.dart`.

@@ -29,7 +29,8 @@ from fastapi.responses import StreamingResponse, Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
-from auth import router as auth_router, get_current_user, ensure_auth_schema, _get_conn as _db_conn
+from auth import (router as auth_router, get_current_user, get_verified_user, is_admin,
+                  ensure_auth_schema, _get_conn as _db_conn)
 
 import requests as _requests
 from dotenv import load_dotenv
@@ -1256,8 +1257,11 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/v1")
 
 # ─── Rate limiting par utilisateur (fenêtre glissante en mémoire) ─────────────
-# Protège le budget LLM/TTS contre un client qui boucle. En mémoire : se vide
-# au redéploiement, suffisant pour une instance unique.
+# Anti-rafale par minute : protège le budget LLM/TTS contre un client qui
+# boucle. En mémoire volontairement (se vide au redéploiement, sans
+# conséquence sur une fenêtre d'une minute) ; les plafonds qui doivent
+# survivre aux redémarrages (comptes, et bientôt quotas journaliers) sont en
+# base. Les administrateurs (ADMIN_EMAILS) n'ont aucune limite.
 
 from collections import defaultdict, deque
 
@@ -1275,12 +1279,14 @@ def _check_rate(user_id: str, scope: str, max_calls: int, window_s: int = 60) ->
         )
     bucket.append(now)
 
-def chat_user(user: dict = Depends(get_current_user)) -> dict:
-    _check_rate(user["sub"], "chat", max_calls=30)
+def chat_user(user: dict = Depends(get_verified_user)) -> dict:
+    if not is_admin(user):
+        _check_rate(user["sub"], "chat", max_calls=30)
     return user
 
-def tts_user(user: dict = Depends(get_current_user)) -> dict:
-    _check_rate(user["sub"], "tts", max_calls=60)
+def tts_user(user: dict = Depends(get_verified_user)) -> dict:
+    if not is_admin(user):
+        _check_rate(user["sub"], "tts", max_calls=60)
     return user
 
 # ─── Erreurs & taille des requêtes ────────────────────────────────────────────
