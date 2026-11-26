@@ -53,17 +53,21 @@ class ScopedBox<T> {
 
   /// Box du compte actif, ouverte au besoin.
   Future<Box<T>> get box async {
-    final key = userScope.key;
-    final cur = current;
-    if (cur != null) return cur;
-    if (_pending != null) {
-      final b = await _pending!;
+    while (true) {
+      final key = userScope.key;
+      final cur = current;
+      if (cur != null) return cur;
+      final pending = _pending;
+      if (pending == null) {
+        _pendingKey = key;
+        final opening = _open(key).whenComplete(() => _pending = null);
+        _pending = opening;
+        return opening;
+      }
+      final b = await pending;
       if (_pendingKey == key || _key == key) return b;
-      return box; // le compte a changé pendant l'ouverture
+      // Le compte a changé pendant l'ouverture : on recommence pour le nouveau
     }
-    _pendingKey = key;
-    _pending = _open(key).whenComplete(() => _pending = null);
-    return _pending!;
   }
 
   Future<Box<T>> _open(String key) async {

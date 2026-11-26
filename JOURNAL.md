@@ -14,7 +14,7 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 3. **Quotas** — coût réel par appel, enveloppe quotidienne, blocage du chat, jauge ✅
 4. **Paramètres** — réglages sans effet branchés ou retirés, sessions par appareil ✅
    (« Rappels à l'heure exacte » : reporté à ta demande ; traduction anglaise : projet à part)
-5. Play Integrity + revue de sécurité, puis paiements
+5. **Play Integrity + revue de sécurité** ✅ (code fait, mise en service à faire de ton côté), puis paiements
 
 ---
 
@@ -45,6 +45,16 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
       Réglages › Compte ; vérifier qu'une fois la limite atteinte la barre de saisie est
       remplacée par le message « Limite d'utilisation du jour atteinte » et que le micro est
       refusé. Avec le compte admin : « Utilisation illimitée » (étape 3)
+
+**Play Integrity (étape 5)**
+- [ ] Play Console › Intégrité de l'application : associer un projet Google Cloud et y activer
+      l'API Play Integrity ; noter le **numéro** du projet
+- [ ] Dans ce projet Google Cloud : créer un compte de service et générer sa clé JSON
+- [ ] Render : `PLAY_INTEGRITY_SA_JSON` = contenu de la clé JSON ; `INTEGRITY_MODE=report`
+- [ ] Compiler avec `AMIIN_CLOUD_PROJECT_NUMBER=<numéro> tool/build_release.sh appbundle`
+- [ ] Après quelques jours en `report` (journaux « Play Integrity [report] … : ok »), passer
+      `INTEGRITY_MODE=enforce`. Attention : un APK installé hors Play Store (comme l'APK de test)
+      sera refusé en `enforce`, sauf pour les adresses de `ADMIN_EMAILS`
 
 **Publication**
 - [ ] Confirmer l'identifiant `dj.amiin.app` avant la première publication (étape 1)
@@ -566,3 +576,70 @@ doit les laisser bloqués.
   - lecture de la reformulation par type de bloc.
 - **78 tests serveur passent** ; `flutter analyze` ne trouve aucune erreur.
 - App : le message 429 dit maintenant « Une réponse est déjà en préparation ».
+
+---
+
+## 2026-11-26 — Compilation de l'APK, pull request, Play Integrity
+
+### APK compilé et vérifié (validation de l'étape 1)
+- **Outils** : SDK Android (plateforme 36, build-tools 36.0.0, NDK 28.2) installé ici, et
+  **Flutter 3.38.10**, la version compatible avec le projet (Gradle 8.14). Flutter 3.50 exige
+  Gradle 9.3 : on ne met pas le projet à niveau pour l'outil.
+- **Compilation release réussie** avec `tool/build_release.sh apk` et une clé de test jetable
+  (pas la clé d'upload). Résultat : APK de 62 Mo.
+- **Vérifié dans l'APK** :
+  - paquet `dj.amiin.app` (version 1.1.0, code 2), SDK cible 36 ;
+  - `allowBackup=false`, `fullBackupContent=false`, `dataExtractionRules` présent ;
+  - `USE_EXACT_ALARM` absent ;
+  - signature valide ;
+  - R8 actif (`mapping.txt` produit), avec `MainActivity`, `AmiinBriefWidgetProvider` et les
+    modèles de `flutter_local_notifications` conservés ;
+  - symboles Dart séparés dans `symbols/1.1.0+2/` ;
+  - **sans `key.properties`, la compilation s'arrête avec le message prévu**.
+- Le téléchargement depuis Maven Central échoue parfois (429 « trop de requêtes ») : il suffit de
+  relancer.
+- Il reste les tests de l'APK sur un téléphone (au retour).
+
+### Pull request
+- **#12** (brouillon) : branche `ccr-3074fd75-c0o8hp` vers `master`. À ne pas fusionner avant les tests
+  de bout en bout avec les vraies clés et les tests sur téléphone.
+
+### Play Integrity (étape 5)
+- **But** : n'accepter les inscriptions et les connexions que depuis la **vraie app**, installée
+  depuis le Play Store, sur un appareil Android intègre. Cela bloque les scripts et les apps
+  modifiées qui créeraient des comptes en masse pour consommer le quota gratuit.
+- **App** :
+  - `MainActivity.kt` : canal `dj.amiin.app/integrity`, API Play Integrity « Standard »,
+    bibliothèque `com.google.android.play:integrity:1.6.0`. Le fournisseur est préparé une fois,
+    puis préparé à nouveau s'il expire ;
+  - `lib/services/integrity_service.dart` : jeton lié à l'action et à l'adresse (empreinte
+    SHA-256 de `action:adresse`), envoyé dans `X-Amiin-Integrity` à l'inscription et à la
+    connexion ;
+  - hors Android, sans numéro de projet (`AMIIN_CLOUD_PROJECT_NUMBER`) ou en cas d'échec,
+    aucun jeton n'est envoyé.
+- **Serveur** (`integrity.py`) :
+  - le jeton est déchiffré par l'API Google (compte de service, `google-auth`) ;
+  - vérifications : paquet, empreinte, jeton de moins de 5 minutes, app reconnue par Play
+    (`PLAY_RECOGNIZED`), appareil intègre (`MEETS_DEVICE_INTEGRITY`).
+- **Modes** (`INTEGRITY_MODE`) :
+  - `off` (défaut) ;
+  - `report` : vérifie et journalise sans bloquer ;
+  - `enforce` : refuse l'inscription ou la connexion (403, en-tête `X-Amiin-Error: integrity_required`).
+- **Exceptions** : les adresses `ADMIN_EMAILS` ne sont jamais bloquées. Si Google est
+  injoignable, on laisse passer : une panne de notre côté ne doit pas bloquer les utilisateurs.
+- **Vérification seulement à l'inscription et à la connexion**, pas à chaque message : le quota
+  gratuit de Google (environ 10 000 vérifications par jour) suffit. Le résultat est enregistré
+  sur la session (`refresh_tokens.integrity`) et `GET /v1/auth/sessions` indique `verified`.
+
+### Tests
+- `tests/test_integrity.py` (12 tests) :
+  - empreinte identique à celle de l'app ;
+  - verdict valide ;
+  - paquet, app ou appareil refusés ;
+  - jeton d'une autre adresse ou d'une autre action ;
+  - jeton périmé ;
+  - modes off, report et enforce, exception admin, panne de Google ;
+  - inscription et connexion en `enforce` contre PostgreSQL.
+- **87 tests serveur passent.**
+- `flutter analyze` (Flutter 3.38.10) : aucun problème sur le code modifié. Un « getter
+  récursif » de `user_scope.dart` a été réécrit en boucle. `flutter test` : 22/22.

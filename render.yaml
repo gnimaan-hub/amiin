@@ -61,5 +61,13 @@ services:
       # Tarifs de la voix (optionnels) : STT_USD_PER_HOUR (0.111), STT_MIN_SECONDS (10),
       # TTS_USD_PER_MILLION_CHARS (4.0), JINA_USD_PER_MILLION (0.05)
 
+      # Play Integrity (integrity.py) : vérifie à l'inscription et à la connexion que la
+      # requête vient de l'app officielle du Play Store, sur un appareil intègre.
+      # INTEGRITY_MODE : off (défaut) → report (mesure sans bloquer) → enforce (bloque).
+      # - key: INTEGRITY_MODE
+      - key: PLAY_INTEGRITY_SA_JSON   # contenu JSON de la clé du compte de service Google Cloud
+        sync: false
+      # - key: PLAY_INTEGRITY_PACKAGE  # défaut dj.amiin.app
+
     # Health check — Render surveille cet endpoint pour savoir si le service est vivant
     healthCheckPath: /v1/chat/health

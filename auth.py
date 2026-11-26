@@ -43,6 +43,8 @@ import bcrypt
 import jwt
 import psycopg2
 import requests
+
+import integrity
 from psycopg2.extras import RealDictCursor
 
 # ── Config ─────────────────────────────────────────────────────────────────────
@@ -242,7 +244,8 @@ def _device_label(request: Optional[Request]) -> str:
 
 def _issue_refresh(user_id: str, session_id: Optional[str] = None,
                    device: Optional[str] = None,
-                   started_at: Optional[datetime] = None) -> tuple:
+                   started_at: Optional[datetime] = None,
+                   integrity_status: Optional[str] = None) -> tuple:
     """Génère un refresh token opaque, le stocke hashé.
     Retourne (token brut, id de session) ; nouvelle session si session_id est None."""
     raw = secrets.token_urlsafe(48)
@@ -254,9 +257,11 @@ def _issue_refresh(user_id: str, session_id: Optional[str] = None,
         with conn.cursor() as cur:
             cur.execute(
                 """INSERT INTO refresh_tokens
-                   (user_id, token_hash, expires_at, family_id, device_label, family_started_at)
-                   VALUES (%s, %s, %s, %s, %s, %s)""",
-                (user_id, h, exp, session_id, device or "Appareil inconnu", started_at or now),
+                   (user_id, token_hash, expires_at, family_id, device_label, family_started_at,
+                    integrity)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (user_id, h, exp, session_id, device or "Appareil inconnu", started_at or now,
+                 integrity_status),
             )
         conn.commit()
     return raw, session_id
@@ -264,9 +269,10 @@ def _issue_refresh(user_id: str, session_id: Optional[str] = None,
 
 def _new_tokens(user_id: str, email: str, request: Optional[Request] = None,
                 session_id: Optional[str] = None, device: Optional[str] = None,
-                started_at: Optional[datetime] = None) -> "TokenResponse":
+                started_at: Optional[datetime] = None,
+                integrity_status: Optional[str] = None) -> "TokenResponse":
     raw, sid = _issue_refresh(user_id, session_id,
-                              device or _device_label(request), started_at)
+                              device or _device_label(request), started_at, integrity_status)
     return TokenResponse(access_token=_make_access_token(user_id, email, sid),
                          refresh_token=raw)
 
@@ -326,6 +332,8 @@ def ensure_auth_schema() -> None:
             # 'rotated' (renouvellement normal) ou 'revoked' (déconnexion,
             # session fermée) : seul un token tourné bénéficie du délai de grâce.
             cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS revoked_reason TEXT")
+            # Résultat Play Integrity à l'ouverture de la session (integrity.py)
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS integrity TEXT")
             cur.execute("UPDATE refresh_tokens SET family_id = id::text, "
                         "family_started_at = COALESCE(family_started_at, created_at) "
                         "WHERE family_id IS NULL")
@@ -479,6 +487,8 @@ def get_verified_user(user: dict = Depends(get_current_user)) -> dict:
 @router.post("/register", response_model=TokenResponse, status_code=201)
 def register(body: RegisterRequest, request: Request, background: BackgroundTasks):
     _hit(f"register:{_client_ip(request)}", max_calls=20, window_s=3600)
+    attest = integrity.check(request, "register", body.email,
+                             is_admin_email=body.email in admin_emails())
     pw_hash = hash_password(body.password)
     display = body.display_name or body.email.split("@")[0]
     # Admin d'emblée seulement si aucune vérification n'est exigée ; sinon le
@@ -505,7 +515,7 @@ def register(body: RegisterRequest, request: Request, background: BackgroundTask
     uid = row["id"]
     if code:
         background.add_task(_send_verification_email, body.email, code)
-    return _new_tokens(uid, body.email, request)
+    return _new_tokens(uid, body.email, request, integrity_status=attest)
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -530,8 +540,11 @@ def login(body: LoginRequest, request: Request):
     if not row["is_active"]:
         raise HTTPException(status_code=403, detail="Compte désactivé.")
 
+    # Après le mot de passe : pas d'appel à Google pour une tentative ratée
+    attest = integrity.check(request, "login", body.email,
+                             is_admin_email=body.email in admin_emails())
     uid = row["id"]
-    return _new_tokens(uid, body.email, request)
+    return _new_tokens(uid, body.email, request, integrity_status=attest)
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -546,7 +559,7 @@ def refresh_token(body: RefreshRequest, request: Request):
             cur.execute(
                 """SELECT rt.id::text, rt.user_id::text, u.email, rt.revoked, rt.revoked_at,
                           rt.revoked_reason, rt.family_id, rt.device_label,
-                          rt.family_started_at
+                          rt.family_started_at, rt.integrity
                    FROM refresh_tokens rt
                    JOIN users u ON u.id = rt.user_id
                    WHERE rt.token_hash = %s
@@ -585,7 +598,8 @@ def refresh_token(body: RefreshRequest, request: Request):
     device = (_device_label(request) if request.headers.get("x-amiin-device")
               else row["device_label"])
     return _new_tokens(row["user_id"], row["email"], session_id=row["family_id"],
-                       device=device, started_at=row["family_started_at"])
+                       device=device, started_at=row["family_started_at"],
+                       integrity_status=row["integrity"])
 
 
 @router.post("/logout", status_code=204)
@@ -988,6 +1002,7 @@ class SessionInfo(BaseModel):
     started_at: str
     last_active_at: str
     current: bool
+    verified: bool = False      # ouverte par l'app officielle (Play Integrity)
 
 
 @router.get("/sessions", response_model=list)
@@ -997,6 +1012,7 @@ def list_sessions(current_user: dict = Depends(get_current_user)):
         with conn.cursor() as cur:
             cur.execute(
                 """SELECT family_id, MAX(device_label) FILTER (WHERE rn = 1) AS device,
+                          BOOL_OR(integrity = 'ok') AS verified,
                           MIN(COALESCE(family_started_at, created_at)) AS started_at,
                           MAX(created_at) AS last_active_at
                    FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY family_id
@@ -1013,7 +1029,8 @@ def list_sessions(current_user: dict = Depends(get_current_user)):
         SessionInfo(id=r["family_id"], device=r["device"] or "Appareil inconnu",
                     started_at=r["started_at"].isoformat(),
                     last_active_at=r["last_active_at"].isoformat(),
-                    current=r["family_id"] == sid).model_dump()
+                    current=r["family_id"] == sid,
+                    verified=bool(r["verified"])).model_dump()
         for r in rows
     ]
 

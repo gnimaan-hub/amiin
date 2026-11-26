@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
+import 'integrity_service.dart';
 import 'user_scope.dart';
 
 // Base URL partagée sans importer api_client (évite la dépendance circulaire)
@@ -219,7 +220,7 @@ class AuthService extends ChangeNotifier {
       'email': email,
       'password': password,
       'display_name': displayName,
-    });
+    }, options: Options(headers: await IntegrityService.headers('register', email)));
     await _handleTokens(resp.data as Map<String, dynamic>);
   }
 
@@ -227,7 +228,7 @@ class AuthService extends ChangeNotifier {
     final resp = await _authDio.post('/auth/login', data: {
       'email': email,
       'password': password,
-    });
+    }, options: Options(headers: await IntegrityService.headers('login', email)));
     await _handleTokens(resp.data as Map<String, dynamic>);
   }
 

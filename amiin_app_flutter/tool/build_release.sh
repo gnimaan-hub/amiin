@@ -6,6 +6,8 @@
 #
 # Prérequis : android/key.properties (clé d'upload). Sans elle, Gradle refuse
 # le build (voir android/app/build.gradle.kts).
+# AMIIN_CLOUD_PROJECT_NUMBER : numéro du projet Google Cloud lié à la Play
+# Console, pour Play Integrity (sans lui, l'app n'envoie pas d'attestation).
 #
 # --obfuscate : noms de classes/fonctions Dart illisibles dans le binaire.
 # --split-debug-info : symboles écrits dans symbols/<version>/ (ignoré par git).
@@ -28,6 +30,7 @@ mkdir -p "$symbols"
 
 flutter build "$target" --release \
   --obfuscate --split-debug-info="$symbols" \
-  --dart-define=AMIIN_API_URL="${AMIIN_API_URL:-https://amiin.onrender.com/v1}"
+  --dart-define=AMIIN_API_URL="${AMIIN_API_URL:-https://amiin.onrender.com/v1}" \
+  --dart-define=AMIIN_CLOUD_PROJECT_NUMBER="${AMIIN_CLOUD_PROJECT_NUMBER:-0}"
 
 echo "OK — version $version, symboles dans $symbols (à archiver)."
