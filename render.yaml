@@ -55,6 +55,9 @@ services:
       # remise à zéro à minuit heure de Djibouti. Défaut : 0.10 (phase de tests).
       # - key: QUOTA_DAILY_USD       # ex. 0.02 en production
       # - key: QUOTA_ENFORCE         # "0" = mesure seulement, personne n'est bloqué
+      # - key: QUOTA_KEY_SECRET      # secret du hachage des adresses (défaut : JWT_SECRET_KEY) — ne jamais changer
+      # Modèles : CLAUDE_MODEL (défaut claude-haiku-5-5, français/anglais), CLAUDE_MODEL_AR,
+      #           CLAUDE_EXPAND_MODEL — pour revenir à Haiku 4.5 : claude-haiku-4-5-20251001
       # Tarifs de la voix (optionnels) : STT_USD_PER_HOUR (0.111), STT_MIN_SECONDS (10),
       # TTS_USD_PER_MILLION_CHARS (4.0), JINA_USD_PER_MILLION (0.05)
 

@@ -97,7 +97,7 @@ class _FakeStream:
         return gen()
 
     async def get_final_message(self):
-        return SimpleNamespace(usage=self._usage, content=[])
+        return SimpleNamespace(usage=self._usage, content=[], stop_reason="end_turn")
 
 
 def _fake_claude(monkeypatch, api, chunks, usage_):
@@ -190,7 +190,7 @@ def test_jauge_et_blocage(db):
     suite = {"message": "Quelles sont mes notes ?", "pending_tool_uses": [
         {"id": "t1", "name": "get_notes", "input": {}}],
         "tool_results": [{"tool_use_id": "t1", "content": "[]"}]}
-    assert usage.used_today_usd(uid) < 0.15
+    assert usage.used_today_usd({"sub": uid}) < 0.15
     # 0,11 $ < 0,15 $ : la passe de suivi passe (le pipeline, sans modèle ici, échoue ensuite)
     assert client.post("/v1/chat", json=suite, headers=h).status_code != 402
     _spend(auth, uid, 0.05)                      # 0,16 $ : au-delà de la marge
@@ -227,5 +227,72 @@ def test_record_ecrit_le_cout(db):
     auth, client, h, uid, _ = db
     m = usage.UsageMeter()
     m.add_claude("claude-haiku-4-5", _u(10_000, 2_000))       # 0,02 $
-    usage.record(uid, "chat", m)
-    assert usage.used_today_usd(uid) == pytest.approx(0.02)
+    usage.record({"sub": uid, "email": _}, "chat", m)
+    assert usage.used_today_usd({"sub": uid, "email": _}) == pytest.approx(0.02)
+
+
+# ── Quota rattaché à l'adresse, limites par compte, Haiku 5.5 ────────────────
+
+def test_normalisation_email():
+    assert usage.normalize_email(" Ali.Hassan+test@GMail.com ") == "alihassan@gmail.com"
+    assert usage.normalize_email("a.b+x@googlemail.com") == "ab@gmail.com"
+    assert usage.normalize_email("a.b+x@amiin.dj") == "a.b@amiin.dj"
+    k = usage.quota_key({"sub": "u1", "email": "a.b+1@gmail.com"})
+    assert k == usage.quota_key({"sub": "u2", "email": "ab@gmail.com"})   # autre compte, même adresse
+    assert "gmail" not in k                                                  # haché
+
+
+@needs_db
+def test_supprimer_et_recreer_ne_remet_pas_le_quota_a_zero(db):
+    auth, client, h, uid, email = db
+    m = usage.UsageMeter()
+    m.add_claude("claude-haiku-4-5", _u(100_000, 5_000))         # 0,125 $ > 0,10 $
+    usage.record({"sub": uid, "email": email}, "chat", m)
+    assert client.get("/v1/me/usage", headers=h).json()["exhausted"]
+    assert client.request("DELETE", "/v1/auth/me", json={"password": "motdepasse123"},
+                          headers=h).status_code == 204
+    variante = email.replace("@", "+bis@")
+    for adresse in (email, variante):
+        r = client.post("/v1/auth/register", json={"email": adresse, "password": "motdepasse123"})
+        assert r.status_code == 201
+        h2 = {"Authorization": f"Bearer {r.json()['access_token']}"}
+        assert client.get("/v1/me/usage", headers=h2).json()["exhausted"]
+        assert client.post("/v1/chat", json={"message": "Bonjour"}, headers=h2).status_code == 402
+
+
+def test_requetes_simultanees_par_compte(api):
+    from fastapi import HTTPException
+    user = {"sub": f"u-{uuid.uuid4().hex}"}
+    a, b = api._inflight_acquire(user), api._inflight_acquire(user)
+    with pytest.raises(HTTPException) as e:
+        api._inflight_acquire(user)
+    assert e.value.status_code == 429
+    api._inflight_release(user, a)
+    c = api._inflight_acquire(user)                  # une place s'est libérée
+    api._inflight_release(user, b)
+    api._inflight_release(user, c)
+    assert api._inflight_acquire({"sub": "x", "role": "admin"}) is None   # admin : pas de limite
+
+
+def test_parametres_haiku_5_5(api):
+    kw = api._sampling_kwargs("claude-haiku-5-5")
+    assert "temperature" not in kw and kw["thinking"] == {"type": "disabled"}
+    assert kw["output_config"] == {"effort": "low"}
+    assert api._sampling_kwargs("claude-haiku-4-5-20251001", temperature=0.0) == {"temperature": 0.0}
+    assert api._model_for({"ai_language": "fr"}) == api.MODEL_CLAUDE == "claude-haiku-5-5"
+    assert api._model_for({"ai_language": "en"}) == "claude-haiku-5-5"
+    assert api._model_for({"ai_language": "so"}) == api.MODEL_CLAUDE_SO
+
+
+def test_reformulation_lit_le_texte_par_type(api, monkeypatch):
+    resp = SimpleNamespace(usage=_u(100, 20), content=[
+        SimpleNamespace(type="thinking", thinking=""),
+        SimpleNamespace(type="text", text='{"v1": "a", "v2": "b", "v3": "c"}')])
+    seen = {}
+
+    def create(**kw):
+        seen.update(kw)
+        return resp
+    monkeypatch.setattr(api, "claude_client", SimpleNamespace(messages=SimpleNamespace(create=create)))
+    assert api.expand_query("question") == ["question", "a", "b", "c"]
+    assert "temperature" not in seen                          # refusée par Haiku 5.5

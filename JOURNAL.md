@@ -57,6 +57,11 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
       l'adresse vérifiée par le code reçu par e-mail (correctif de la revue de sécurité).
 - [ ] Vérifier dans les journaux de production (`/v1/logs`, champ `claude_cache_read`) si le cache
       de prompt fonctionne : la simulation indique que non avec Haiku 4.5 (voir revue du 26/11)
+- [ ] **Haiku 5.5 (défaut désormais en français et en anglais) : tester la QUALITÉ des réponses
+      avec la vraie clé** (la simulation ne mesure que le coût). Si elle déçoit : variable Render
+      `CLAUDE_MODEL=claude-haiku-4-5-20251001`, sans redéploiement de code (étape 3b)
+- [ ] Ne jamais changer `JWT_SECRET_KEY` (ou définir `QUOTA_KEY_SECRET` une fois pour toutes) :
+      les quotas sont rattachés aux adresses via ce secret (étape 3b)
 - [ ] Créer un compte Brevo (gratuit, 300 e-mails/jour), valider l'adresse d'expédition,
       créer une clé API, puis renseigner `BREVO_API_KEY` et `SMTP_FROM` (ex. `Amiin <adresse@validée>`) (étape 2)
 - [ ] (Optionnel) `QUOTA_DAILY_USD` : 0.10 par défaut pour les tests, passer à `0.02` plus tard ;
@@ -491,3 +496,73 @@ profil et préférences d'Amiin. En changeant de compte, on voyait donc celles d
    injecté à chaque appel.
 3. Si on reste sur Haiku 4.5, viser un préfixe de plus de 4 096 tokens pour que le cache s'active,
    ou retirer les `cache_control` inutiles.
+
+---
+
+## 2026-11-26 — Étape 3b : décisions de suite de campagne (limites, quota, Haiku 5.5, cache)
+
+### Décisions et mise en œuvre
+1. **Limites par compte, plus de limite par message.**
+   - Supprimer le compte et changer le mot de passe : 10 fois par heure **par compte** (et non plus
+     par IP), compté en base même en cas d'échec (`_account_hit`).
+   - Chat, voix et dictée : **plus de plafond par minute**. C'est le quota (coût réel) qui limite.
+     Il reste un garde-fou : **2 requêtes en cours au maximum par compte** (`_inflight_*`).
+     Sans lui, 50 requêtes lancées en même temps passeraient toutes le contrôle du quota avant
+     d'être débitées. Les admins ne sont pas concernés.
+   - Restent par IP, faute de compte à ce stade : inscription (20/h), connexion (30/min),
+     mot de passe oublié (10/h), code de réinitialisation (20/h), renouvellement de session (60/min).
+2. **Le quota survit à la suppression du compte.**
+   - Les lignes `usage_events` sont conservées.
+   - Le quota est rattaché à l'**adresse e-mail normalisée et hachée** (HMAC, colonne
+     `quota_key`), et non plus au compte : on retire `+étiquette`, et les points pour Gmail.
+   - Supprimer puis recréer un compte avec la même adresse, ou une variante, ne remet donc pas
+     le compteur à zéro. Les lignes existantes ont été rattachées au démarrage.
+   - Secret : `QUOTA_KEY_SECRET` (par défaut `JWT_SECRET_KEY`), **à ne jamais changer**.
+3. **Haiku 5.5 pour le français et l'anglais** (`CLAUDE_MODEL`, par défaut `claude-haiku-5-5`).
+   La reformulation suit le même modèle (`CLAUDE_EXPAND_MODEL`). Somali : Sonnet 5 inchangé.
+   Arabe : Haiku 4.5 tant que Haiku 5.5 n'y est pas évalué (`CLAUDE_MODEL_AR`). Adaptations
+   imposées par Haiku 5.5 (documentation de migration Anthropic) :
+   - `temperature` est refusée (400) : retirée pour ce modèle, y compris dans la reformulation ;
+   - réflexion coupée (`thinking: disabled`) et effort bas, ce qui convient à une conversation.
+     Cela évite aussi de devoir renvoyer les blocs de réflexion à la 2e passe d'outils ;
+   - le texte de la reformulation est lu par type de bloc, et non plus comme premier bloc ;
+   - refus de sécurité (`stop_reason: refusal`, sans modèle de repli côté serveur) : la réponse
+     affichée est « Désolé, je ne peux pas répondre à cette demande… » (ou en anglais).
+4. **Catalogue des démarches en cache.** Il **était déjà marqué** pour le cache (premier bloc
+   système, avec les consignes), mais Haiku 4.5 ne met rien en cache sous 4 096 tokens.
+   Haiku 5.5 met en cache dès 512 tokens. **86 % du texte envoyé est désormais lu depuis le cache**
+   (10 fois moins cher). Le cache est commun à tous les utilisateurs, car le préfixe est identique.
+
+### Campagnes comparatives (simulation, 20 comptes chacune, quota 0,02 $/jour)
+Faux Claude rendu plus fidèle : tokeniseur de Haiku 5.5 (+30 % de tokens), cache dès 512 tokens,
+**rejet (400) des paramètres interdits par Haiku 5.5**. Aucun rejet n'a eu lieu, ce qui valide
+l'adaptation de la requête. Contrôle ajouté : supprimer puis recréer 3 comptes avec la même adresse
+doit les laisser bloqués.
+
+| | A : Haiku 4.5, français | B : Haiku 5.5, français | C : Haiku 5.5, anglais |
+|---|---|---|---|
+| Vérifications | 364/364 | 364/364 | 364/364 |
+| Messages servis par compte (2 centimes) | **4** (3 à 5) | **84** (82 à 85) | **86** (84 à 87) |
+| Coût moyen d'un message | 0,578 centime | **0,024 centime** | **0,023 centime** |
+| Question simple / tâche en 2 passes | 0,44 / 0,84–0,90 c | 0,018 / 0,035–0,038 c | 0,017 / 0,034–0,038 c |
+| Texte envoyé par appel | ~3 900 tokens, 0 % en cache | ~5 450 tokens, **86 % en cache** | ~5 575 tokens, 87 % en cache |
+| Recréation de compte bloquée | 3/3 | 3/3 | 3/3 |
+| Comptes supprimés, données restantes | 20/20, aucune | 20/20, aucune | 20/20, aucune |
+| Erreurs serveur | 0 | 0 | 0 |
+
+- **Environ 24 fois moins cher par message, donc environ 21 fois plus de messages par jour pour le même budget.**
+- Les 20 suppressions passent maintenant d'un coup (limite par compte).
+- L'écart entre le coût enregistré et le faux Claude (0,6 % en B et C) correspond aux
+  embeddings Jina, que seul Amiin compte.
+- **Limite de la simulation** : les réponses sont fictives. La **qualité** de Haiku 5.5 en
+  français et en anglais reste à vérifier avec la vraie clé.
+
+### Tests
+- 5 nouveaux tests :
+  - normalisation et hachage des adresses ;
+  - suppression puis recréation (même adresse et variante `+bis`) toujours bloquée ;
+  - requêtes simultanées par compte ;
+  - paramètres de Haiku 5.5 ;
+  - lecture de la reformulation par type de bloc.
+- **78 tests serveur passent** ; `flutter analyze` ne trouve aucune erreur.
+- App : le message 429 dit maintenant « Une réponse est déjà en préparation ».

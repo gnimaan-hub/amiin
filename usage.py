@@ -21,8 +21,12 @@ Variables d'environnement :
                             est gratuit ; tarif volontairement modéré pour que l'oral
                             consomme un peu plus que l'écrit sans pénaliser la voix)
   JINA_USD_PER_MILLION      tarif embeddings (défaut 0.05)
+  QUOTA_KEY_SECRET          secret du hachage des adresses (défaut : JWT_SECRET_KEY).
+                            Ne jamais le changer : les quotas repartiraient de zéro.
 """
 
+import hashlib
+import hmac
 import logging
 import os
 import threading
@@ -31,7 +35,7 @@ from typing import Optional
 
 from fastapi import HTTPException
 
-from auth import _get_conn, is_admin
+from auth import JWT_SECRET, _get_conn, is_admin
 
 # ── Tarifs (dollars par million de tokens) ────────────────────────────────────
 # Lecture du cache : 0,1 × l'entrée ; écriture (cache 5 min) : 1,25 × l'entrée.
@@ -141,6 +145,36 @@ class UsageMeter:
             self.cost_usd += (chars or 0) * _env_float("TTS_USD_PER_MILLION_CHARS", 4.0) / 1_000_000
 
 
+# ── Clé de quota : l'adresse e-mail, pas le compte ────────────────────────────
+# Le quota suit l'ADRESSE (normalisée, hachée) : supprimer son compte puis le
+# recréer avec la même adresse — ou une variante « nom+1@… », « n.o.m@gmail… »
+# — ne remet pas le compteur à zéro. Les lignes d'usage sont conservées après
+# la suppression d'un compte pour cette raison (elles ne contiennent que
+# l'identifiant du compte, ce hachage et des compteurs, aucun contenu).
+
+def normalize_email(email: str) -> str:
+    local, _, domain = (email or "").strip().lower().partition("@")
+    local = local.split("+", 1)[0]
+    if domain in ("gmail.com", "googlemail.com"):
+        local, domain = local.replace(".", ""), "gmail.com"
+    return f"{local}@{domain}"
+
+
+def _quota_secret() -> bytes:
+    # Secret propre au quota ; à défaut, celui des JWT. À NE JAMAIS CHANGER :
+    # une nouvelle valeur donnerait de nouvelles clés, donc des quotas remis
+    # à zéro et l'historique d'usage détaché des adresses.
+    return (os.environ.get("QUOTA_KEY_SECRET") or JWT_SECRET).encode()
+
+
+def quota_key(user: dict) -> str:
+    email = user.get("email")
+    if not email:
+        return "uid:" + user["sub"]
+    return hmac.new(_quota_secret(), normalize_email(email).encode(),
+                    hashlib.sha256).hexdigest()[:40]
+
+
 # ── Base de données ───────────────────────────────────────────────────────────
 
 def ensure_usage_schema() -> None:
@@ -165,11 +199,24 @@ def ensure_usage_schema() -> None:
                 )""")
             cur.execute("CREATE INDEX IF NOT EXISTS usage_events_user_at "
                         "ON usage_events (user_id, at)")
+            cur.execute("ALTER TABLE usage_events ADD COLUMN IF NOT EXISTS quota_key TEXT")
+            cur.execute("CREATE INDEX IF NOT EXISTS usage_events_key_at "
+                        "ON usage_events (quota_key, at)")
+            # Lignes d'avant la clé de quota : rattachées à l'adresse du compte
+            cur.execute("""SELECT DISTINCT ue.user_id, u.email FROM usage_events ue
+                           JOIN users u ON u.id::text = ue.user_id
+                           WHERE ue.quota_key IS NULL""")
+            for row in cur.fetchall():
+                cur.execute("UPDATE usage_events SET quota_key = %s "
+                            "WHERE user_id = %s AND quota_key IS NULL",
+                            (quota_key({"sub": row["user_id"], "email": row["email"]}),
+                             row["user_id"]))
 
 
-def record(user_id: str, kind: str, meter: UsageMeter) -> None:
+def record(user: dict, kind: str, meter: UsageMeter) -> None:
     """Inscrit le coût d'une requête. Ne lève jamais : un échec d'écriture ne
     doit pas casser la réponse déjà servie (il est journalisé)."""
+    user_id = user["sub"]
     if meter.cost_usd <= 0 and not meter.models:
         return
     try:
@@ -177,11 +224,11 @@ def record(user_id: str, kind: str, meter: UsageMeter) -> None:
             with conn.cursor() as cur:
                 cur.execute(
                     """INSERT INTO usage_events
-                       (user_id, kind, cost_micro_usd, models, input_tokens, output_tokens,
-                        cache_read_tokens, cache_write_tokens, jina_tokens, audio_seconds,
-                        tts_chars, estimated)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (user_id, kind, round(meter.cost_usd * 1_000_000),
+                       (user_id, quota_key, kind, cost_micro_usd, models, input_tokens,
+                        output_tokens, cache_read_tokens, cache_write_tokens, jina_tokens,
+                        audio_seconds, tts_chars, estimated)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (user_id, quota_key(user), kind, round(meter.cost_usd * 1_000_000),
                      ",".join(sorted(meter.models)), meter.input_tokens, meter.output_tokens,
                      meter.cache_read_tokens, meter.cache_write_tokens, meter.jina_tokens,
                      meter.audio_seconds, meter.tts_chars, meter.estimated),
@@ -197,12 +244,15 @@ def day_window(now: Optional[datetime] = None) -> tuple:
     return start.astimezone(timezone.utc), (start + timedelta(days=1)).astimezone(timezone.utc)
 
 
-def used_today_usd(user_id: str) -> float:
+def used_today_usd(user: dict) -> float:
+    """Dépense du jour pour l'adresse e-mail du compte (tous comptes
+    successifs confondus)."""
     start, _ = day_window()
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT COALESCE(SUM(cost_micro_usd), 0) AS s FROM usage_events "
-                        "WHERE user_id = %s AND at >= %s", (user_id, start))
+                        "WHERE (quota_key = %s OR (quota_key IS NULL AND user_id = %s)) "
+                        "AND at >= %s", (quota_key(user), user["sub"], start))
             # SUM(BIGINT) revient en Decimal : converti pour les calculs en float
             return float(cur.fetchone()["s"]) / 1_000_000
 
@@ -210,7 +260,7 @@ def used_today_usd(user_id: str) -> float:
 def summary(user: dict) -> dict:
     """État du quota du jour, pour la jauge de l'app."""
     _, reset = day_window()
-    used = used_today_usd(user["sub"])
+    used = used_today_usd(user)
     limit = daily_quota_usd()
     unlimited = is_admin(user) or not quota_enforced()
     percent = 0.0 if limit <= 0 else min(100.0, used / limit * 100)
@@ -236,7 +286,7 @@ def ensure_quota(user: dict, grace: float = 0.0) -> None:
     if is_admin(user) or not quota_enforced():
         return
     try:
-        used = used_today_usd(user["sub"])
+        used = used_today_usd(user)
     except Exception:
         logging.exception("Lecture du quota impossible")
         return

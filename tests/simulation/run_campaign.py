@@ -38,14 +38,27 @@ SCRIPT = [
     ("note", "Note que je dois renouveler ma carte d'identité avant la fin de l'année"),
     ("lecture", "Rappelle-moi mes notes"),
 ]
+SCRIPT_EN = [
+    ("salutation", "Hello Amiin"),
+    ("question", "How do I get a residence certificate in Djibouti?"),
+    ("note", "Create a note: submit the residence certificate file at the town hall on Monday"),
+    ("question", "What is the legal working week in Djibouti and how is overtime paid?"),
+    ("démarche", "I want to follow the procedure egouv_103 for my passport, add it"),
+    ("lecture", "What are my notes?"),
+    ("détail", "Which documents are needed for the passport? Give me the details"),
+    ("question", "How do I set up a limited company in Djibouti, what are the steps and costs?"),
+    ("note", "Take a note: renew my identity card before the end of the year"),
+    ("lecture", "Remind me of my notes"),
+]
 READ_TOOLS = {"get_events", "get_notes", "get_demarche_detail"}
 
 
 class AppUser:
     """État local de l'app pour un compte (notes, démarches, historique, mémoire)."""
 
-    def __init__(self, api, idx, run_id):
+    def __init__(self, api, idx, run_id, lang="fr"):
         self.api = api
+        self.lang = lang
         self.idx = idx
         self.email = f"sim{idx:02d}.{run_id}@amiin-test.dj"
         self.name = f"Testeur {idx:02d}"
@@ -108,7 +121,7 @@ class AppUser:
         body = {"message": message, "history": history, "client_context": self._context(),
                 "expand": True,
                 "user_preferences": {"tone": "neutral", "response_length": "balanced",
-                                     "expertise_level": "standard", "ai_language": "fr",
+                                     "expertise_level": "standard", "ai_language": self.lang,
                                      "show_sources": False, "currency": "DJF"}}
         reply, passes, tools_used = "", 0, []
         for _ in range(3):
@@ -178,7 +191,8 @@ def wait_events(db, uid, n_expected, timeout=5):
 
 
 def run_account(args, idx, run_id):
-    u = AppUser(args.api, idx, run_id)
+    u = AppUser(args.api, idx, run_id, args.lang)
+    script = SCRIPT_EN if args.lang == "en" else SCRIPT
     res = {"idx": idx, "email": u.email, "checks": {}, "messages": []}
     chk = res["checks"]
 
@@ -213,7 +227,7 @@ def run_account(args, idx, run_id):
     # Conversation jusqu'au blocage
     n_events, last_cost, blocked = 0, 0.0, False
     for k in range(args.max_messages):
-        kind, text = SCRIPT[(k + idx) % len(SCRIPT)]
+        kind, text = script[(k + idx) % len(script)]
         out = u.send(kind, text)
         if out["status"] == 402:
             blocked = True
@@ -264,13 +278,31 @@ def cleanup(args):
         h = {"Authorization": f"Bearer {r.json()['access_token']}"}
         codes.append(requests.delete(args.api + "/auth/me", json={"password": PASSWORD},
                                      headers=h, timeout=30).status_code)
-    uids = [r["user_id"] for r in data["comptes"]]
+    recreated_uids = []
+    # Supprimer puis recréer avec la même adresse ne doit pas rendre de quota
+    recreated = []
+    for email in emails[:3]:
+        t0 = time.time()
+        r = requests.post(args.api + "/auth/register", headers=DEVICE, timeout=30,
+                          json={"email": email, "password": PASSWORD, "display_name": 'Testeur recréé'})
+        h = {**DEVICE, "Authorization": f"Bearer {r.json()['access_token']}"}
+        mail = wait_mail(args.mailbox, email, t0 - 0.5)
+        code = re.search(r"\b(\d{6})\b", mail["body"]).group(1)
+        requests.post(args.api + "/auth/verify-email", json={"code": code}, headers=h, timeout=30)
+        state = requests.get(args.api + "/me/usage", headers=h, timeout=30).json()
+        chat = requests.post(args.api + "/chat", json={"message": "Bonjour"}, headers=h, timeout=30)
+        recreated.append(state["exhausted"] and chat.status_code == 402)
+        recreated_uids.append(requests.get(args.api + "/auth/me", headers=h, timeout=30).json()["id"])
+        requests.delete(args.api + "/auth/me", json={"password": PASSWORD}, headers=h, timeout=30)
+
+    uids = [r["user_id"] for r in data["comptes"]] + recreated_uids
     left = {t: db_query(args.db, f"SELECT COUNT(*) AS n FROM {t} WHERE user_id::text = ANY(%s)",
                         (uids,))[0]["n"]
             for t in ("refresh_tokens", "email_verification_codes", "usage_events")}
     left["users"] = db_query(args.db, "SELECT COUNT(*) AS n FROM users WHERE email = ANY(%s)",
                              (emails,))[0]["n"]
     data["resume"]["nettoyage"] = {"restants_avant": len(present),
+                                   "recreation_toujours_bloquee": recreated,
                                    "suppressions": {str(c): codes.count(c) for c in set(codes)},
                                    "lignes_restantes_apres": left}
     json.dump(data, open(args.out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -285,7 +317,8 @@ def main():
     ap.add_argument("--fake-log", required=True)
     ap.add_argument("--accounts", type=int, default=20)
     ap.add_argument("--quota", type=float, default=0.02)
-    ap.add_argument("--max-messages", type=int, default=60)
+    ap.add_argument("--max-messages", type=int, default=200)
+    ap.add_argument("--lang", default="fr", choices=["fr", "en"])
     ap.add_argument("--out", default="results.json")
     ap.add_argument("--cleanup", action="store_true",
                     help="supprimer les comptes restants d'une campagne (lit --out)")

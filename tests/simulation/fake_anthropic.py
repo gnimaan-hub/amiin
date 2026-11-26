@@ -32,16 +32,22 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 CHARS_PER_TOKEN = 4.0
 CACHE_TTL_S = 300
-MIN_CACHEABLE = {"claude-haiku-4-5": 4096, "claude-sonnet-5": 1024}
+# Minimums de mise en cache (documentation Anthropic) ; Haiku 5.5 : nouveau
+# tokeniseur, ~30 % de tokens en plus pour le même texte.
+MIN_CACHEABLE = {"claude-haiku-4-5": 4096, "claude-haiku-5-5": 512, "claude-sonnet-5": 1024}
+TOKENIZER_FACTOR = {"claude-haiku-5-5": 1.3}
 
 app = FastAPI()
 _cache_seen: dict = {}
 LOG_PATH = "calls.jsonl"
 
 
+_FACTOR = [1.0]   # facteur du modèle de la requête en cours
+
+
 def _tokens(obj) -> int:
     text = obj if isinstance(obj, str) else json.dumps(obj, ensure_ascii=False)
-    return max(1, round(len(text) / CHARS_PER_TOKEN))
+    return max(1, round(len(text) / CHARS_PER_TOKEN * _FACTOR[0]))
 
 
 def _min_cache(model: str) -> int:
@@ -84,6 +90,16 @@ def _usage_for(body: dict) -> dict:
 
 # ── Réponses simulées ─────────────────────────────────────────────────────────
 
+_INFO_EN = [
+    "In Djibouti, this procedure is handled by the relevant office. Bring your identity "
+    "card and a recent proof of address. It usually takes a few working days. Ask for a "
+    "receipt when you submit the file: it proves your application until the final "
+    "document is ready. Fees are paid on site in Djibouti francs.",
+    "Djibouti's Labour Code sets the legal working week at 40 hours. Overtime is paid at "
+    "a higher rate set by law and collective agreements. In a dispute, the labour "
+    "inspectorate can be contacted before going to the labour court.",
+]
+
 _INFO = [
     "À Djibouti, cette démarche se fait auprès du service concerné, muni de votre "
     "carte d'identité et d'un justificatif de domicile récent. Comptez en général "
@@ -123,33 +139,40 @@ def _plan(body: dict) -> tuple:
     messages = body.get("messages") or []
     text, has_tool_result = _last_user(messages)
     t = text.lower()
+    system_text = json.dumps(body.get("system") or "", ensure_ascii=False)
+    english = "ONLY in English" in system_text
+    info = _INFO_EN if english else _INFO
 
     if not body.get("tools"):                    # reformulation de la question
         return json.dumps({"v1": text[:80] + " ?", "v2": "démarche " + text[:60],
                            "v3": "procédure Djibouti " + text[:50]}, ensure_ascii=False), [], "end_turn"
     if has_tool_result:                          # 2e passe : réponse avec les résultats
-        return ("D'après vos informations, voici ce que je trouve. " + random.choice(_INFO)[:260]
+        if english:
+            return ("Based on your information, here is what I found. " + random.choice(info)[:260]
+                    + " Would you like help with the next step?"), [], "end_turn"
+        return ("D'après vos informations, voici ce que je trouve. " + random.choice(info)[:260]
                 + " Souhaitez-vous que je vous aide pour la suite ?"), [], "end_turn"
 
     def tool(name, inp, intro):
         return intro, [{"type": "tool_use", "id": "toolu_" + uuid.uuid4().hex[:20],
                         "name": name, "input": inp}], "tool_use"
 
-    if re.search(r"(note|retiens|rappelle-toi)", t) and re.search(r"(crée|créer|prends|ajoute|retiens|note que)", t):
+    if (re.search(r"(note|retiens|rappelle-toi)", t) and re.search(r"(crée|créer|prends|ajoute|retiens|note que|create|take a note|write down)", t)):
         title = re.sub(r"^.*?:\s*", "", text)[:60] or "Note"
         return tool("create_note", {"title": title, "content": text}, "Je crée cette note pour vous.")
-    if "mes notes" in t:
+    if "mes notes" in t or "my notes" in t:
         return tool("get_notes", {}, "Je regarde vos notes.")
     m = re.search(r"egouv_(\d+)", t)
-    if m and re.search(r"(suivre|commence|démarre|ajoute)", t):
+    if m and re.search(r"(suivre|commence|démarre|ajoute|follow|start|add)", t):
         return tool("start_demarche", {"demarche_id": f"egouv_{m.group(1)}"},
                     "J'ajoute cette démarche à votre suivi.")
-    if "passeport" in t and re.search(r"(détail|documents|pièces)", t):
+    if ("passeport" in t or "passport" in t) and re.search(r"(détail|documents|pièces|detail)", t):
         return tool("get_demarche_detail", {"demarche_id": "egouv_103"},
                     "Je consulte la fiche détaillée.")
     if len(t) < 25:
-        return "Bonjour ! Je suis Amiin. Comment puis-je vous aider aujourd'hui ?", [], "end_turn"
-    return random.choice(_INFO), [], "end_turn"
+        return ("Hello! I'm Amiin. How can I help you today?" if english else
+                "Bonjour ! Je suis Amiin. Comment puis-je vous aider aujourd'hui ?"), [], "end_turn"
+    return random.choice(info), [], "end_turn"
 
 
 def _log(entry: dict) -> None:
@@ -161,6 +184,15 @@ def _log(entry: dict) -> None:
 async def messages(request: Request):
     body = await request.json()
     model = body.get("model", "")
+    # Règles de l'API pour Haiku 5.5 (doc de migration) : on les fait respecter
+    if model.startswith("claude-haiku-5"):
+        bad = [k for k in ("temperature", "top_p", "top_k") if k in body]
+        th = body.get("thinking") or {}
+        if bad or th.get("type") == "enabled" or "budget_tokens" in th:
+            return JSONResponse(status_code=400, content={"type": "error", "error": {
+                "type": "invalid_request_error",
+                "message": f"claude-haiku-5-5: paramètres refusés {bad or ['budget_tokens']}"}})
+    _FACTOR[0] = next((f for k, f in TOKENIZER_FACTOR.items() if model.startswith(k)), 1.0)
     usage = _usage_for(body)
     text, tools, stop = _plan(body)
     out_tokens = _tokens(text) + sum(_tokens(b["input"]) + 10 for b in tools)

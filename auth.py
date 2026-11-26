@@ -146,6 +146,14 @@ def _db_hit(cur, key: str, max_calls: int, window_s: int,
         raise HTTPException(status_code=429, detail=detail)
     _db_record(cur, key)
 
+def _account_hit(key: str, max_calls: int, window_s: int) -> None:
+    """Comme _db_hit, dans sa propre transaction : la tentative reste comptée
+    même si la requête échoue ensuite (mauvais mot de passe…)."""
+    with _get_conn() as conn:
+        with conn.cursor() as cur:
+            _db_hit(cur, key, max_calls, window_s)
+
+
 def _login_failures_exceeded(cur, email: str) -> bool:
     return _db_recent_count(cur, f"login_fail:{email}", LOGIN_FAIL_WINDOW) >= LOGIN_FAIL_MAX
 
@@ -615,8 +623,10 @@ def delete_account(body: DeleteAccountRequest, request: Request,
                    current_user: dict = Depends(get_current_user)):
     """Suppression définitive du compte et des données serveur associées
     (exigée par Google Play et l'App Store). Mot de passe requis."""
-    _hit(f"delete:{_client_ip(request)}", max_calls=10, window_s=3600)
+    # Limite PAR COMPTE (et non par IP : à Djibouti, beaucoup d'abonnés
+    # mobiles partagent la même adresse IP).
     uid = current_user["sub"]
+    _account_hit(f"delete:{uid}", max_calls=10, window_s=3600)
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT password_hash FROM users WHERE id = %s", (uid,))
@@ -712,8 +722,8 @@ def change_password(body: ChangePasswordRequest, request: Request,
                     current_user: dict = Depends(get_current_user)):
     """Change le mot de passe, coupe toutes les autres sessions et renvoie de
     nouveaux tokens pour l'appareil courant."""
-    _hit(f"chpw:{_client_ip(request)}", max_calls=10, window_s=3600)
     uid = current_user["sub"]
+    _account_hit(f"chpw:{uid}", max_calls=10, window_s=3600)
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT email, password_hash FROM users WHERE id = %s", (uid,))

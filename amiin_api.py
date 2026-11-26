@@ -11,6 +11,7 @@ import hmac
 import json
 import math
 import time
+import uuid
 import asyncio
 import difflib
 import logging
@@ -75,18 +76,35 @@ def _log_request(data: dict) -> None:
 JINA_MODEL     = 'jina-embeddings-v3'   # API Jina AI — remplace SentenceTransformers local
 JINA_EMBED_DIM = 1024                   # dimension du modèle jina-embeddings-v3
 QDRANT_COLLECTION = 'djibouti_knowledge'
-MODEL_CLAUDE   = 'claude-haiku-4-5-20251001'
+# Français et anglais : Claude Haiku 5.5 (10 fois moins cher que Haiku 4.5,
+# cache de prompt dès 512 tokens). Arabe : Haiku 4.5 tant que Haiku 5.5 n'y a
+# pas été évalué. Modifiables sans redéployer le code (variables Render).
+MODEL_CLAUDE    = os.environ.get("CLAUDE_MODEL", "claude-haiku-5-5")
+MODEL_CLAUDE_AR = os.environ.get("CLAUDE_MODEL_AR", "claude-haiku-4-5-20251001")
 # Somali : langue à faibles ressources — Haiku produit un somali calqué sur le
 # français (mot-à-mot). Sonnet 5 a une maîtrise multilingue très supérieure ;
 # on ne paie le surcoût (~3x) que sur les conversations en somali.
 MODEL_CLAUDE_SO = 'claude-sonnet-5'
-EXPAND_MODEL   = 'claude-haiku-4-5-20251001'
+EXPAND_MODEL   = os.environ.get("CLAUDE_EXPAND_MODEL", MODEL_CLAUDE)
 
 def _model_for(prefs: dict | None) -> str:
     """Choisit le modèle selon la langue de réponse demandée par l'app."""
-    return MODEL_CLAUDE_SO if (prefs or {}).get("ai_language") == "so" else MODEL_CLAUDE
+    lang = (prefs or {}).get("ai_language")
+    if lang == "so":
+        return MODEL_CLAUDE_SO
+    if lang == "ar":
+        return MODEL_CLAUDE_AR
+    return MODEL_CLAUDE
 
-def _sampling_kwargs(model: str) -> dict:
+def _refusal_text(prefs: dict | None) -> str:
+    """Réponse affichée quand le modèle décline une demande (filtres de
+    sécurité de Haiku 5.5, sans modèle de repli côté serveur)."""
+    if (prefs or {}).get("ai_language") == "en":
+        return "Sorry, I can't help with that request. Could you rephrase it?"
+    return "Désolé, je ne peux pas répondre à cette demande. Pouvez-vous la reformuler ?"
+
+
+def _sampling_kwargs(model: str, temperature: float = None) -> dict:
     """Sonnet 5 rejette les paramètres d'échantillonnage (temperature → 400) ;
     on ne les envoie qu'aux modèles qui les acceptent (Haiku).
     Sonnet 5 tourne en thinking adaptatif par défaut dès que le paramètre est
@@ -95,7 +113,13 @@ def _sampling_kwargs(model: str) -> dict:
     (Haiku 4.5 n'accepte pas ce paramètre, donc on ne l'envoie qu'à Sonnet 5)."""
     if model == MODEL_CLAUDE_SO:
         return {"output_config": {"effort": "low"}}
-    return {"temperature": TEMPERATURE}
+    if model.startswith("claude-haiku-5"):
+        # Haiku 5.5 : température refusée (400) ; réflexion coupée et effort
+        # bas pour une conversation. Couper la réflexion évite aussi de devoir
+        # renvoyer ses blocs lors de la 2e passe d'outils (l'app ne renvoie
+        # que l'appel d'outil).
+        return {"thinking": {"type": "disabled"}, "output_config": {"effort": "low"}}
+    return {"temperature": TEMPERATURE if temperature is None else temperature}
 TOP_K          = 6
 TOP_K_FINAL    = 4
 MAX_TOKENS     = 2048
@@ -623,13 +647,16 @@ def expand_query(query: str, meter: Optional[UsageMeter] = None) -> list:
         response = claude_client.messages.create(
             model=EXPAND_MODEL,
             max_tokens=300,
-            temperature=0.0,
+            **_sampling_kwargs(EXPAND_MODEL, temperature=0.0),
             messages=[{"role": "user", "content": EXPAND_PROMPT.replace("{query}", query)}]
         )
         _log_usage(response.usage, "[expand] ")
         if meter is not None:
             meter.add_claude(EXPAND_MODEL, response.usage)
-        texte = response.content[0].text.strip().replace('```json', '').replace('```', '').strip()
+        # Lire le bloc texte par son type (un modèle récent peut renvoyer
+        # d'autres blocs avant, ex. réflexion).
+        texte = next((b.text for b in response.content if b.type == "text"), "")
+        texte = texte.strip().replace('```json', '').replace('```', '').strip()
         variantes = json.loads(texte)
         return [query, variantes.get('v1', ''), variantes.get('v2', ''), variantes.get('v3', '')]
     except Exception as e:
@@ -1030,10 +1057,12 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
     )
 
     _log_usage(response.usage, "[sync] ")
+    if response.stop_reason == "refusal":
+        response.content = [b for b in response.content if b.type != "text"]
     meter.add_claude(_model, response.usage)
     meter.add_jina(jina_acc[0])
 
-    reply_text = ""
+    reply_text = _refusal_text(user_preferences) if response.stop_reason == "refusal" else ""
     tool_calls = []
     for block in response.content:
         if block.type == "text":
@@ -1151,6 +1180,8 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
             final_msg = await stream.get_final_message()
             final_usage = final_msg.usage
             _log_usage(final_usage, "[stream] ")
+            if final_msg.stop_reason == "refusal" and streamed_chars == 0:
+                yield f'data: {json.dumps({"type": "token", "text": _refusal_text(user_preferences)})}\n\n'
             for block in final_msg.content:
                 if block.type == "tool_use":
                     tool_calls.append({"id": block.id, "name": block.name, "input": block.input})
@@ -1288,36 +1319,47 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/v1")
 
-# ─── Rate limiting par utilisateur (fenêtre glissante en mémoire) ─────────────
-# Anti-rafale par minute : protège le budget LLM/TTS contre un client qui
-# boucle. En mémoire volontairement (se vide au redéploiement, sans
-# conséquence sur une fenêtre d'une minute) ; les plafonds qui doivent
-# survivre aux redémarrages (comptes, et bientôt quotas journaliers) sont en
-# base. Les administrateurs (ADMIN_EMAILS) n'ont aucune limite.
+# ─── Requêtes simultanées par compte ──────────────────────────────────────────
+# Plus de limite « par message » : c'est le quota (coût réel, usage.py) qui
+# borne l'utilisation. Reste un garde-fou : au plus 2 requêtes de chat ou de
+# dictée en cours par compte. Sans lui, 50 requêtes lancées en parallèle
+# passeraient toutes le contrôle du quota avant que la première soit débitée.
+# Les entrées de plus de 3 min sont oubliées (requête abandonnée sans fin propre).
 
-from collections import defaultdict, deque
+import threading
+_MAX_INFLIGHT = 2
+_INFLIGHT_TTL_S = 180
+_inflight: Dict[str, Dict[str, float]] = {}
+_inflight_lock = threading.Lock()
 
-_rate_buckets: Dict[str, deque] = defaultdict(deque)
 
-def _check_rate(user_id: str, scope: str, max_calls: int, window_s: int = 60) -> None:
-    now = time.monotonic()
-    bucket = _rate_buckets[f"{scope}:{user_id}"]
-    while bucket and now - bucket[0] > window_s:
-        bucket.popleft()
-    if len(bucket) >= max_calls:
-        raise HTTPException(
-            status_code=429,
-            detail="Trop de requêtes — réessayez dans une minute.",
-        )
-    bucket.append(now)
+def _inflight_acquire(user: dict) -> Optional[str]:
+    if is_admin(user):
+        return None
+    uid, now = user["sub"], time.monotonic()
+    with _inflight_lock:
+        slots = {k: t for k, t in _inflight.get(uid, {}).items() if now - t < _INFLIGHT_TTL_S}
+        if len(slots) >= _MAX_INFLIGHT:
+            _inflight[uid] = slots
+            raise HTTPException(status_code=429,
+                                detail="Une réponse est déjà en préparation — patientez un instant.")
+        token = uuid.uuid4().hex
+        slots[token] = now
+        _inflight[uid] = slots
+        return token
+
+
+def _inflight_release(user: dict, token: Optional[str]) -> None:
+    if token is None:
+        return
+    with _inflight_lock:
+        _inflight.get(user["sub"], {}).pop(token, None)
 
 # Quota quotidien (usage.py) : le chat et la dictée sont refusés (402) une
 # fois l'enveloppe du jour épuisée ; la lecture à voix haute garde une marge
 # de 25 % pour pouvoir lire la réponse qui vient de faire franchir le seuil.
 
 def chat_user(user: dict = Depends(get_verified_user)) -> dict:
-    if not is_admin(user):
-        _check_rate(user["sub"], "chat", max_calls=30)
     return user
 
 
@@ -1329,24 +1371,20 @@ def _ensure_chat_quota(user: dict, request: "ChatRequest") -> None:
     usage_meter.ensure_quota(user, grace=0.5 if request.tool_results else 0.0)
 
 def tts_user(user: dict = Depends(get_verified_user)) -> dict:
-    if not is_admin(user):
-        _check_rate(user["sub"], "tts", max_calls=60)
     usage_meter.ensure_quota(user, grace=0.25)
     return user
 
 def stt_user(user: dict = Depends(get_verified_user)) -> dict:
-    if not is_admin(user):
-        _check_rate(user["sub"], "tts", max_calls=60)
     usage_meter.ensure_quota(user)
     return user
 
 
-def _record_usage_later(user_id: str, kind: str, meter: UsageMeter) -> None:
+def _record_usage_later(user: dict, kind: str, meter: UsageMeter) -> None:
     """Écrit l'usage hors de la boucle d'événements, sans attendre."""
     try:
-        asyncio.get_running_loop().run_in_executor(None, usage_meter.record, user_id, kind, meter)
+        asyncio.get_running_loop().run_in_executor(None, usage_meter.record, user, kind, meter)
     except RuntimeError:
-        usage_meter.record(user_id, kind, meter)
+        usage_meter.record(user, kind, meter)
 
 # ─── Erreurs & taille des requêtes ────────────────────────────────────────────
 
@@ -1435,6 +1473,7 @@ async def chat(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
     _ensure_chat_quota(user, request)
+    slot = _inflight_acquire(user)
     meter = UsageMeter()
     try:
         loop = asyncio.get_event_loop()
@@ -1459,7 +1498,8 @@ async def chat(request: ChatRequest, user: dict = Depends(chat_user)):
         logging.exception("Erreur pipeline")
         raise HTTPException(status_code=500, detail=_GENERIC_ERROR)
     finally:
-        _record_usage_later(user["sub"], "chat", meter)
+        _inflight_release(user, slot)
+        _record_usage_later(user, "chat", meter)
 
 # ─── Chat streaming SSE ───────────────────────────────────────────────────────
 
@@ -1468,6 +1508,7 @@ async def chat_stream(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
     _ensure_chat_quota(user, request)
+    slot = _inflight_acquire(user)
     meter = UsageMeter()
 
     async def event_gen():
@@ -1494,7 +1535,8 @@ async def chat_stream(request: ChatRequest, user: dict = Depends(chat_user)):
                 await pipeline.aclose()
             except BaseException:
                 pass
-            _record_usage_later(user["sub"], "chat", meter)
+            _inflight_release(user, slot)
+            _record_usage_later(user, "chat", meter)
 
     return StreamingResponse(event_gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no",
@@ -2154,7 +2196,7 @@ async def text_to_speech(req: TTSRequest, user: dict = Depends(tts_user)):
 
     meter = UsageMeter()
     meter.add_tts(len(req.text))
-    _record_usage_later(user["sub"], "tts", meter)
+    _record_usage_later(user, "tts", meter)
     return Response(
         content=audio_bytes,
         media_type="audio/mpeg",
@@ -2302,13 +2344,17 @@ async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so", ma
     if len(audio) > _STT_MAX_BYTES:
         raise HTTPException(status_code=413, detail="fichier audio trop volumineux")
     lang = (lang or "so").lower()
-    text, duration = await asyncio.to_thread(
-        _groq_transcribe, audio, file.filename, file.content_type, lang
-    )
+    slot = _inflight_acquire(user)
+    try:
+        text, duration = await asyncio.to_thread(
+            _groq_transcribe, audio, file.filename, file.content_type, lang
+        )
+    finally:
+        _inflight_release(user, slot)
     meter = UsageMeter()
     # Durée inconnue : estimation d'après la taille (~4 Ko/s pour de l'AAC/m4a 32 kb/s)
     meter.add_stt(duration if duration is not None else len(audio) / 4000)
-    _record_usage_later(user["sub"], "stt", meter)
+    _record_usage_later(user, "stt", meter)
     if lang == "so":
         text = _correct_with_lexicon(text)
     return {"text": text}

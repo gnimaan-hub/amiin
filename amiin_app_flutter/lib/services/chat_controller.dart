@@ -432,7 +432,7 @@ class ChatController extends ChangeNotifier {
         return "Votre adresse e-mail n'est pas encore vérifiée. "
             "Saisissez le code reçu par e-mail pour discuter avec Amiin.";
       case 429:
-        return 'Vous avez envoyé beaucoup de messages en peu de temps. '
+        return 'Une réponse est déjà en préparation. '
             'Patientez un instant puis réessayez.';
       default:
         return "Désolé, je n'arrive pas à joindre le service Amiin pour le moment. "
