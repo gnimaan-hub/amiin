@@ -13,14 +13,19 @@
         android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission
         android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission
-        android:name="android.permission.USE_EXACT_ALARM"/>
+    <!-- Alarmes exactes : SCHEDULE_EXACT_ALARM seulement. USE_EXACT_ALARM est
+         réservée par Google Play aux applis de réveil/calendrier (déclaration
+         obligatoire, risque de refus). Sans autorisation (Android 14+, refusée
+         par défaut), les rappels passent en mode inexact (notification_service). -->
     <uses-permission
         android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <application
         android:label="Amiin"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".MainActivity"

@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Symboles de débogage Dart (--split-debug-info) : à archiver hors du dépôt,
+# nécessaires pour lire les traces de plantage d'une version obfusquée
+/symbols/

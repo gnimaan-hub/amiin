@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ressources à ne jamais supprimer par isShrinkResources : l'icône des
+     notifications est résolue par son NOM à l'exécution
+     (flutter_local_notifications, '@mipmap/launcher_icon'), et les ressources
+     du widget sont chargées par le lanceur. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@mipmap/launcher_icon,@drawable/*,@layout/amiin_brief_widget,@anim/widget_*" />

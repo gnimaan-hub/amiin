@@ -52,6 +52,23 @@ class NotificationService {
     _initialized = true;
   }
 
+  /// Alarme exacte si le système l'autorise, sinon inexacte (Android 14+ :
+  /// SCHEDULE_EXACT_ALARM est refusée par défaut ; demander une alarme exacte
+  /// sans l'autorisation lèverait une exception et le rappel serait perdu).
+  /// En mode inexact, Android peut décaler le rappel de quelques minutes.
+  Future<AndroidScheduleMode> _scheduleMode() async {
+    try {
+      final canExact = await _plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.canScheduleExactNotifications();
+      if (canExact == false) return AndroidScheduleMode.inexactAllowWhileIdle;
+    } catch (e) {
+      debugPrint('canScheduleExactNotifications indisponible : $e');
+    }
+    return AndroidScheduleMode.exactAllowWhileIdle;
+  }
+
   Future<void> scheduleReminder({
     required String id,
     required String title,
@@ -87,7 +104,7 @@ class NotificationService {
         body,
         tzScheduled,
         details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: await _scheduleMode(),
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
