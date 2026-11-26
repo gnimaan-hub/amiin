@@ -100,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
                       SettingRow(
                         icon: Icons.language_outlined,
                         label: 'Langue & région',
-                        value: settings.language == 'fr' ? 'Français' : 'English',
+                        value: 'Français',
                         onTap: () => context.push('/settings/language'),
                       ),
                       SettingRow(

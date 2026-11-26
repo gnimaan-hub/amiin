@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../models/chat_message.dart';
 import '../models/user_action.dart';
+import 'settings_service.dart';
 import 'user_scope.dart';
 
 class MemoryService {
@@ -86,7 +87,8 @@ class MemoryService {
 
   void recordAction(UserAction action) {
     final box = _actionBox;
-    if (box == null) return;
+    // Mémoire long terme désactivée dans les réglages : rien n'est retenu.
+    if (box == null || !settingsService.memoryEnabled) return;
     box.put(const Uuid().v4(), action);
     _pruneActions();
   }

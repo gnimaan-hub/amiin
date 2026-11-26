@@ -379,7 +379,9 @@ class ChatController extends ChangeNotifier {
       // Suggestion proactive de note
       final hasNoteAction = allActions
           .any((a) => a.name == 'create_note' || a.name == 'update_note');
-      if (!hasNoteAction && _shouldSuggestNote(reply, text)) {
+      if (settingsService.proactiveSuggestions &&
+          !hasNoteAction &&
+          _shouldSuggestNote(reply, text)) {
         noteSuggestionMsgId = streamId;
         noteSuggestionText = _getSuggestionText(reply);
         _noteSuggestionContent = reply;
@@ -843,7 +845,10 @@ class ChatController extends ChangeNotifier {
   /// Données structurées seulement : le backend formule lui-même le texte
   /// injecté dans le prompt (le catalogue des démarches y est déjà).
   Map<String, dynamic> _buildClientContext() {
-    final actions = MemoryService().getRecentActions(limit: 8);
+    // Mémoire long terme désactivée : Amiin ne reçoit pas les actions passées.
+    final actions = settingsService.memoryEnabled
+        ? MemoryService().getRecentActions(limit: 8)
+        : const <UserAction>[];
     return {
       'now': DateTime.now().toIso8601String(),
       'profile': settingsService.profileContextPayload,

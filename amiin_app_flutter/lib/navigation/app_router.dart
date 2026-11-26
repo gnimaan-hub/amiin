@@ -61,6 +61,7 @@ CustomTransitionPage<T> _amiinPage<T>(GoRouterState state, Widget child) {
     transitionDuration: const Duration(milliseconds: 260),
     reverseTransitionDuration: const Duration(milliseconds: 200),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.of(context).disableAnimations) return child;
       final curved =
           CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
       return FadeTransition(

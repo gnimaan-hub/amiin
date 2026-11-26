@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import 'user_scope.dart';
 import 'memory_service.dart';
 import 'notification_service.dart';
+import 'settings_service.dart';
 import '../models/user_action.dart';
 
 enum EventCategory {
@@ -215,6 +216,7 @@ class AgendaService {
 
   void _scheduleNotification(AmiinEvent event) {
     if (event.reminder == null || event.reminder! < 0) return;
+    if (!settingsService.notifMaster || !settingsService.notifAgenda) return;
     final start = DateTime.parse(event.startDate);
     final notifAt = start.subtract(Duration(minutes: event.reminder!));
     notificationService.scheduleReminder(
@@ -225,6 +227,14 @@ class AgendaService {
           : 'Rappel dans ${event.reminder} min.',
       scheduledAt: notifAt,
     );
+  }
+
+  /// Annule tous les rappels d'agenda (notifications désactivées).
+  Future<void> cancelAllReminders() async {
+    await _init();
+    for (final e in _box.values) {
+      await notificationService.cancelReminder(e.id);
+    }
   }
 
   /// Reprogramme les rappels des événements à venir (changement de compte :

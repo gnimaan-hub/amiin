@@ -48,7 +48,8 @@ class SettingsLanguageScreen extends StatelessWidget {
                             label: 'English',
                             value: 'en',
                             current: settings.language,
-                            onTap: () => settingsService.language = 'en',
+                            onTap: () {},
+                            comingSoon: true,
                           ),
                         ],
                       ),
@@ -124,42 +125,6 @@ class SettingsLanguageScreen extends StatelessWidget {
                         code: 'USD',
                         current: settings.currency,
                         onTap: () => settingsService.currency = 'USD',
-                      ),
-                    ]),
-
-                    const SettingsSection('Format de date'),
-                    SettingCard(children: [
-                      _FormatOption(
-                        label: 'JJ/MM/AAAA',
-                        subtitle: 'Ex : 16/06/2026',
-                        value: 'dmy',
-                        current: settings.dateFormat,
-                        onTap: () => settingsService.dateFormat = 'dmy',
-                      ),
-                      _FormatOption(
-                        label: 'MM/DD/YYYY',
-                        subtitle: 'Ex : 06/16/2026',
-                        value: 'mdy',
-                        current: settings.dateFormat,
-                        onTap: () => settingsService.dateFormat = 'mdy',
-                      ),
-                    ]),
-
-                    const SettingsSection('Format d\'heure'),
-                    SettingCard(children: [
-                      _FormatOption(
-                        label: '24 heures',
-                        subtitle: 'Ex : 14:30',
-                        value: '24h',
-                        current: settings.timeFormat,
-                        onTap: () => settingsService.timeFormat = '24h',
-                      ),
-                      _FormatOption(
-                        label: '12 heures (AM/PM)',
-                        subtitle: 'Ex : 2:30 PM',
-                        value: '12h',
-                        current: settings.timeFormat,
-                        onTap: () => settingsService.timeFormat = '12h',
                       ),
                     ]),
 
@@ -260,45 +225,6 @@ class _CurrencyOption extends StatelessWidget {
                 children: [
                   Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
                   Text(code, style: TextStyles.caption(context).copyWith(fontSize: 11)),
-                ],
-              ),
-            ),
-            if (selected)
-              Icon(Icons.check_circle, color: primary, size: 20)
-            else
-              Icon(Icons.circle_outlined, color: context.ac.border, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FormatOption extends StatelessWidget {
-  final String label;
-  final String subtitle;
-  final String value;
-  final String current;
-  final VoidCallback onTap;
-  const _FormatOption({required this.label, required this.subtitle, required this.value, required this.current, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final selected = value == current;
-    final primary = Theme.of(context).colorScheme.primary;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: 13),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label, style: TextStyles.body(context).copyWith(fontSize: 15)),
-                  Text(subtitle, style: TextStyles.caption(context)),
                 ],
               ),
             ),

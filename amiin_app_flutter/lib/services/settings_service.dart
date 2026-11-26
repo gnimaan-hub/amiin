@@ -17,7 +17,7 @@ class SettingsService extends ChangeNotifier {
   /// l'appareil (thème, texte, voix, notifications…), communes aux comptes.
   static const accountKeys = {
     'tone', 'response_length', 'expertise_level', 'memory_enabled',
-    'proactive_suggestions', 'daily_digest', 'favorite_topics',
+    'proactive_suggestions', 'favorite_topics',
     'default_voice_mode', 'ai_language', 'currency', 'show_sources',
     'profile_firstname', 'profile_lastname', 'profile_birth_year',
     'profile_profession', 'profile_phone', 'profile_employment',
@@ -128,8 +128,6 @@ class SettingsService extends ChangeNotifier {
   bool get proactiveSuggestions => _get('proactive_suggestions', true);
   set proactiveSuggestions(bool v) => _set('proactive_suggestions', v);
 
-  bool get dailyDigest => _get('daily_digest', false);
-  set dailyDigest(bool v) => _set('daily_digest', v);
 
   /// Thématiques prioritaires pour Amiin (liste libre)
   List<String> get favoriteTopics {
@@ -167,8 +165,8 @@ class SettingsService extends ChangeNotifier {
 
   // ── Langue & Région ───────────────────────────────────────────────────────
 
-  /// 'fr' | 'en'
-  String get language => _get('language', 'fr');
+  /// Langue de l'interface : français uniquement pour l'instant.
+  String get language => 'fr';
   set language(String v) => _set('language', v);
 
   /// Langue dans laquelle Amiin répond — 'fr' | 'en' | 'ar' | 'so'
@@ -179,13 +177,7 @@ class SettingsService extends ChangeNotifier {
   String get currency => _get('currency', 'DJF');
   set currency(String v) => _set('currency', v);
 
-  /// 'dmy' | 'mdy'
-  String get dateFormat => _get('date_format', 'dmy');
-  set dateFormat(String v) => _set('date_format', v);
 
-  /// '24h' | '12h'
-  String get timeFormat => _get('time_format', '24h');
-  set timeFormat(String v) => _set('time_format', v);
 
   // ── Notifications ─────────────────────────────────────────────────────────
 
@@ -198,20 +190,10 @@ class SettingsService extends ChangeNotifier {
   bool get notifDemarches => _get('notif_demarches', true);
   set notifDemarches(bool v) => _set('notif_demarches', v);
 
-  bool get notifConseil => _get('notif_conseil', true);
-  set notifConseil(bool v) => _set('notif_conseil', v);
 
-  bool get notifRelance => _get('notif_relance', true);
-  set notifRelance(bool v) => _set('notif_relance', v);
 
-  bool get notifDigest => _get('notif_digest', false);
-  set notifDigest(bool v) => _set('notif_digest', v);
 
-  int get notifQuietStart => _get('notif_quiet_start', 22);
-  set notifQuietStart(int v) => _set('notif_quiet_start', v);
 
-  int get notifQuietEnd => _get('notif_quiet_end', 7);
-  set notifQuietEnd(int v) => _set('notif_quiet_end', v);
 
   // ── Profil utilisateur ────────────────────────────────────────────────────
 
