@@ -11,15 +11,26 @@ plugins {
 // Clé de signature release : android/key.properties (jamais commité, cf.
 // android/.gitignore). Contenu attendu :
 //   storePassword=…  keyPassword=…  keyAlias=upload  storeFile=/chemin/upload-keystore.jks
-// Sans ce fichier, la release retombe sur la clé debug (builds locaux
-// uniquement — refusé par le Play Store).
+//
+// Sans ce fichier, un build release ÉCHOUE (plus de repli silencieux sur la
+// clé debug, qui produisait un APK non publiable et non mettable à jour).
+// Pour un test local ponctuel signé debug, exporter AMIIN_ALLOW_DEBUG_SIGNING=1.
 val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) load(FileInputStream(keystorePropertiesFile))
 }
+val allowDebugSigning = System.getenv("AMIIN_ALLOW_DEBUG_SIGNING") == "1"
+val isReleaseBuild = gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
+if (isReleaseBuild && !keystorePropertiesFile.exists() && !allowDebugSigning) {
+    throw GradleException(
+        "Build release impossible : android/key.properties introuvable. " +
+        "Créer la clé d'upload (voir android/app/build.gradle.kts) ou, pour un " +
+        "test local uniquement, exporter AMIIN_ALLOW_DEBUG_SIGNING=1."
+    )
+}
 
 android {
-    namespace = "com.example.amiin_app_flutter"
+    namespace = "dj.amiin.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "28.2.13676358"
 
@@ -34,10 +45,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.amiin_app_flutter"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // Identifiant définitif sur le Play Store : NE PLUS LE CHANGER après la
+        // première publication (un autre identifiant = une autre application).
+        applicationId = "dj.amiin.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -60,7 +70,16 @@ android {
             signingConfig = if (keystorePropertiesFile.exists())
                 signingConfigs.getByName("release")
             else
-                signingConfigs.getByName("debug")
+                signingConfigs.getByName("debug")   // uniquement avec AMIIN_ALLOW_DEBUG_SIGNING=1
+            // R8 : réduction + obfuscation du code Java/Kotlin et suppression
+            // des ressources inutilisées. (Le code Dart est obfusqué à part :
+            // --obfuscate --split-debug-info, cf. tool/build_release.sh.)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
@@ -71,4 +90,6 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    // Play Integrity : preuve que la requête vient de l'app officielle (MainActivity.kt)
+    implementation("com.google.android.play:integrity:1.6.0")
 }

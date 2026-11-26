@@ -32,3 +32,5 @@ PyJWT==2.10.1                  # JWT tokens (remplace python-jose, CVE-2024-3366
 
 # ── SYNTHÈSE VOCALE CLOUD (Edge TTS) ──────────────────────────────
 edge-tts==7.2.8               # TTS neuronal Microsoft Edge — gratuit, sans clé API
+# ── PLAY INTEGRITY (vérification de l'app officielle, integrity.py) ──
+google-auth==2.40.3            # jeton OAuth du compte de service Google Cloud

@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
-import 'hive_utils.dart';
+import 'integrity_service.dart';
+import 'user_scope.dart';
 
 // Base URL partagée sans importer api_client (évite la dépendance circulaire)
 const _kBaseUrl = String.fromEnvironment(
@@ -19,6 +20,8 @@ const _kRefreshToken = 'refresh_token';
 const _kUserId       = 'user_id';
 const _kEmail        = 'user_email';
 const _kDisplayName  = 'user_display_name';
+const _kEmailVerified = 'user_email_verified';
+const _kRole          = 'user_role';
 
 // ── Modèle utilisateur ────────────────────────────────────────────────────────
 
@@ -26,7 +29,37 @@ class AuthUser {
   final String id;
   final String email;
   final String displayName;
-  const AuthUser({required this.id, required this.email, required this.displayName});
+  /// Adresse vérifiée (ou vérification non exigée par le serveur). Tant que
+  /// c'est faux, le routeur envoie sur /verify-email.
+  final bool emailVerified;
+  /// 'user' | 'admin' (admin : aucune limite d'usage côté serveur).
+  final String role;
+  const AuthUser({
+    required this.id,
+    required this.email,
+    required this.displayName,
+    this.emailVerified = true,
+    this.role = 'user',
+  });
+
+  bool get isAdmin => role == 'admin';
+}
+
+/// Session ouverte sur un appareil (Réglages › Sécurité).
+class DeviceSession {
+  final String id;
+  final String device;
+  final DateTime startedAt;
+  final DateTime lastActiveAt;
+  /// Session de cet appareil-ci.
+  final bool current;
+  const DeviceSession({
+    required this.id,
+    required this.device,
+    required this.startedAt,
+    required this.lastActiveAt,
+    required this.current,
+  });
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -45,8 +78,22 @@ class AuthService extends ChangeNotifier {
     baseUrl: _kBaseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 30),
-    headers: {'Content-Type': 'application/json'},
+    // X-Amiin-Device : nom affiché dans Réglages › Sécurité › Appareils
+    // connectés (ASCII uniquement : contrainte des en-têtes HTTP).
+    headers: {'Content-Type': 'application/json', 'X-Amiin-Device': _deviceLabel()},
   ));
+
+  static String _deviceLabel() {
+    if (kIsWeb) return 'Navigateur web';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android: return 'Android';
+      case TargetPlatform.iOS:     return 'iPhone ou iPad';
+      case TargetPlatform.macOS:   return 'Mac';
+      case TargetPlatform.windows: return 'Windows';
+      case TargetPlatform.linux:   return 'Linux';
+      default:                     return 'Appareil';
+    }
+  }
 
   AuthUser? _user;
   bool _initialized = false;
@@ -79,6 +126,7 @@ class AuthService extends ChangeNotifier {
     // que la session soit invalide pour autant — _validateSession tentera un
     // refresh dans ce cas plutôt que de forcer un retour au login.
     if (refreshToken == null) {
+      await _syncScope(atStartup: true);
       _initialized = true;
       debugPrint('[AUTH] init() : pas de refresh token → non connecté');
       notifyListeners();
@@ -90,6 +138,7 @@ class AuthService extends ChangeNotifier {
     // (Render free tier) peut mettre 30 s à se réveiller — hors de question
     // de bloquer le démarrage là-dessus.
     _user = await _cachedUser();
+    if (_user != null) await _syncScope(atStartup: true);
     _initialized = true;
     debugPrint('[AUTH] init() : cachedUser=${_user != null} → isLoggedIn=$isLoggedIn');
     notifyListeners();
@@ -98,16 +147,18 @@ class AuthService extends ChangeNotifier {
       unawaited(_validateSession(accessToken, refreshToken));
     } else {
       // Tokens présents mais pas de cache : il faut le réseau pour savoir
-      await _validateSession(accessToken, refreshToken);
+      await _validateSession(accessToken, refreshToken, atStartup: true);
     }
   }
 
   /// Vérifie la session auprès du backend. Sur 401 (ou pas d'accessToken du
   /// tout) → tentative de refresh (échec = déconnexion). Sur erreur réseau →
   /// on garde la session locale.
-  Future<void> _validateSession(String? accessToken, String refreshToken) async {
+  Future<void> _validateSession(String? accessToken, String refreshToken,
+      {bool atStartup = false}) async {
     if (accessToken == null) {
       await _tryRefresh(refreshToken);
+      await _syncScope(atStartup: atStartup);
       notifyListeners();
       return;
     }
@@ -129,6 +180,7 @@ class AuthService extends ChangeNotifier {
       debugPrint('[AUTH] _validateSession : erreur inattendue $e');
       // Jamais de crash au démarrage pour une erreur de validation
     }
+    await _syncScope(atStartup: atStartup);
     notifyListeners();
   }
 
@@ -168,7 +220,7 @@ class AuthService extends ChangeNotifier {
       'email': email,
       'password': password,
       'display_name': displayName,
-    });
+    }, options: Options(headers: await IntegrityService.headers('register', email)));
     await _handleTokens(resp.data as Map<String, dynamic>);
   }
 
@@ -176,7 +228,7 @@ class AuthService extends ChangeNotifier {
     final resp = await _authDio.post('/auth/login', data: {
       'email': email,
       'password': password,
-    });
+    }, options: Options(headers: await IntegrityService.headers('login', email)));
     await _handleTokens(resp.data as Map<String, dynamic>);
   }
 
@@ -189,6 +241,7 @@ class AuthService extends ChangeNotifier {
     }
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
   }
 
@@ -227,7 +280,43 @@ class AuthService extends ChangeNotifier {
     } catch (_) {}
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
+  }
+
+  /// Vérifie l'adresse e-mail avec le code à 6 chiffres reçu à l'inscription.
+  /// Lève une DioException si le code est refusé (400).
+  Future<void> verifyEmail(String code) async {
+    final resp = await _authDio.post('/auth/verify-email',
+        data: {'code': code}, options: await _authed());
+    _user = _parseUser(resp.data as Map<String, dynamic>);
+    await _cacheUser(_user!);
+    notifyListeners();
+  }
+
+  /// Redemande un code de vérification (le serveur limite à 1/min, 5/h).
+  Future<void> resendVerificationCode() async {
+    await _authDio.post('/auth/verify-email/send', options: await _authed());
+  }
+
+  /// Appareils connectés au compte (une session par appareil).
+  Future<List<DeviceSession>> listSessions() async {
+    final resp = await _authDio.get('/auth/sessions', options: await _authed());
+    return [
+      for (final s in (resp.data as List).cast<Map<String, dynamic>>())
+        DeviceSession(
+          id: s['id'] as String,
+          device: s['device'] as String,
+          startedAt: DateTime.parse(s['started_at'] as String).toLocal(),
+          lastActiveAt: DateTime.parse(s['last_active_at'] as String).toLocal(),
+          current: s['current'] == true,
+        ),
+    ];
+  }
+
+  /// Déconnecte un autre appareil (effectif en une minute au plus).
+  Future<void> revokeSession(String id) async {
+    await _authDio.delete('/auth/sessions/$id', options: await _authed());
   }
 
   /// Demande l'envoi d'un code à 6 chiffres par e-mail (réponse identique que
@@ -252,6 +341,7 @@ class AuthService extends ChangeNotifier {
     await wipeLocalUserData();
     _user = null;
     await _clearAll();
+    await _syncScope();
     notifyListeners();
   }
 
@@ -316,6 +406,7 @@ class AuthService extends ChangeNotifier {
       if (current == refreshToken) {
         _user = null;
         await _clearAll();
+        await _syncScope();
         notifyListeners();
       }
       return null;
@@ -337,7 +428,20 @@ class AuthService extends ChangeNotifier {
     );
     _user = _parseUser(meResp.data as Map<String, dynamic>);
     await _cacheUser(_user!);
+    await _syncScope();
     notifyListeners();
+  }
+
+  /// Bascule les données locales (conversations, notes, agenda, démarches,
+  /// profil) sur celles du compte connecté — ou sur l'espace invité vide.
+  /// Jamais dans l'isolate WorkManager, qui ne touche pas à Hive.
+  Future<void> _syncScope({bool atStartup = false}) async {
+    if (_isBackgroundIsolate) return;
+    try {
+      await userScope.activate(_user?.id, atStartup: atStartup);
+    } catch (e) {
+      debugPrint('[AUTH] bascule des données locales échouée : $e');
+    }
   }
 
   Future<void> _storeTokens({
@@ -352,14 +456,26 @@ class AuthService extends ChangeNotifier {
     await _storage.write(key: _kUserId,      value: u.id);
     await _storage.write(key: _kEmail,       value: u.email);
     await _storage.write(key: _kDisplayName, value: u.displayName);
+    await _storage.write(key: _kEmailVerified, value: u.emailVerified ? '1' : '0');
+    await _storage.write(key: _kRole,          value: u.role);
   }
 
   Future<AuthUser?> _cachedUser() async {
     final id    = await _storage.read(key: _kUserId);
     final email = await _storage.read(key: _kEmail);
     final name  = await _storage.read(key: _kDisplayName);
+    final verified = await _storage.read(key: _kEmailVerified);
+    final role  = await _storage.read(key: _kRole);
     if (id == null || email == null) return null;
-    return AuthUser(id: id, email: email, displayName: name ?? email.split('@')[0]);
+    return AuthUser(
+      id: id,
+      email: email,
+      displayName: name ?? email.split('@')[0],
+      // Absent (cache d'une version précédente) : considéré vérifié, la
+      // validation de session en arrière-plan corrige aussitôt.
+      emailVerified: verified != '0',
+      role: role ?? 'user',
+    );
   }
 
   // Supprime uniquement les clés d'auth, jamais deleteAll() : ce storage est
@@ -371,12 +487,17 @@ class AuthService extends ChangeNotifier {
     _storage.delete(key: _kUserId),
     _storage.delete(key: _kEmail),
     _storage.delete(key: _kDisplayName),
+    _storage.delete(key: _kEmailVerified),
+    _storage.delete(key: _kRole),
   ]);
 
   AuthUser _parseUser(Map<String, dynamic> d) => AuthUser(
-    id:          d['id']           as String,
-    email:       d['email']        as String,
-    displayName: d['display_name'] as String,
+    id:            d['id']           as String,
+    email:         d['email']        as String,
+    displayName:   d['display_name'] as String,
+    // Champs absents sur un serveur plus ancien : comportement d'avant.
+    emailVerified: d['email_verified'] as bool? ?? true,
+    role:          d['role']         as String? ?? 'user',
   );
 }
 

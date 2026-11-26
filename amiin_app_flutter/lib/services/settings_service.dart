@@ -9,24 +9,76 @@ import 'hive_utils.dart';
 
 class SettingsService extends ChangeNotifier {
   static const _boxName = 'settings';
+  static const _accountBoxBase = 'settings_account';
 
-  // Nullable : l'app démarre (et affiche le splash) AVANT l'ouverture de la
-  // box. Tant qu'elle n'est pas ouverte, les getters renvoient les valeurs
-  // par défaut ; init() notifie ensuite pour reconstruire avec les vraies.
+  /// Préférences propres au COMPTE (profil, comportement d'Amiin, langue des
+  /// réponses, devise…) : stockées dans une box par compte (voir
+  /// user_scope.dart). Toutes les autres clés sont des préférences de
+  /// l'appareil (thème, texte, voix, notifications…), communes aux comptes.
+  static const accountKeys = {
+    'tone', 'response_length', 'expertise_level', 'memory_enabled',
+    'proactive_suggestions', 'favorite_topics',
+    'default_voice_mode', 'ai_language', 'currency', 'show_sources',
+    'profile_firstname', 'profile_lastname', 'profile_birth_year',
+    'profile_profession', 'profile_phone', 'profile_employment',
+    'profile_native_language',
+  };
+
+  // Nullable : l'app démarre (et affiche le splash) AVANT l'ouverture des
+  // boxes. Tant qu'elles ne sont pas ouvertes, les getters renvoient les
+  // valeurs par défaut ; init()/openAccount() notifient ensuite.
   Box<dynamic>? _box;
+  Box<dynamic>? _accountBox;
 
   Future<void> init() async {
     _box = await openBoxSafe<dynamic>(_boxName);
     notifyListeners();
   }
 
+  /// Ouvre les préférences du compte [scopeKey] (appelé par UserScope).
+  Future<void> openAccount(String scopeKey) async {
+    final name = '${_accountBoxBase}_$scopeKey';
+    if (_accountBox != null && _accountBox!.isOpen && _accountBox!.name == name) return;
+    final old = _accountBox;
+    _accountBox = null;
+    if (old != null && old.isOpen) await old.close();
+    _accountBox = await openBoxSafe<dynamic>(name);
+    notifyListeners();
+  }
+
+  /// Migration : déplace les préférences de compte de l'ancienne box commune
+  /// vers celle du compte [scopeKey] (ou les efface si null).
+  Future<void> moveLegacyAccountSettings(String? scopeKey) async {
+    final device = _box ?? await openBoxSafe<dynamic>(_boxName);
+    final legacy = {
+      for (final k in accountKeys)
+        if (device.containsKey(k)) k: device.get(k),
+    };
+    if (legacy.isEmpty) return;
+    if (scopeKey != null) {
+      final target = await openBoxSafe<dynamic>('${_accountBoxBase}_$scopeKey');
+      await target.putAll(legacy);
+      if (!identical(target, _accountBox)) await target.close();
+    }
+    await device.deleteAll(legacy.keys);
+  }
+
+  /// Efface les préférences de l'appareil et celles du compte actif.
+  Future<void> clearAll() async {
+    await _box?.clear();
+    await _accountBox?.clear();
+    notifyListeners();
+  }
+
   // ── Helpers internes ──────────────────────────────────────────────────────
 
+  Box<dynamic>? _boxFor(String key) => accountKeys.contains(key) ? _accountBox : _box;
+
   T _get<T>(String key, T defaultValue) =>
-      (_box?.get(key, defaultValue: defaultValue) as T?) ?? defaultValue;
+      (_boxFor(key)?.get(key, defaultValue: defaultValue) as T?) ?? defaultValue;
 
   void _set<T>(String key, T value) {
-    _box?.put(key, value);
+    _boxFor(key)?.put(key, value);
     notifyListeners();
   }
 
@@ -47,7 +99,7 @@ class SettingsService extends ChangeNotifier {
   bool get memoryEnabled => _get('memory_enabled', true);
   set memoryEnabled(bool v) => _set('memory_enabled', v);
 
-  double get ttsSpeed => ((_box?.get('tts_speed', defaultValue: 1.0) ?? 1.0) as num).toDouble();
+  double get ttsSpeed => ((_boxFor('tts_speed')?.get('tts_speed', defaultValue: 1.0) ?? 1.0) as num).toDouble();
   set ttsSpeed(double v) => _set('tts_speed', v);
 
   /// Active la synthèse vocale cloud (Edge TTS via backend) au lieu des voix système.
@@ -76,18 +128,16 @@ class SettingsService extends ChangeNotifier {
   bool get proactiveSuggestions => _get('proactive_suggestions', true);
   set proactiveSuggestions(bool v) => _set('proactive_suggestions', v);
 
-  bool get dailyDigest => _get('daily_digest', false);
-  set dailyDigest(bool v) => _set('daily_digest', v);
 
   /// Thématiques prioritaires pour Amiin (liste libre)
   List<String> get favoriteTopics {
-    final raw = _box?.get('favorite_topics');
+    final raw = _boxFor('favorite_topics')?.get('favorite_topics');
     if (raw == null) return [];
     if (raw is List) return raw.map((e) => e.toString()).toList();
     return [];
   }
   set favoriteTopics(List<String> v) {
-    _box?.put('favorite_topics', v);
+    _boxFor('favorite_topics')?.put('favorite_topics', v);
     notifyListeners();
   }
 
@@ -102,7 +152,7 @@ class SettingsService extends ChangeNotifier {
   String get themeVariant => _get('theme_variant', 'terre');
   set themeVariant(String v) => _set('theme_variant', v);
 
-  double get textScale => ((_box?.get('text_scale', defaultValue: 1.0) ?? 1.0) as num).toDouble();
+  double get textScale => ((_boxFor('text_scale')?.get('text_scale', defaultValue: 1.0) ?? 1.0) as num).toDouble();
   set textScale(double v) => _set('text_scale', v);
 
   /// 'dmsans' | 'opensans' | 'noto'
@@ -115,8 +165,8 @@ class SettingsService extends ChangeNotifier {
 
   // ── Langue & Région ───────────────────────────────────────────────────────
 
-  /// 'fr' | 'en'
-  String get language => _get('language', 'fr');
+  /// Langue de l'interface : français uniquement pour l'instant.
+  String get language => 'fr';
   set language(String v) => _set('language', v);
 
   /// Langue dans laquelle Amiin répond — 'fr' | 'en' | 'ar' | 'so'
@@ -127,13 +177,7 @@ class SettingsService extends ChangeNotifier {
   String get currency => _get('currency', 'DJF');
   set currency(String v) => _set('currency', v);
 
-  /// 'dmy' | 'mdy'
-  String get dateFormat => _get('date_format', 'dmy');
-  set dateFormat(String v) => _set('date_format', v);
 
-  /// '24h' | '12h'
-  String get timeFormat => _get('time_format', '24h');
-  set timeFormat(String v) => _set('time_format', v);
 
   // ── Notifications ─────────────────────────────────────────────────────────
 
@@ -146,20 +190,10 @@ class SettingsService extends ChangeNotifier {
   bool get notifDemarches => _get('notif_demarches', true);
   set notifDemarches(bool v) => _set('notif_demarches', v);
 
-  bool get notifConseil => _get('notif_conseil', true);
-  set notifConseil(bool v) => _set('notif_conseil', v);
 
-  bool get notifRelance => _get('notif_relance', true);
-  set notifRelance(bool v) => _set('notif_relance', v);
 
-  bool get notifDigest => _get('notif_digest', false);
-  set notifDigest(bool v) => _set('notif_digest', v);
 
-  int get notifQuietStart => _get('notif_quiet_start', 22);
-  set notifQuietStart(int v) => _set('notif_quiet_start', v);
 
-  int get notifQuietEnd => _get('notif_quiet_end', 7);
-  set notifQuietEnd(int v) => _set('notif_quiet_end', v);
 
   // ── Profil utilisateur ────────────────────────────────────────────────────
 
@@ -170,11 +204,11 @@ class SettingsService extends ChangeNotifier {
   set profileLastname(String v) => _set('profile_lastname', v);
 
   int? get profileBirthYear {
-    final v = _box?.get('profile_birth_year');
+    final v = _boxFor('profile_birth_year')?.get('profile_birth_year');
     return v == null ? null : (v as num).toInt();
   }
   set profileBirthYear(int? v) {
-    _box?.put('profile_birth_year', v);
+    _boxFor('profile_birth_year')?.put('profile_birth_year', v);
     notifyListeners();
   }
 

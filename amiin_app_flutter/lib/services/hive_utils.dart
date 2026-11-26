@@ -113,23 +113,7 @@ Future<Box<T>> _migrateOnWeb<T>(
   }
 }
 
-/// Efface toutes les données utilisateur stockées sur l'appareil
-/// (conversations, mémoire, notes, agenda, suivi des démarches, profil et
-/// préférences, cache d'accueil). Le catalogue public des démarches et la clé
-/// de chiffrement sont conservés.
-Future<void> wipeLocalUserData() async {
-  const names = [
-    'chat_messages', 'user_actions', 'notes_box', 'agenda_events',
-    'user_demarches', 'settings', 'home_brief',
-  ];
-  for (final name in names) {
-    if (Hive.isBoxOpen(name)) {
-      await Hive.box<dynamic>(name).clear();
-    } else {
-      await Hive.deleteBoxFromDisk(name);
-    }
-  }
-}
+// wipeLocalUserData() : déplacé dans user_scope.dart (données par compte).
 
 /// Ouvre une box avec le cipher global. Si la box existante n'est pas
 /// déchiffrable (ancienne box non chiffrée, clé perdue…), elle est

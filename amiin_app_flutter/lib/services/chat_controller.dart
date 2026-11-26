@@ -27,6 +27,8 @@ import 'connectivity_service.dart';
 import 'demarches_service.dart';
 import 'location_service.dart';
 import 'memory_service.dart';
+import 'usage_service.dart';
+import 'user_scope.dart';
 import 'notes_service.dart';
 import 'settings_service.dart';
 
@@ -55,7 +57,26 @@ class ChatController extends ChangeNotifier {
   ChatController({AmiinApiService? api}) : _api = api ?? AmiinApiService() {
     _messages.addAll(
         MemoryService().getRecentMessages(limit: loadedHistoryLimit));
+    userScope.addListener(_onAccountChanged);
     unawaited(_refreshEnvContextIfStale());
+  }
+
+  /// Changement de compte : on quitte la conversation affichée (celle de
+  /// l'ancien compte) et on charge l'historique du compte actif.
+  void _onAccountChanged() {
+    _api.cancelStream();
+    _messages
+      ..clear()
+      ..addAll(MemoryService().getRecentMessages(limit: loadedHistoryLimit));
+    noteResults.clear();
+    eventResults.clear();
+    _clearNoteSuggestion(notify: false);
+    pendingDeletions.clear();
+    pendingDeletionMsgId = null;
+    _loading = false;
+    _streaming = false;
+    _streamStatus = '';
+    notifyListeners();
   }
 
   final AmiinApiService _api;
@@ -113,6 +134,7 @@ class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    userScope.removeListener(_onAccountChanged);
     _notices.close();
     _api.cancelStream();
     super.dispose();
@@ -176,6 +198,12 @@ class ChatController extends ChangeNotifier {
 
     if (!connectivityService.isOnline) {
       _notice('Vous êtes hors ligne — vérifiez votre connexion.',
+          success: false);
+      return null;
+    }
+
+    if (usageService.exhausted) {
+      _notice("Limite d'utilisation du jour atteinte — elle se recharge à minuit.",
           success: false);
       return null;
     }
@@ -351,7 +379,9 @@ class ChatController extends ChangeNotifier {
       // Suggestion proactive de note
       final hasNoteAction = allActions
           .any((a) => a.name == 'create_note' || a.name == 'update_note');
-      if (!hasNoteAction && _shouldSuggestNote(reply, text)) {
+      if (settingsService.proactiveSuggestions &&
+          !hasNoteAction &&
+          _shouldSuggestNote(reply, text)) {
         noteSuggestionMsgId = streamId;
         noteSuggestionText = _getSuggestionText(reply);
         _noteSuggestionContent = reply;
@@ -362,6 +392,8 @@ class ChatController extends ChangeNotifier {
         await _executeActions(allActions, contextText: text, msgId: streamId);
       }
 
+      // Jauge du jour : le coût de cette réponse vient d'être enregistré
+      unawaited(usageService.refresh());
       return reply.isEmpty ? null : reply;
     } catch (e) {
       if (_cancelled ||
@@ -377,9 +409,7 @@ class ChatController extends ChangeNotifier {
       _addMessage(ChatMessage(
         id: _uuid.v4(),
         role: 'agent',
-        content:
-            "Désolé, je n'arrive pas à joindre le service Amiin pour le moment. "
-            'Vérifiez votre connexion et réessayez.',
+        content: _errorMessageFor(e),
         timestamp: DateTime.now(),
       ));
       _loading = false;
@@ -387,6 +417,26 @@ class ChatController extends ChangeNotifier {
       _streamStatus = '';
       notifyListeners();
       return null;
+    }
+  }
+
+  /// Message affiché dans le fil quand l'appel au serveur échoue.
+  static String _errorMessageFor(Object e) {
+    final status = e is DioException ? e.response?.statusCode : null;
+    switch (status) {
+      case 402:
+        usageService.markExhausted();
+        return "Vous avez atteint la limite d'utilisation du jour. "
+            'Elle se recharge à minuit (heure de Djibouti).';
+      case 403:
+        return "Votre adresse e-mail n'est pas encore vérifiée. "
+            "Saisissez le code reçu par e-mail pour discuter avec Amiin.";
+      case 429:
+        return 'Une réponse est déjà en préparation. '
+            'Patientez un instant puis réessayez.';
+      default:
+        return "Désolé, je n'arrive pas à joindre le service Amiin pour le moment. "
+            'Vérifiez votre connexion et réessayez.';
     }
   }
 
@@ -795,7 +845,10 @@ class ChatController extends ChangeNotifier {
   /// Données structurées seulement : le backend formule lui-même le texte
   /// injecté dans le prompt (le catalogue des démarches y est déjà).
   Map<String, dynamic> _buildClientContext() {
-    final actions = MemoryService().getRecentActions(limit: 8);
+    // Mémoire long terme désactivée : Amiin ne reçoit pas les actions passées.
+    final actions = settingsService.memoryEnabled
+        ? MemoryService().getRecentActions(limit: 8)
+        : const <UserAction>[];
     return {
       'now': DateTime.now().toIso8601String(),
       'profile': settingsService.profileContextPayload,

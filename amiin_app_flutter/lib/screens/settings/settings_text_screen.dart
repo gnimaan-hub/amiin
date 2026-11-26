@@ -111,19 +111,13 @@ class SettingsTextScreen extends StatelessWidget {
                         label: 'Complètes',
                         subtitle: 'Transitions et effets visuels',
                         value: 'full',
-                        current: settings.animations,
+                        current: settings.animations == 'full' ? 'full' : 'reduced',
                       ),
                       _AnimOption(
                         label: 'Réduites',
-                        subtitle: 'Moins de mouvements',
+                        subtitle: 'Écrans sans glissement ni effets de mouvement (accessibilité)',
                         value: 'reduced',
-                        current: settings.animations,
-                      ),
-                      _AnimOption(
-                        label: 'Désactivées',
-                        subtitle: 'Aucune animation (accessibilité)',
-                        value: 'off',
-                        current: settings.animations,
+                        current: settings.animations == 'full' ? 'full' : 'reduced',
                       ),
                     ]),
 

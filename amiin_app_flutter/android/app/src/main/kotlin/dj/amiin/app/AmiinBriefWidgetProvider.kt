@@ -1,4 +1,4 @@
-package com.example.amiin_app_flutter
+package dj.amiin.app
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider

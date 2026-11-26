@@ -157,18 +157,10 @@ class SettingsAssistantScreen extends StatelessWidget {
                       SettingRow(
                         icon: Icons.auto_awesome_outlined,
                         label: 'Suggestions automatiques',
-                        subtitle: 'Amiin propose de créer des notes ou rappels',
+                        subtitle: 'Amiin propose d\'enregistrer une réponse utile en note',
                         toggle: true,
                         toggleValue: settings.proactiveSuggestions,
                         onToggle: (v) => settingsService.proactiveSuggestions = v,
-                      ),
-                      SettingRow(
-                        icon: Icons.wb_sunny_outlined,
-                        label: 'Résumé quotidien',
-                        subtitle: 'Briefing matinal de l\'agenda et des tâches',
-                        toggle: true,
-                        toggleValue: settings.dailyDigest,
-                        onToggle: (v) => settingsService.dailyDigest = v,
                       ),
                     ]),
 

@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
-import '../../theme/typography.dart';
+import '../../services/agenda_service.dart';
 import '../../services/demarches_service.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/header.dart';
-import '../../widgets/card.dart';
 import 'settings_widgets.dart';
 
 class SettingsNotificationsScreen extends StatelessWidget {
@@ -43,9 +42,13 @@ class SettingsNotificationsScreen extends StatelessWidget {
                         toggleValue: enabled,
                         onToggle: (v) {
                           settingsService.notifMaster = v;
-                          v
-                              ? demarchesService.rescheduleAllFollowUps()
-                              : demarchesService.cancelAllFollowUps();
+                          if (v) {
+                            agendaService.rescheduleAllReminders();
+                            demarchesService.rescheduleAllFollowUps();
+                          } else {
+                            agendaService.cancelAllReminders();
+                            demarchesService.cancelAllFollowUps();
+                          }
                         },
                       ),
                     ]),
@@ -61,7 +64,14 @@ class SettingsNotificationsScreen extends StatelessWidget {
                           subtitle: 'Avant vos rendez-vous',
                           toggle: true,
                           toggleValue: enabled && settings.notifAgenda,
-                          onToggle: enabled ? (v) => settingsService.notifAgenda = v : null,
+                          onToggle: enabled
+                              ? (v) {
+                                  settingsService.notifAgenda = v;
+                                  v
+                                      ? agendaService.rescheduleAllReminders()
+                                      : agendaService.cancelAllReminders();
+                                }
+                              : null,
                         ),
                         SettingRow(
                           icon: Icons.assignment_outlined,
@@ -81,76 +91,6 @@ class SettingsNotificationsScreen extends StatelessWidget {
                       ]),
                     ),
 
-                    // ── Amiin ─────────────────────────────────────────────
-                    const SettingsSection('Amiin'),
-                    Opacity(
-                      opacity: enabled ? 1.0 : 0.4,
-                      child: SettingCard(children: [
-                        SettingRow(
-                          icon: Icons.tips_and_updates_outlined,
-                          label: 'Conseil du jour',
-                          subtitle: 'Une astuce ou information utile chaque matin',
-                          toggle: true,
-                          toggleValue: enabled && settings.notifConseil,
-                          onToggle: enabled ? (v) => settingsService.notifConseil = v : null,
-                        ),
-                        SettingRow(
-                          icon: Icons.replay_outlined,
-                          label: 'Relance d\'actions',
-                          subtitle: 'Rappel pour les tâches en cours non terminées',
-                          toggle: true,
-                          toggleValue: enabled && settings.notifRelance,
-                          onToggle: enabled ? (v) => settingsService.notifRelance = v : null,
-                        ),
-                        SettingRow(
-                          icon: Icons.summarize_outlined,
-                          label: 'Résumé hebdomadaire',
-                          subtitle: 'Bilan de votre semaine chaque lundi',
-                          toggle: true,
-                          toggleValue: enabled && settings.notifDigest,
-                          onToggle: enabled ? (v) => settingsService.notifDigest = v : null,
-                        ),
-                      ]),
-                    ),
-
-                    // ── Ne pas déranger ───────────────────────────────────
-                    const SettingsSection('Ne pas déranger'),
-                    AmiinCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Aucune notification pendant ces heures',
-                            style: TextStyles.bodyMuted(context).copyWith(fontSize: 13),
-                          ),
-                          const SizedBox(height: Spacing.md),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _TimeButton(
-                                  label: 'De',
-                                  hour: settings.notifQuietStart,
-                                  onTap: () => _pickHour(context, settings.notifQuietStart,
-                                      (h) => settingsService.notifQuietStart = h),
-                                ),
-                              ),
-                              const SizedBox(width: Spacing.md),
-                              Text('—', style: TextStyles.bodyMuted(context)),
-                              const SizedBox(width: Spacing.md),
-                              Expanded(
-                                child: _TimeButton(
-                                  label: 'À',
-                                  hour: settings.notifQuietEnd,
-                                  onTap: () => _pickHour(context, settings.notifQuietEnd,
-                                      (h) => settingsService.notifQuietEnd = h),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
                     const SizedBox(height: Spacing.xxxl),
                   ],
                 ),
@@ -161,59 +101,4 @@ class SettingsNotificationsScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _pickHour(BuildContext context, int current, ValueChanged<int> onPick) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: SizedBox(
-          height: 300,
-          child: ListView.builder(
-            itemCount: 24,
-            itemBuilder: (_, h) => ListTile(
-              title: Text('${h.toString().padLeft(2, '0')}:00'),
-              trailing: h == current
-                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
-                  : null,
-              onTap: () { onPick(h); Navigator.pop(ctx); },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
-
-class _TimeButton extends StatelessWidget {
-  final String label;
-  final int hour;
-  final VoidCallback onTap;
-  const _TimeButton({required this.label, required this.hour, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: Spacing.md, horizontal: Spacing.lg),
-        decoration: BoxDecoration(
-          color: context.ac.background,
-          borderRadius: BorderRadius.circular(RadiusAmiin.md),
-          border: Border.all(color: context.ac.border),
-        ),
-        child: Column(
-          children: [
-            Text(label, style: TextStyles.caption(context).copyWith(fontSize: 11)),
-            const SizedBox(height: 4),
-            Text('${hour.toString().padLeft(2, '0')}:00',
-                style: TextStyles.screenTitle(context).copyWith(color: primary)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

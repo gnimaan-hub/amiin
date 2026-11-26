@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
-import 'hive_utils.dart';
+import 'user_scope.dart';
 import 'memory_service.dart';
 import 'notification_service.dart';
 import 'settings_service.dart';
@@ -415,30 +415,34 @@ class UserDemarcheAdapter extends TypeAdapter<UserDemarche> {
 
 class DemarchesService {
   static const String _catalogBoxName   = 'demarches_catalog';
-  static const String _userBoxName      = 'user_demarches';
   static const String _settingsBoxName  = 'demarches_settings';
   static const String _catalogVersion   = '2025-v3';
 
   late Box<Demarche>     _catalogBox;
   late Box<UserDemarche> _userBox;
   late Box<dynamic>      _settingsBox;
-  bool _initialized = false;
+  // Suivi des démarches : box chiffrée propre au compte actif (voir
+  // user_scope.dart). Le catalogue, public, reste commun à l'appareil.
+  final _userScoped = ScopedBox<UserDemarche>('user_demarches');
+  Future<void>? _catalogReady;
 
   Future<void> _init() async {
-    if (_initialized) return;
     if (!Hive.isAdapterRegistered(12)) Hive.registerAdapter(DemarcheAdapter());
     if (!Hive.isAdapterRegistered(13)) Hive.registerAdapter(UserDemarcheAdapter());
-    // Le catalogue est public (pas de chiffrement) ; le suivi des démarches
-    // de l'utilisateur est chiffré comme les autres données personnelles.
+    await (_catalogReady ??= _openCatalog());
+    _userBox = await _userScoped.box;
+  }
+
+  Future<void> _openCatalog() async {
     _catalogBox   = await Hive.openBox<Demarche>(_catalogBoxName);
     _settingsBox  = await Hive.openBox<dynamic>(_settingsBoxName);
-    _userBox      = await openBoxMigratingToEncrypted<UserDemarche>(
-      _userBoxName,
-      migrated: _settingsBox.get('user_box_encrypted') == true,
-      markMigrated: () => _settingsBox.put('user_box_encrypted', true),
-    );
-    _initialized  = true;
     await _loadInitialCatalog();
+  }
+
+  /// Reflète les démarches du compte actif sur le widget d'accueil.
+  Future<void> syncWidget() async {
+    await _init();
+    await _syncWidget();
   }
 
   Future<void> _loadInitialCatalog() async {
@@ -894,6 +898,13 @@ class DemarchesService {
   }
 
   Future<void> init() async => _init();
+
+  /// Efface le suivi des démarches du compte actif (pas le catalogue).
+  Future<void> clearUserData() async {
+    await _init();
+    await _userBox.clear();
+    await _syncWidget();
+  }
 
   // ── Détail pour Amiin (outil get_demarche_detail) ─────────────────────────
 

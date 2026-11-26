@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
           final variant = AmiinThemeVariantExt.fromId(settings.themeVariant);
           return MaterialApp.router(
             title: 'Amiin',
-            locale: Locale(settings.language),
+            // Interface en français uniquement pour l'instant (l'anglais est
+            // annoncé « Bientôt » dans Réglages › Langue).
+            locale: const Locale('fr'),
             supportedLocales: const [Locale('fr'), Locale('en'), Locale('ar')],
             localizationsDelegates: GlobalMaterialLocalizations.delegates,
             // Un seul thème par variante — chaque variante porte sa propre
@@ -35,6 +37,11 @@ class MyApp extends StatelessWidget {
               return MediaQuery(
                 data: mq.copyWith(
                   textScaler: TextScaler.linear(settings.textScale),
+                  // Réglage « Animations réduites » (ou réglage d'accessibilité
+                  // du téléphone) : les widgets qui lisent disableAnimations
+                  // coupent leurs mouvements.
+                  disableAnimations:
+                      mq.disableAnimations || settings.animations != 'full',
                 ),
                 child: child!,
               );

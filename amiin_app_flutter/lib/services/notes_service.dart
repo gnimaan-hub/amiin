@@ -1,9 +1,9 @@
 // ─── Notes Service (local Hive) ─────────────────────────────────────────────
 
-import 'package:flutter/foundation.dart' show ValueListenable;
+import 'package:flutter/foundation.dart' show Listenable;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'hive_utils.dart';
+import 'user_scope.dart';
 import 'memory_service.dart';
 import '../models/user_action.dart';
 
@@ -93,22 +93,22 @@ class AmiinNoteAdapter extends TypeAdapter<AmiinNote> {
 }
 
 class NotesService {
-  static const String _boxName = 'notes_box';
+  // Box du compte actif (voir user_scope.dart) : rouverte sur celle du
+  // nouveau compte au premier accès après un changement de compte.
+  final _scoped = ScopedBox<AmiinNote>('notes_box');
   late Box<AmiinNote> _box;
-  bool _initialized = false;
 
   Future<void> _init() async {
-    if (_initialized) return;
     if (!Hive.isAdapterRegistered(11)) {
       Hive.registerAdapter(AmiinNoteAdapter());
     }
-    _box = await openBoxSafe<AmiinNote>(_boxName);
-    _initialized = true;
+    _box = await _scoped.box;
   }
 
   /// Notifie à chaque changement de la box — rafraîchissement automatique
-  /// des écrans quand Amiin crée/modifie/supprime une note.
-  ValueListenable<Box<AmiinNote>> get listenable => _box.listenable();
+  /// des écrans quand Amiin crée/modifie/supprime une note — et au
+  /// changement de compte.
+  Listenable get listenable => _scoped.changes;
 
   // Normalisation accent-insensible pour le français (é→e, à→a, etc.)
   static String _norm(String s) => s.toLowerCase()
@@ -203,6 +203,12 @@ class NotesService {
 
   // Méthode publique d'initialisation
   Future<void> init() async => _init();
+
+  /// Efface toutes les notes du compte actif.
+  Future<void> clearAll() async {
+    await _init();
+    await _box.clear();
+  }
 
 }
 
