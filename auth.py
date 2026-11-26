@@ -8,9 +8,11 @@ Endpoints : POST /auth/register, /auth/login, /auth/refresh, /auth/logout,
             GET/PATCH/DELETE /auth/me
 
 Variables d'environnement liées aux comptes :
-  ADMIN_EMAILS        e-mails (séparés par des virgules) promus administrateurs
-                      au démarrage : e-mail réputé vérifié, aucune limite d'usage.
-                      Un e-mail retiré de la liste redevient simple utilisateur.
+  ADMIN_EMAILS        e-mails (séparés par des virgules) des administrateurs : aucune
+                      limite d'usage. Le rôle n'est accordé qu'une fois l'adresse
+                      VÉRIFIÉE (code reçu par e-mail), pour qu'on ne puisse pas le
+                      prendre en s'inscrivant avec l'adresse d'un admin. Un e-mail
+                      retiré de la liste redevient simple utilisateur.
   EMAIL_VERIFICATION  "required" | "off". Par défaut : exigée dès qu'un envoi
                       d'e-mails est configuré (BREVO_API_KEY ou SMTP_HOST).
   BREVO_API_KEY       envoi via l'API HTTP Brevo (prioritaire sur SMTP).
@@ -351,8 +353,11 @@ def ensure_auth_schema() -> None:
             cur.execute("DELETE FROM auth_rate_events WHERE at < NOW() - INTERVAL '2 days'")
             # ADMIN_EMAILS est la source de vérité des administrateurs.
             admins = admin_emails()
-            cur.execute("UPDATE users SET role = 'admin', email_verified = TRUE "
-                        "WHERE email = ANY(%s::text[])", (admins,))
+            # Promotion seulement pour une adresse prouvée (ou quand aucune
+            # vérification n'est possible faute d'envoi d'e-mails).
+            cur.execute("UPDATE users SET role = 'admin' WHERE email = ANY(%s::text[]) "
+                        "AND (email_verified OR %s)",
+                        (admins, not email_verification_required()))
             cur.execute("UPDATE users SET role = 'user' "
                         "WHERE role = 'admin' AND NOT (email = ANY(%s::text[]))", (admins,))
     _status_cache.clear()
@@ -468,7 +473,9 @@ def register(body: RegisterRequest, request: Request, background: BackgroundTask
     _hit(f"register:{_client_ip(request)}", max_calls=20, window_s=3600)
     pw_hash = hash_password(body.password)
     display = body.display_name or body.email.split("@")[0]
-    admin = body.email in admin_emails()
+    # Admin d'emblée seulement si aucune vérification n'est exigée ; sinon le
+    # rôle est accordé à la saisie du code (verify_email).
+    admin = body.email in admin_emails() and not email_verification_required()
     code = None
     try:
         with _get_conn() as conn:
@@ -951,8 +958,10 @@ def verify_email(body: VerifyEmailRequest, current_user: dict = Depends(get_curr
                             "WHERE user_id = %s", (uid,))
                 conn.commit()
                 raise invalid
-            cur.execute(f"UPDATE users SET email_verified = TRUE WHERE id = %s "
-                        f"RETURNING {_USER_COLS}", (uid,))
+            cur.execute(
+                f"UPDATE users SET email_verified = TRUE, "
+                f"role = CASE WHEN email = ANY(%s::text[]) THEN 'admin' ELSE role END "
+                f"WHERE id = %s RETURNING {_USER_COLS}", (admin_emails(), uid))
             row = cur.fetchone()
             cur.execute("DELETE FROM email_verification_codes WHERE user_id = %s", (uid,))
     invalidate_user_status(uid)

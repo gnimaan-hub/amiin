@@ -123,18 +123,31 @@ def test_code_de_verification_inutilisable_pour_reset(env):
 def test_admin_verifie_et_sans_limite(env):
     auth, client, sent = env
     _, h, _ = _register(client, ADMIN)
+    # Pas d'admin avant d'avoir prouvé la possession de l'adresse
     me = client.get("/v1/auth/me", headers=h).json()
+    assert me["role"] == "user" and me["email_verified"] is False
+    r = client.post("/v1/auth/verify-email", json={"code": _code(sent, ADMIN)}, headers=h)
+    me = r.json()
     assert me["role"] == "admin" and me["email_verified"] is True
-    assert not [1 for to, _ in sent if to == ADMIN]       # aucun code envoyé
+    auth._status_cache.clear()
     import amiin_api
     user = auth.get_current_user(type("C", (), {"credentials": h["Authorization"][7:]})())
     for _ in range(100):                                   # plafond normal : 30/min
         amiin_api.chat_user(user)
 
 
-def test_admin_retire_de_la_liste(env, monkeypatch):
+def test_admin_non_verifie_jamais_promu(env):
     auth, client, _ = env
+    _, h, _ = _register(client, ADMIN)          # quelqu'un d'autre prend l'adresse
+    auth.ensure_auth_schema()                     # redémarrage du serveur
+    auth._status_cache.clear()
+    assert client.get("/v1/auth/me", headers=h).json()["role"] == "user"
+
+
+def test_admin_retire_de_la_liste(env, monkeypatch):
+    auth, client, sent = env
     _, h, _ = _register(client, ADMIN)
+    client.post("/v1/auth/verify-email", json={"code": _code(sent, ADMIN)}, headers=h)
     monkeypatch.setenv("ADMIN_EMAILS", "")
     auth.ensure_auth_schema()
     assert client.get("/v1/auth/me", headers=h).json()["role"] == "user"
