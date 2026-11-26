@@ -23,7 +23,7 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 À faire en une seule fois. Chaque ligne renvoie à l'étape qui l'a ajoutée.
 
 **Build et tests de l'app**
-- [ ] `flutter clean && flutter pub get && flutter analyze` (étape 1)
+- [ ] `flutter clean && flutter pub get && flutter analyze` sur ta version de Flutter (déjà propre avec 3.50.1 ici) (étapes 1-2)
 - [ ] Désinstaller l'ancienne app (`com.example…`) des téléphones de test (étape 1)
 - [ ] `tool/build_release.sh apk` avec `key.properties` : l'app démarre, un rappel d'agenda
       s'affiche avec son icône, le widget d'accueil s'ajoute et se met à jour (étape 1)
@@ -195,6 +195,9 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
   conservés après redémarrage, mode `off`, suppression du compte). Ces tests sont ignorés sans
   `TEST_DATABASE_URL`.
 - Résultat : **55 tests passent** (PostgreSQL 16 local).
+- App : `flutter analyze` (Flutter 3.50.1) ne trouve **aucune erreur**, et rien sur les
+  fichiers modifiés aux étapes 1 et 2. Les remarques restantes existaient déjà. Les tests
+  Flutter existants passent (18/18). Pas de build Android ici (pas de SDK Android).
 
 ### Fichiers
 `auth.py`, `amiin_api.py`, `render.yaml`, `tests/test_auth.py`, `tests/test_auth_db.py`,
