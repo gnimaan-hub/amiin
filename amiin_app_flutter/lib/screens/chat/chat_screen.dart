@@ -3,6 +3,8 @@
 // Toute l'orchestration agentique vit dans ChatController.
 
 import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart' hide TextDirection;
@@ -29,6 +31,7 @@ import '../../widgets/amiin_logo.dart';
 import '../../widgets/floating_card.dart';
 import '../../widgets/horizon_line.dart';
 import '../../services/chat_controller.dart';
+import '../../services/usage_service.dart';
 import '../../services/connectivity_service.dart';
 import '../../models/chat_message.dart';
 import '../../widgets/toast.dart';
@@ -145,6 +148,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     _chat = context.read<ChatController>();
     _chat!.addListener(_onChatChanged);
+    unawaited(usageService.refresh());
     _noticeSub = _chat!.notices.listen((n) {
       if (mounted) AmiinToast.show(context, n.message, success: n.success);
     });
@@ -260,6 +264,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _toggleRecording() async {
+    if (usageService.exhausted && !_isListening) {
+      AmiinToast.show(
+        context,
+        "Limite d'utilisation du jour atteinte — elle se recharge à minuit.",
+        success: false,
+      );
+      return;
+    }
     HapticFeedback.lightImpact();
     if (_isSpeaking) await _stopSpeaking();
 
@@ -332,8 +344,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           AmiinToast.show(context, 'Aucune parole détectée.', success: false);
         }
       } catch (e) {
+        final quota = e is DioException && e.response?.statusCode == 402;
+        if (quota) usageService.markExhausted();
         if (mounted) {
-          AmiinToast.show(context, 'Transcription impossible. Réessayez.',
+          AmiinToast.show(
+              context,
+              quota
+                  ? "Limite d'utilisation du jour atteinte — elle se recharge à minuit."
+                  : 'Transcription impossible. Réessayez.',
               success: false);
         }
       } finally {
@@ -448,6 +466,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final chat = _chat!;
     final text = (presetText ?? _controller.text).trim();
     if (text.isEmpty || chat.isBusy) return;
+
+    if (usageService.exhausted) {
+      AmiinToast.show(
+        context,
+        "Limite d'utilisation du jour atteinte — elle se recharge à minuit.",
+        success: false,
+      );
+      return;
+    }
 
     if (!connectivityService.isOnline) {
       AmiinToast.show(
@@ -1030,6 +1057,57 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // ── Barre de saisie ────────────────────────────────────────────────────────
 
   Widget _buildInputBar(
+    EdgeInsets insets,
+    ChatController chat,
+    AmiinThemeColors ac,
+  ) {
+    return ListenableBuilder(
+      listenable: usageService,
+      builder: (context, _) => usageService.exhausted && !chat.isBusy
+          ? _buildQuotaReachedBar(insets, ac)
+          : _buildInputPill(insets, chat, ac),
+    );
+  }
+
+  /// Quota du jour épuisé : plus de saisie ni de dictée jusqu'à minuit.
+  Widget _buildQuotaReachedBar(EdgeInsets insets, AmiinThemeColors ac) {
+    final reset = usageService.resetsAt;
+    final when = reset == null
+        ? 'à minuit'
+        : 'à ${reset.hour.toString().padLeft(2, '0')}:${reset.minute.toString().padLeft(2, '0')}';
+    return Padding(
+      padding: EdgeInsets.only(
+        left: Spacing.md,
+        right: Spacing.md,
+        top: Spacing.xs,
+        bottom: insets.bottom + 8,
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.md),
+        decoration: BoxDecoration(
+          color: ac.surface,
+          borderRadius: BorderRadius.circular(26),
+          border: hairline(context),
+          boxShadow: floatShadow(context, lift: 0.6),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.hourglass_bottom_rounded, size: 20, color: ac.muted),
+            const SizedBox(width: Spacing.sm),
+            Expanded(
+              child: Text(
+                "Limite d'utilisation du jour atteinte. "
+                'Vous pourrez à nouveau écrire à Amiin $when.',
+                style: TextStyles.bodyMuted(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputPill(
     EdgeInsets insets,
     ChatController chat,
     AmiinThemeColors ac,

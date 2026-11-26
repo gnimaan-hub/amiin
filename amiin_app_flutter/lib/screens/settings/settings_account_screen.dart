@@ -7,6 +7,8 @@ import '../../theme/themes.dart';
 import '../../theme/spacing.dart';
 import '../../services/auth_service.dart';
 import '../../services/chat_controller.dart';
+import '../../services/usage_service.dart';
+import '../../theme/typography.dart';
 import '../../widgets/header.dart';
 import 'settings_widgets.dart';
 
@@ -62,6 +64,9 @@ class SettingsAccountScreen extends StatelessWidget {
                           value: 'Administrateur',
                         ),
                     ]),
+
+                    const SettingsSection("Utilisation aujourd'hui"),
+                    const SettingCard(children: [_UsageGauge()]),
 
                     const SettingsSection('Sécurité du compte'),
                     SettingCard(children: [
@@ -330,6 +335,83 @@ class SettingsAccountScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Jauge du quota du jour (chat et voix confondus), remise à zéro à minuit.
+class _UsageGauge extends StatefulWidget {
+  const _UsageGauge();
+
+  @override
+  State<_UsageGauge> createState() => _UsageGaugeState();
+}
+
+class _UsageGaugeState extends State<_UsageGauge> {
+  @override
+  void initState() {
+    super.initState();
+    usageService.refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: usageService,
+      builder: (context, _) {
+        final ac = context.ac;
+        if (usageService.unlimited) {
+          return Padding(
+            padding: const EdgeInsets.all(Spacing.lg),
+            child: Text('Utilisation illimitée', style: TextStyles.body(context)),
+          );
+        }
+        final pct = usageService.percent.clamp(0, 100).toDouble();
+        final reset = usageService.resetsAt;
+        final resetText = reset == null
+            ? 'Se recharge chaque jour à minuit.'
+            : 'Se recharge à ${reset.hour.toString().padLeft(2, '0')}:'
+                '${reset.minute.toString().padLeft(2, '0')}.';
+        final color = usageService.exhausted
+            ? ac.alertColor
+            : Theme.of(context).colorScheme.primary;
+        return Padding(
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      usageService.exhausted
+                          ? 'Limite du jour atteinte'
+                          : '${pct.round()} % utilisés',
+                      style: TextStyles.body(context),
+                    ),
+                  ),
+                  Text(resetText, style: TextStyles.caption(context)),
+                ],
+              ),
+              const SizedBox(height: Spacing.sm),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: pct / 100,
+                  minHeight: 8,
+                  color: color,
+                  backgroundColor: ac.border,
+                ),
+              ),
+              const SizedBox(height: Spacing.sm),
+              Text(
+                'Discussions et voix partagent la même limite quotidienne.',
+                style: TextStyles.caption(context),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

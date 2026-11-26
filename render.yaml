@@ -51,5 +51,12 @@ services:
         sync: false
       # - key: CORS_ORIGINS        # optionnel — origines web autorisées, séparées par des virgules
 
+      # Quota quotidien (usage.py) : enveloppe gratuite en dollars, chat + voix,
+      # remise à zéro à minuit heure de Djibouti. Défaut : 0.10 (phase de tests).
+      # - key: QUOTA_DAILY_USD       # ex. 0.02 en production
+      # - key: QUOTA_ENFORCE         # "0" = mesure seulement, personne n'est bloqué
+      # Tarifs de la voix (optionnels) : STT_USD_PER_HOUR (0.111), STT_MIN_SECONDS (10),
+      # TTS_USD_PER_MILLION_CHARS (4.0), JINA_USD_PER_MILLION (0.05)
+
     # Health check — Render surveille cet endpoint pour savoir si le service est vivant
     healthCheckPath: /v1/chat/health

@@ -11,7 +11,7 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
    - 2b. **Données locales propres à chaque compte** — aujourd'hui, en changeant de compte sur
      le même téléphone, on voit les discussions, notes, agenda, démarches et profil du compte
      précédent (stockage Hive commun à tous les comptes). Signalé le 2026-11-26. ✅
-3. Quotas — table `usage`, colonne `plan`, `GET /v1/me/usage`, jauge dans l'app
+3. **Quotas** — coût réel par appel, enveloppe quotidienne, blocage du chat, jauge ✅
 4. Paramètres — brancher ou retirer les réglages sans effet, i18n anglais, sessions par appareil,
    bouton « Rappels à l'heure exacte » (cf. étape 1, §6)
 5. Play Integrity + revue de sécurité, puis paiements
@@ -35,6 +35,10 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
       conversations, notes, agenda et démarches lui seront rattachés. Ensuite, compte A → déconnexion →
       compte B : B ne voit rien de A ; retour sur A : tout est là. Vérifier aussi les rappels
       d'agenda et le widget après le changement de compte (étape 2b)
+- [ ] Quota : envoyer quelques messages (écrits et vocaux) et suivre la jauge dans
+      Réglages › Compte ; vérifier qu'une fois la limite atteinte la barre de saisie est
+      remplacée par le message « Limite d'utilisation du jour atteinte » et que le micro est
+      refusé. Avec le compte admin : « Utilisation illimitée » (étape 3)
 
 **Publication**
 - [ ] Confirmer l'identifiant `dj.amiin.app` avant la première publication (étape 1)
@@ -47,6 +51,10 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
       au redéploiement ; sinon, il le devient dès l'inscription avec cette adresse.
 - [ ] Créer un compte Brevo (gratuit, 300 e-mails/jour), valider l'adresse d'expédition,
       créer une clé API, puis renseigner `BREVO_API_KEY` et `SMTP_FROM` (ex. `Amiin <adresse@validée>`) (étape 2)
+- [ ] (Optionnel) `QUOTA_DAILY_USD` : 0.10 par défaut pour les tests, passer à `0.02` plus tard ;
+      `QUOTA_ENFORCE=0` pour mesurer sans bloquer personne (étape 3)
+- [ ] Vérifier les tarifs voix chez Groq (whisper-large-v3 : 0,111 $/h, 10 s minimum par requête
+      retenus) et Jina (0,05 $/M tokens retenu) ; ajustables par variables d'environnement (étape 3)
 - [ ] Après le déploiement : la vérification devient active toute seule. Les comptes existants
       (hors admin) devront saisir un code une fois à leur prochaine ouverture de l'app (étape 2)
 
@@ -271,3 +279,75 @@ profil et préférences d'Amiin. En changeant de compte, on voyait donc celles d
     n'est connecté ;
   - « Supprimer toutes mes données » n'efface que le compte actif.
 - `flutter analyze` : aucune erreur, rien sur les fichiers modifiés. `flutter test` : 22/22.
+
+---
+
+## 2026-11-26 — Étape 3 : quota d'utilisation quotidien (coût réel)
+
+### Décisions (prises avec toi)
+- **Unité** : le **coût réel** de chaque appel, en dollars. Une grande question, un long
+  historique, une tâche en plusieurs passes ou une réponse en somali (Sonnet, 2× plus cher)
+  consomment automatiquement plus. Aucune pondération faite à la main.
+- **Enveloppe** : **0,10 $ par jour** pendant les tests (`QUOTA_DAILY_USD`), à descendre à 0,02 $
+  ensuite. Remise à zéro **chaque jour à minuit, heure de Djibouti**.
+- **Au-delà** : **chat bloqué**. Plus d'envoi ni de dictée jusqu'à minuit.
+- **Voix dans la même enveloppe** :
+  - la reconnaissance vocale est débitée selon la durée d'audio (tarif Groq, 10 s minimum) ;
+  - la synthèse est débitée à 4 $ par million de caractères. Edge TTS est gratuit ; ce tarif est
+    volontairement modéré, pour que **l'oral consomme un peu plus que l'écrit** sans le
+    pénaliser. Il est réglable (`TTS_USD_PER_MILLION_CHARS`) pour calibrer.
+
+### Serveur
+- Nouveau `usage.py` :
+  - `UsageMeter` additionne le coût de tous les appels déclenchés par une requête : réponse
+    principale, reformulation de la question, embeddings Jina, voix ;
+  - tarifs par modèle : Haiku 4.5 1 $/5 $, Sonnet 5 2 $/10 $ par million de tokens. Le cache
+    est compté à 0,1× en lecture et 1,25× en écriture. Les tarifs de Haiku 5.5 et Sonnet 5.5
+    sont prêts ; un modèle inconnu reçoit le tarif prudent ;
+  - table `usage_events` : une ligne par requête (coût en micro-dollars, tokens par catégorie,
+    secondes d'audio, caractères lus) ;
+  - `ensure_quota` renvoie **402** (en-tête `X-Amiin-Error: quota_exceeded`) une fois
+    l'enveloppe épuisée.
+- **Réponse arrêtée en cours de route** (bouton stop, réseau coupé) : les tokens ont quand même
+  été facturés par Anthropic. Le coût est estimé de façon prudente, sinon arrêter chaque
+  réponse permettrait de contourner le quota.
+- **Contrôles** :
+  - `/v1/chat`, `/v1/chat/stream` et `/v1/stt` sont bloqués dès l'enveloppe épuisée ;
+  - `/v1/tts` garde une marge de 25 %, pour pouvoir lire à voix haute la réponse qui vient de
+    faire franchir le seuil.
+- **Admins** (`ADMIN_EMAILS`) : jamais bloqués, mais leur usage est enregistré.
+  `QUOTA_ENFORCE=0` : mesure seule, personne n'est bloqué.
+- Nouveau `GET /v1/me/usage` : pourcentage utilisé, épuisé ou non, illimité ou non, heure de
+  remise à zéro.
+- Reconnaissance vocale : Groq est interrogé en `verbose_json` pour obtenir la durée exacte de
+  l'audio.
+- `Dockerfile` : copie de `usage.py`.
+
+### App
+- Nouveau `UsageService` : suit la jauge, se rafraîchit après chaque réponse, au changement de
+  compte et à minuit.
+- **Chat** : quand le quota est épuisé, la barre de saisie est remplacée par « Limite
+  d'utilisation du jour atteinte. Vous pourrez à nouveau écrire à Amiin à 00:00 ». L'envoi et
+  le micro sont refusés, et un 402 du serveur bascule l'app dans cet état.
+- **Réglages › Compte** : section « Utilisation aujourd'hui » avec la jauge et l'heure de
+  recharge (« Utilisation illimitée » pour un admin).
+
+### Bugs trouvés par les tests et corrigés
+- PostgreSQL renvoie la somme du jour en `Decimal` : la jauge plantait (503). Elle est
+  maintenant convertie en nombre décimal.
+
+### Tests
+- `tests/test_usage.py` (13 tests) :
+  - coût avec cache, somali 2× plus cher, plusieurs passes ;
+  - préfixes de modèles, voix, estimation d'une réponse interrompue, journée de Djibouti ;
+  - streaming complet et streaming interrompu, avec un faux client Anthropic ;
+  - avec PostgreSQL : jauge, blocage (402) du chat, du streaming et de la dictée, marge de la
+    lecture à voix haute, la veille non comptée, admin et mode mesure jamais bloqués.
+- Résultat : **68 tests serveur passent** ; `flutter analyze` ne trouve aucune erreur ;
+  `flutter test` : 22/22.
+
+### À calibrer ensuite
+- Observer le coût moyen réel d'un message (table `usage_events`) avant de descendre à 0,02 $.
+- Évaluer Haiku 5.5 (10 fois moins cher que Haiku 4.5), surtout en somali.
+- Côté serveur, plafonner les passes d'outils (aujourd'hui seule l'app limite à 3) : le coût est
+  de toute façon compté.

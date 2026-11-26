@@ -27,6 +27,7 @@ import 'connectivity_service.dart';
 import 'demarches_service.dart';
 import 'location_service.dart';
 import 'memory_service.dart';
+import 'usage_service.dart';
 import 'user_scope.dart';
 import 'notes_service.dart';
 import 'settings_service.dart';
@@ -197,6 +198,12 @@ class ChatController extends ChangeNotifier {
 
     if (!connectivityService.isOnline) {
       _notice('Vous êtes hors ligne — vérifiez votre connexion.',
+          success: false);
+      return null;
+    }
+
+    if (usageService.exhausted) {
+      _notice("Limite d'utilisation du jour atteinte — elle se recharge à minuit.",
           success: false);
       return null;
     }
@@ -383,6 +390,8 @@ class ChatController extends ChangeNotifier {
         await _executeActions(allActions, contextText: text, msgId: streamId);
       }
 
+      // Jauge du jour : le coût de cette réponse vient d'être enregistré
+      unawaited(usageService.refresh());
       return reply.isEmpty ? null : reply;
     } catch (e) {
       if (_cancelled ||
@@ -413,6 +422,10 @@ class ChatController extends ChangeNotifier {
   static String _errorMessageFor(Object e) {
     final status = e is DioException ? e.response?.statusCode : null;
     switch (status) {
+      case 402:
+        usageService.markExhausted();
+        return "Vous avez atteint la limite d'utilisation du jour. "
+            'Elle se recharge à minuit (heure de Djibouti).';
       case 403:
         return "Votre adresse e-mail n'est pas encore vérifiée. "
             "Saisissez le code reçu par e-mail pour discuter avec Amiin.";

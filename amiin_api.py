@@ -31,6 +31,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from auth import (router as auth_router, get_current_user, get_verified_user, is_admin,
                   ensure_auth_schema, _get_conn as _db_conn)
+import usage as usage_meter
+from usage import UsageMeter
 
 import requests as _requests
 from dotenv import load_dotenv
@@ -616,7 +618,7 @@ def _search_with_embedding(embedding: list, top_k: int, category: str = None,
         for hit in hits
     ]
 
-def expand_query(query: str) -> list:
+def expand_query(query: str, meter: Optional[UsageMeter] = None) -> list:
     try:
         response = claude_client.messages.create(
             model=EXPAND_MODEL,
@@ -625,6 +627,8 @@ def expand_query(query: str) -> list:
             messages=[{"role": "user", "content": EXPAND_PROMPT.replace("{query}", query)}]
         )
         _log_usage(response.usage, "[expand] ")
+        if meter is not None:
+            meter.add_claude(EXPAND_MODEL, response.usage)
         texte = response.content[0].text.strip().replace('```json', '').replace('```', '').strip()
         variantes = json.loads(texte)
         return [query, variantes.get('v1', ''), variantes.get('v2', ''), variantes.get('v3', '')]
@@ -969,9 +973,12 @@ def _build_messages(query: str, history, pending_tool_uses=None, tool_results=No
 def run_pipeline(query: str, history=None, expand: bool = True, system: str = None,
                  lat: float = None, lon: float = None,
                  pending_tool_uses=None, tool_results=None,
-                 user_preferences: dict = None) -> dict:
+                 user_preferences: dict = None,
+                 meter: Optional[UsageMeter] = None) -> dict:
     t0 = time.time()
     chunks = []
+    meter = meter if meter is not None else UsageMeter()
+    jina_acc = [0]
 
     if lat is not None and lon is not None:
         weather_ctx = _fetch_weather_context(lat, lon)
@@ -986,11 +993,11 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
         context = ""
     else:
         should_exp = expand and _should_expand(query)
-        direct_embedding = list(_cached_embed(query))
+        direct_embedding = list(_cached_embed(query, token_acc=jina_acc))
 
         if should_exp:
             with ThreadPoolExecutor(max_workers=2) as ex:
-                expand_future = ex.submit(expand_query, query)
+                expand_future = ex.submit(expand_query, query, meter)
                 direct_future = ex.submit(_search_with_embedding, direct_embedding, TOP_K)
                 direct_chunks = direct_future.result()
                 queries = expand_future.result()
@@ -998,7 +1005,8 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
             extras = [q for q in queries[1:] if q.strip()]
             all_chunks: dict = {c['id']: c for c in direct_chunks}
             if extras:
-                extra_embeddings, _ = _jina_embed_batch(extras)
+                extra_embeddings, extra_tokens = _jina_embed_batch(extras)
+                jina_acc[0] += extra_tokens
                 for emb in extra_embeddings:
                     for chunk in _search_with_embedding(emb, TOP_K):
                         cid = chunk['id']
@@ -1022,6 +1030,8 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
     )
 
     _log_usage(response.usage, "[sync] ")
+    meter.add_claude(_model, response.usage)
+    meter.add_jina(jina_acc[0])
 
     reply_text = ""
     tool_calls = []
@@ -1044,8 +1054,10 @@ def run_pipeline(query: str, history=None, expand: bool = True, system: str = No
 async def _stream_pipeline(query: str, history=None, expand: bool = True, system: str = None,
                            lat: float = None, lon: float = None,
                            pending_tool_uses=None, tool_results=None,
-                           user_preferences: dict = None):
+                           user_preferences: dict = None,
+                           meter: Optional[UsageMeter] = None):
     t0 = time.time()
+    meter = meter if meter is not None else UsageMeter()
     loop = asyncio.get_event_loop()
     chunks = []
     jina_acc = [0]   # accumulateur de tokens Jina pour cette requête
@@ -1089,7 +1101,7 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
             None, functools.partial(_cached_embed, query, token_acc=jina_acc)))
 
         if should_exp:
-            expand_task = loop.run_in_executor(None, expand_query, query)
+            expand_task = loop.run_in_executor(None, expand_query, query, meter)
             direct_task = loop.run_in_executor(None, _search_with_embedding, direct_embedding, TOP_K)
             queries, direct_chunks = await asyncio.gather(expand_task, direct_task)
 
@@ -1120,22 +1132,38 @@ async def _stream_pipeline(query: str, history=None, expand: bool = True, system
     tool_calls = []
     final_usage = None
     _model = _model_for(user_preferences)
-    async with async_claude.messages.stream(
-        model=_model,
-        max_tokens=MAX_TOKENS,
-        **_sampling_kwargs(_model),
-        system=_build_system(context, system, prefs_text),
-        tools=TOOLS,
-        messages=_build_messages(query, history, pending_tool_uses, tool_results),
-    ) as stream:
-        async for text in stream.text_stream:
-            yield f'data: {json.dumps({"type": "token", "text": text})}\n\n'
-        final_msg = await stream.get_final_message()
-        final_usage = final_msg.usage
-        _log_usage(final_usage, "[stream] ")
-        for block in final_msg.content:
-            if block.type == "tool_use":
-                tool_calls.append({"id": block.id, "name": block.name, "input": block.input})
+    meter.add_jina(jina_acc[0])
+    system_blocks = _build_system(context, system, prefs_text)
+    api_messages = _build_messages(query, history, pending_tool_uses, tool_results)
+    streamed_chars = 0
+    try:
+        async with async_claude.messages.stream(
+            model=_model,
+            max_tokens=MAX_TOKENS,
+            **_sampling_kwargs(_model),
+            system=system_blocks,
+            tools=TOOLS,
+            messages=api_messages,
+        ) as stream:
+            async for text in stream.text_stream:
+                streamed_chars += len(text)
+                yield f'data: {json.dumps({"type": "token", "text": text})}\n\n'
+            final_msg = await stream.get_final_message()
+            final_usage = final_msg.usage
+            _log_usage(final_usage, "[stream] ")
+            for block in final_msg.content:
+                if block.type == "tool_use":
+                    tool_calls.append({"id": block.id, "name": block.name, "input": block.input})
+    finally:
+        # Usage exact si la réponse est allée au bout ; sinon (arrêt par
+        # l'utilisateur, coupure réseau) estimation prudente : les tokens
+        # générés ont été facturés quand même.
+        if final_usage is not None:
+            meter.add_claude(_model, final_usage)
+        else:
+            prompt_chars = len(json.dumps(system_blocks, ensure_ascii=False)) + \
+                len(json.dumps(api_messages, ensure_ascii=False, default=str))
+            meter.add_claude_estimate(_model, prompt_chars, streamed_chars)
 
     sources = [
         {"title": c['metadata'].get('title', '?'), "source": c['metadata'].get('source', '?'),
@@ -1233,6 +1261,10 @@ async def lifespan(app: FastAPI):
         ensure_auth_schema()
     except Exception:
         logging.exception("Migration du schéma d'authentification impossible")
+    try:
+        usage_meter.ensure_usage_schema()
+    except Exception:
+        logging.exception("Création de la table usage_events impossible")
     yield
 
 app = FastAPI(
@@ -1279,15 +1311,35 @@ def _check_rate(user_id: str, scope: str, max_calls: int, window_s: int = 60) ->
         )
     bucket.append(now)
 
+# Quota quotidien (usage.py) : le chat et la dictée sont refusés (402) une
+# fois l'enveloppe du jour épuisée ; la lecture à voix haute garde une marge
+# de 25 % pour pouvoir lire la réponse qui vient de faire franchir le seuil.
+
 def chat_user(user: dict = Depends(get_verified_user)) -> dict:
     if not is_admin(user):
         _check_rate(user["sub"], "chat", max_calls=30)
+    usage_meter.ensure_quota(user)
     return user
 
 def tts_user(user: dict = Depends(get_verified_user)) -> dict:
     if not is_admin(user):
         _check_rate(user["sub"], "tts", max_calls=60)
+    usage_meter.ensure_quota(user, grace=0.25)
     return user
+
+def stt_user(user: dict = Depends(get_verified_user)) -> dict:
+    if not is_admin(user):
+        _check_rate(user["sub"], "tts", max_calls=60)
+    usage_meter.ensure_quota(user)
+    return user
+
+
+def _record_usage_later(user_id: str, kind: str, meter: UsageMeter) -> None:
+    """Écrit l'usage hors de la boucle d'événements, sans attendre."""
+    try:
+        asyncio.get_running_loop().run_in_executor(None, usage_meter.record, user_id, kind, meter)
+    except RuntimeError:
+        usage_meter.record(user_id, kind, meter)
 
 # ─── Erreurs & taille des requêtes ────────────────────────────────────────────
 
@@ -1371,10 +1423,11 @@ async def health():
 
 # ─── Chat non-streaming (fallback) ────────────────────────────────────────────
 
-@app.post("/v1/chat", response_model=ChatResponse, dependencies=[Depends(chat_user)])
-async def chat(request: ChatRequest):
+@app.post("/v1/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
+    meter = UsageMeter()
     try:
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(
@@ -1385,7 +1438,8 @@ async def chat(request: ChatRequest):
                               lat=request.lat, lon=request.lon,
                               pending_tool_uses=request.pending_tool_uses,
                               tool_results=request.tool_results,
-                              user_preferences=request.user_preferences),
+                              user_preferences=request.user_preferences,
+                              meter=meter),
         )
         return ChatResponse(
             reply=result["reply"],
@@ -1396,17 +1450,19 @@ async def chat(request: ChatRequest):
     except Exception:
         logging.exception("Erreur pipeline")
         raise HTTPException(status_code=500, detail=_GENERIC_ERROR)
+    finally:
+        _record_usage_later(user["sub"], "chat", meter)
 
 # ─── Chat streaming SSE ───────────────────────────────────────────────────────
 
-@app.post("/v1/chat/stream", dependencies=[Depends(chat_user)])
-async def chat_stream(request: ChatRequest):
+@app.post("/v1/chat/stream")
+async def chat_stream(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
+    meter = UsageMeter()
 
     async def event_gen():
-        try:
-            async for chunk in _stream_pipeline(
+        pipeline = _stream_pipeline(
                 query=request.message, history=request.history,
                 expand=request.expand if request.expand is not None else True,
                 system=_format_client_context(request.client_context, request.lat, request.lon),
@@ -1414,15 +1470,38 @@ async def chat_stream(request: ChatRequest):
                 pending_tool_uses=request.pending_tool_uses,
                 tool_results=request.tool_results,
                 user_preferences=request.user_preferences,
-            ):
+                meter=meter,
+        )
+        try:
+            async for chunk in pipeline:
                 yield chunk
         except Exception:
             logging.exception("Erreur streaming")
             yield f'data: {json.dumps({"type": "error", "detail": _GENERIC_ERROR})}\n\n'
+        finally:
+            # Fermer le pipeline AVANT d'enregistrer : en cas d'arrêt en cours
+            # de réponse, c'est sa fermeture qui ajoute l'estimation au compteur.
+            try:
+                await pipeline.aclose()
+            except BaseException:
+                pass
+            _record_usage_later(user["sub"], "chat", meter)
 
     return StreamingResponse(event_gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no",
                                       "Connection": "keep-alive"})
+
+# ─── Quota du jour (jauge de l'app) ───────────────────────────────────────────
+
+@app.get("/v1/me/usage")
+def my_usage(user: dict = Depends(get_current_user)):
+    """Utilisation du jour : pourcentage de l'enveloppe gratuite, remise à zéro
+    à minuit (heure de Djibouti), compte illimité (admin)."""
+    try:
+        return usage_meter.summary(user)
+    except Exception:
+        logging.exception("Lecture de l'usage impossible")
+        raise HTTPException(status_code=503, detail="Utilisation indisponible pour le moment.")
 
 # ─── Stats ────────────────────────────────────────────────────────────────────
 
@@ -2025,8 +2104,8 @@ async def tts_voices():
     """Retourne la liste curatée des voix Edge TTS disponibles."""
     return {"voices": _TTS_VOICES}
 
-@app.post("/v1/tts", dependencies=[Depends(tts_user)])
-async def text_to_speech(req: TTSRequest):
+@app.post("/v1/tts")
+async def text_to_speech(req: TTSRequest, user: dict = Depends(tts_user)):
     """
     Génère un fichier MP3 à partir du texte via Edge TTS (Microsoft, gratuit).
     Retourne directement les bytes audio avec Content-Type audio/mpeg.
@@ -2064,6 +2143,9 @@ async def text_to_speech(req: TTSRequest):
         logging.error(f"[TTS] ERREUR edge-tts — {err_detail}\n{traceback.format_exc()}")
         raise HTTPException(status_code=502, detail="Synthèse vocale indisponible.")
 
+    meter = UsageMeter()
+    meter.add_tts(len(req.text))
+    _record_usage_later(user["sub"], "tts", meter)
     return Response(
         content=audio_bytes,
         media_type="audio/mpeg",
@@ -2081,15 +2163,17 @@ _STT_LANGS = {"so", "fr", "en", "ar"}
 # Garde-fou taille : les fichiers Groq gratuits sont limités ; on refuse au-delà.
 _STT_MAX_BYTES = 25 * 1024 * 1024   # 25 Mo
 
-def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) -> str:
-    """Appel bloquant à Groq Whisper — exécuté dans un thread par l'endpoint."""
+def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) -> tuple:
+    """Appel bloquant à Groq Whisper — exécuté dans un thread par l'endpoint.
+    Retourne (texte, durée de l'audio en secondes ou None)."""
     key = _load_env_key("GROQ_API_KEY")
     if not key:
         raise HTTPException(
             status_code=503,
             detail="STT indisponible : GROQ_API_KEY absente côté serveur.",
         )
-    data = {"model": GROQ_STT_MODEL, "response_format": "json", "temperature": 0}
+    # verbose_json : donne aussi la durée de l'audio (facturation à la seconde)
+    data = {"model": GROQ_STT_MODEL, "response_format": "verbose_json", "temperature": 0}
     if lang in _STT_LANGS:
         data["language"] = lang
     if lang == "so":
@@ -2130,7 +2214,9 @@ def _groq_transcribe(audio: bytes, filename: str, content_type: str, lang: str) 
     if resp.status_code != 200:
         logging.error(f"[STT] Groq {resp.status_code} — {resp.text[:300]}")
         raise HTTPException(status_code=502, detail="Reconnaissance vocale indisponible.")
-    return (resp.json() or {}).get("text", "").strip()
+    body = resp.json() or {}
+    duration = body.get("duration")
+    return body.get("text", "").strip(), (float(duration) if duration is not None else None)
 
 # Lexique fermé de termes récurrents en somali djiboutien (démarches
 # administratives) que Whisper transcrit régulièrement de travers. On ne
@@ -2191,8 +2277,9 @@ def _correct_with_lexicon(text: str) -> str:
             i += 1
     return " ".join(out)
 
-@app.post("/v1/stt", dependencies=[Depends(tts_user)])
-async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so", max_length=8)):
+@app.post("/v1/stt")
+async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so", max_length=8),
+                         user: dict = Depends(stt_user)):
     """
     Transcrit un fichier audio en texte via Groq Whisper large-v3.
     Champ multipart `file` (audio) + `lang` (code ISO : so, fr, en, ar).
@@ -2206,9 +2293,13 @@ async def speech_to_text(file: UploadFile = File(...), lang: str = Form("so", ma
     if len(audio) > _STT_MAX_BYTES:
         raise HTTPException(status_code=413, detail="fichier audio trop volumineux")
     lang = (lang or "so").lower()
-    text = await asyncio.to_thread(
+    text, duration = await asyncio.to_thread(
         _groq_transcribe, audio, file.filename, file.content_type, lang
     )
+    meter = UsageMeter()
+    # Durée inconnue : estimation d'après la taille (~4 Ko/s pour de l'AAC/m4a 32 kb/s)
+    meter.add_stt(duration if duration is not None else len(audio) / 4000)
+    _record_usage_later(user["sub"], "stt", meter)
     if lang == "so":
         text = _correct_with_lexicon(text)
     return {"text": text}
