@@ -53,8 +53,10 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
 - [ ] Play Console : activer Play App Signing (étape 1)
 
 **Serveur (Render › amiin-api › Environment)**
-- [ ] `ADMIN_EMAILS` = ton adresse e-mail (étape 2). Si le compte existe déjà, il devient admin
-      au redéploiement ; sinon, il le devient dès l'inscription avec cette adresse.
+- [ ] `ADMIN_EMAILS` = ton adresse e-mail (étape 2). Le rôle admin n'est accordé qu'une fois
+      l'adresse vérifiée par le code reçu par e-mail (correctif de la revue de sécurité).
+- [ ] Vérifier dans les journaux de production (`/v1/logs`, champ `claude_cache_read`) si le cache
+      de prompt fonctionne : la simulation indique que non avec Haiku 4.5 (voir revue du 26/11)
 - [ ] Créer un compte Brevo (gratuit, 300 e-mails/jour), valider l'adresse d'expédition,
       créer une clé API, puis renseigner `BREVO_API_KEY` et `SMTP_FROM` (ex. `Amiin <adresse@validée>`) (étape 2)
 - [ ] (Optionnel) `QUOTA_DAILY_USD` : 0.10 par défaut pour les tests, passer à `0.02` plus tard ;
@@ -411,3 +413,81 @@ profil et préférences d'Amiin. En changeant de compte, on voyait donc celles d
   dans la même session, déconnexion à distance), impossibilité de fermer la session d'un autre
   compte, pas de délai de grâce après déconnexion, changement de mot de passe.
 - **72 tests serveur passent**. `flutter analyze` ne trouve aucune erreur ; `flutter test` : 22/22.
+
+---
+
+## 2026-11-26 — Revue de sécurité et campagne de test « 20 comptes »
+
+### Revue de sécurité (toutes les modifications de la branche)
+- Rien n'atteint le seuil de confiance d'une vulnérabilité exploitable :
+  - requêtes SQL toutes paramétrées ;
+  - sessions et quota limités à l'utilisateur connecté ;
+  - JWT HS256 imposé avec `exp` et `sub` obligatoires ;
+  - codes de vérification tirés au hasard cryptographique, hachés en HMAC, séparés par usage,
+    expirant au bout de 30 minutes, limités à 5 essais ;
+  - pas d'énumération des comptes par « mot de passe oublié ».
+- **Corrigé quand même** (faiblesse moyenne) : s'inscrire **en premier** avec une adresse de
+  `ADMIN_EMAILS` donnait le rôle admin sans prouver qu'on possède la boîte mail. Le rôle n'est
+  désormais accordé qu'à la vérification de l'adresse (ou au démarrage, pour une adresse déjà
+  vérifiée). Tests : `test_admin_verifie_et_sans_limite`, `test_admin_non_verifie_jamais_promu`.
+
+### Campagne de test (simulation, sans clé)
+- **Outil** : `tests/simulation/` (README inclus). Il fait tourner le **vrai serveur** avec
+  PostgreSQL et un SMTP local en STARTTLS. Seul Claude est remplacé par un faux serveur qui compte
+  les tokens d'après la taille réelle des requêtes. Qdrant et Jina sont remplacés par une recherche
+  vide. Les clés réelles n'ont pas été fournies : environnement dédié refusé, clé sur
+  l'environnement par défaut refusée.
+- **Paramètres** : 20 comptes joués l'un après l'autre, quota de **0,02 $ (2 centimes) par jour**,
+  français uniquement, sans voix.
+- **Résultat** : **364 vérifications sur 364 réussies**, aucune erreur côté serveur, 22 s au total.
+  - Inscription, e-mail reçu (0,36 s en moyenne, en STARTTLS, code dans l'objet), chat refusé
+    avant vérification, mauvais code refusé, vérification : 20/20.
+  - 80 messages servis, 14 notes créées, 10 démarches suivies, 26 tâches en deux passes.
+  - Blocage par le quota : 20/20. Le chat (normal et streaming) et la dictée renvoient 402, et la
+    jauge affiche 100 %.
+  - L'usage enregistré par Amiin (0,46237 $) correspond à la consommation vue par le faux Claude
+    (0,46225 $) : écart de 0,03 %.
+  - Suppression des 20 comptes : il ne reste aucun compte, aucune session, aucun code. La base de
+    simulation a ensuite été supprimée.
+- **Consommation mesurée (Haiku 4.5)** :
+
+  | Type de message | Coût moyen |
+  |---|---|
+  | salutation | 0,40 centime |
+  | question | 0,44 |
+  | note | 0,47 |
+  | démarche | 0,46 |
+  | lecture des notes (2 passes) | 0,84 |
+  | détail d'une démarche (2 passes) | 0,90 |
+  | **moyenne** | **0,58** |
+
+  → **3 à 5 messages par jour** avec 2 centimes. Le dépassement moyen du quota est de 0,31 centime
+  (0,70 au maximum), c'est-à-dire la dernière réponse.
+- **94 % du coût vient du texte envoyé à Claude** : environ 3 900 tokens par appel (consignes, catalogue
+  des démarches, outils, historique). Les réponses ne pèsent que ~53 tokens.
+  **Le cache de prompt ne se déclenche jamais** : le préfixe commun fait environ 3 000 tokens,
+  alors que Haiku 4.5 ne met rien en cache en dessous de 4 096. À confirmer en production.
+
+### Corrigé grâce à la campagne
+- **Tâche coupée en deux par le quota** : quand le seuil était franchi entre les deux passes d'une
+  tâche (« Quelles sont mes notes ? »), la seconde passe était refusée et l'utilisateur restait sur
+  « Je regarde vos notes. ». La passe de suivi (résultats d'outils) a maintenant une marge de 50 %
+  (`_ensure_chat_quota` dans amiin_api.py). Le contrôle du quota du chat se fait désormais dans
+  l'endpoint, une fois le corps de la requête lu.
+
+### Constats laissés en l'état (décision à prendre)
+- **Suppression de compte : 10 par heure et par IP.** Pendant la campagne, 10 suppressions sur 20
+  ont été refusées (429) parce que tout venait de la même IP. À Djibouti, beaucoup d'abonnés
+  mobiles partagent une IP (CGNAT). La limite pourrait passer à une limite par compte.
+- **`usage_events` est conservé après la suppression d'un compte** (106 lignes). Elles ne
+  contiennent que l'identifiant du compte supprimé et des compteurs, aucun contenu. Il faut choisir
+  entre les garder pour la facturation et les effacer avec le compte.
+
+### Pistes d'économie (par ordre d'impact)
+1. **Haiku 5.5** (0,10 $ / 0,50 $ par million de tokens, cache possible dès 512 tokens) : un message
+   coûterait environ **0,04 centime** au lieu de 0,42, soit à peu près 50 messages pour 2 centimes.
+   Qualité à évaluer, surtout en somali.
+2. Alléger ce qui est envoyé à chaque message, en particulier le catalogue complet des 46 démarches
+   injecté à chaque appel.
+3. Si on reste sur Haiku 4.5, viser un préfixe de plus de 4 096 tokens pour que le cache s'active,
+   ou retirer les `cache_control` inutiles.

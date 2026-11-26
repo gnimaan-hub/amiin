@@ -180,12 +180,21 @@ def test_jauge_et_blocage(db):
     _spend(auth, uid, 0.05)
     state = client.get("/v1/me/usage", headers=h).json()
     assert state["exhausted"] and state["percent"] == 100
-    r = client.post("/v1/chat", json={}, headers=h)
+    r = client.post("/v1/chat", json={"message": "Bonjour"}, headers=h)
     assert r.status_code == 402 and r.headers["x-amiin-error"] == "quota_exceeded"
-    assert client.post("/v1/chat/stream", json={}, headers=h).status_code == 402
+    assert client.post("/v1/chat/stream", json={"message": "Bonjour"}, headers=h).status_code == 402
     assert client.post("/v1/stt", headers=h).status_code == 402
     # Lecture à voix haute : marge de 25 % (0,11 $ < 0,125 $)
     assert client.post("/v1/tts", json={}, headers=h).status_code == 422
+    # Passe de suivi d'une tâche commencée (résultats d'outils) : marge de 50 %
+    suite = {"message": "Quelles sont mes notes ?", "pending_tool_uses": [
+        {"id": "t1", "name": "get_notes", "input": {}}],
+        "tool_results": [{"tool_use_id": "t1", "content": "[]"}]}
+    assert usage.used_today_usd(uid) < 0.15
+    # 0,11 $ < 0,15 $ : la passe de suivi passe (le pipeline, sans modèle ici, échoue ensuite)
+    assert client.post("/v1/chat", json=suite, headers=h).status_code != 402
+    _spend(auth, uid, 0.05)                      # 0,16 $ : au-delà de la marge
+    assert client.post("/v1/chat/stream", json=suite, headers=h).status_code == 402
 
 
 @needs_db
@@ -202,12 +211,15 @@ def test_admin_et_mode_mesure_jamais_bloques(db, monkeypatch):
     _spend(auth, uid, 1.0)
     monkeypatch.setenv("QUOTA_ENFORCE", "0")
     assert client.post("/v1/chat", json={}, headers=h).status_code == 422
+    monkeypatch.setenv("QUOTA_ENFORCE", "1")
+    assert client.post("/v1/chat", json={"message": "Bonjour"}, headers=h).status_code == 402
     monkeypatch.delenv("QUOTA_ENFORCE")
     monkeypatch.setenv("ADMIN_EMAILS", email)
     auth.ensure_auth_schema()
     state = client.get("/v1/me/usage", headers=h).json()
     assert state["unlimited"] and not state["exhausted"]
-    assert client.post("/v1/chat", json={}, headers=h).status_code == 422
+    # Admin : jamais 402 (le pipeline, sans modèle branché ici, répond 500)
+    assert client.post("/v1/chat", json={"message": "Bonjour"}, headers=h).status_code != 402
 
 
 @needs_db

@@ -1318,8 +1318,15 @@ def _check_rate(user_id: str, scope: str, max_calls: int, window_s: int = 60) ->
 def chat_user(user: dict = Depends(get_verified_user)) -> dict:
     if not is_admin(user):
         _check_rate(user["sub"], "chat", max_calls=30)
-    usage_meter.ensure_quota(user)
     return user
+
+
+def _ensure_chat_quota(user: dict, request: "ChatRequest") -> None:
+    """Quota du chat. Une passe de suivi (résultats d'outils renvoyés par
+    l'app) termine une réponse déjà commencée : marge de 50 %, sinon
+    l'utilisateur resterait sur « Je regarde vos notes… » sans réponse
+    quand le seuil est franchi entre deux passes."""
+    usage_meter.ensure_quota(user, grace=0.5 if request.tool_results else 0.0)
 
 def tts_user(user: dict = Depends(get_verified_user)) -> dict:
     if not is_admin(user):
@@ -1427,6 +1434,7 @@ async def health():
 async def chat(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
+    _ensure_chat_quota(user, request)
     meter = UsageMeter()
     try:
         loop = asyncio.get_event_loop()
@@ -1459,6 +1467,7 @@ async def chat(request: ChatRequest, user: dict = Depends(chat_user)):
 async def chat_stream(request: ChatRequest, user: dict = Depends(chat_user)):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Le message ne peut pas être vide.")
+    _ensure_chat_quota(user, request)
     meter = UsageMeter()
 
     async def event_gen():
