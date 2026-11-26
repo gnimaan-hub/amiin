@@ -199,7 +199,7 @@ class RefreshRequest(BaseModel):
 
 # ── Token helpers ──────────────────────────────────────────────────────────────
 
-def _make_access_token(user_id: str, email: str) -> str:
+def _make_access_token(user_id: str, email: str, session_id: Optional[str] = None) -> str:
     now = datetime.now(tz=timezone.utc)
     payload = {
         "sub": user_id,
@@ -207,6 +207,8 @@ def _make_access_token(user_id: str, email: str) -> str:
         "iat": now,
         "exp": now + ACCESS_TTL,
     }
+    if session_id:
+        payload["sid"] = session_id   # session (appareil) d'où vient ce jeton
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
@@ -214,19 +216,49 @@ def _hash_refresh(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def _issue_refresh(user_id: str) -> str:
-    """Génère un refresh token opaque, le stocke hashé, retourne le raw."""
+# ── Sessions (une par appareil connecté) ────────────────────────────────────────
+# Une connexion ouvre une SESSION (family_id). Chaque renouvellement du refresh
+# token crée une nouvelle ligne dans la même session ; la session vit tant
+# qu'elle a un refresh token non révoqué et non expiré. Le JWT porte l'id de
+# session (`sid`) : l'appareil courant est reconnu dans la liste des sessions,
+# et une session fermée depuis un autre appareil perd l'accès en 1 min au plus.
+
+def _device_label(request: Optional[Request]) -> str:
+    """Nom d'appareil envoyé par l'app (en-tête X-Amiin-Device), nettoyé."""
+    raw = request.headers.get("x-amiin-device", "") if request is not None else ""
+    label = "".join(ch for ch in raw if ch.isprintable()).strip()[:60]
+    return label or "Appareil inconnu"
+
+
+def _issue_refresh(user_id: str, session_id: Optional[str] = None,
+                   device: Optional[str] = None,
+                   started_at: Optional[datetime] = None) -> tuple:
+    """Génère un refresh token opaque, le stocke hashé.
+    Retourne (token brut, id de session) ; nouvelle session si session_id est None."""
     raw = secrets.token_urlsafe(48)
     h   = _hash_refresh(raw)
-    exp = datetime.now(tz=timezone.utc) + REFRESH_TTL
+    now = datetime.now(tz=timezone.utc)
+    exp = now + REFRESH_TTL
+    session_id = session_id or str(uuid.uuid4())
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (%s, %s, %s)",
-                (user_id, h, exp),
+                """INSERT INTO refresh_tokens
+                   (user_id, token_hash, expires_at, family_id, device_label, family_started_at)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (user_id, h, exp, session_id, device or "Appareil inconnu", started_at or now),
             )
         conn.commit()
-    return raw
+    return raw, session_id
+
+
+def _new_tokens(user_id: str, email: str, request: Optional[Request] = None,
+                session_id: Optional[str] = None, device: Optional[str] = None,
+                started_at: Optional[datetime] = None) -> "TokenResponse":
+    raw, sid = _issue_refresh(user_id, session_id,
+                              device or _device_label(request), started_at)
+    return TokenResponse(access_token=_make_access_token(user_id, email, sid),
+                         refresh_token=raw)
 
 
 def _verify_access_token(token: str) -> dict:
@@ -273,6 +305,22 @@ def ensure_auth_schema() -> None:
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS revoked_at TIMESTAMPTZ")
+            # Sessions par appareil (voir _issue_refresh). Les tokens d'avant
+            # deviennent chacun leur propre session.
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS family_id TEXT")
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS device_label TEXT")
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS "
+                        "created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS "
+                        "family_started_at TIMESTAMPTZ")
+            # 'rotated' (renouvellement normal) ou 'revoked' (déconnexion,
+            # session fermée) : seul un token tourné bénéficie du délai de grâce.
+            cur.execute("ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS revoked_reason TEXT")
+            cur.execute("UPDATE refresh_tokens SET family_id = id::text, "
+                        "family_started_at = COALESCE(family_started_at, created_at) "
+                        "WHERE family_id IS NULL")
+            cur.execute("CREATE INDEX IF NOT EXISTS refresh_tokens_family "
+                        "ON refresh_tokens (family_id)")
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS password_reset_codes (
                     user_id    TEXT PRIMARY KEY,
@@ -317,10 +365,11 @@ def ensure_auth_schema() -> None:
 
 def _revoke_all(cur, user_id: str) -> None:
     cur.execute(
-        "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW() "
+        "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW(), revoked_reason = 'revoked' "
         "WHERE user_id = %s AND revoked = FALSE",
         (user_id,),
     )
+    _session_cache.clear()
 
 
 # ── Auth dependency ────────────────────────────────────────────────────────────
@@ -337,6 +386,29 @@ _STATUS_FALLBACK = {"is_active": True, "email_verified": True, "role": "user"}
 
 def invalidate_user_status(user_id: str) -> None:
     _status_cache.pop(user_id, None)
+
+
+_session_cache: dict = {}
+
+
+def _session_open(session_id: str) -> bool:
+    """La session a-t-elle encore un refresh token valide ? (cache 60 s ;
+    base injoignable : dernier état connu, sinon on laisse passer)."""
+    now = time.monotonic()
+    hit = _session_cache.get(session_id)
+    if hit and now - hit[0] < _STATUS_TTL_S:
+        return hit[1]
+    try:
+        with _get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM refresh_tokens WHERE family_id = %s "
+                            "AND revoked = FALSE AND expires_at > NOW() LIMIT 1", (session_id,))
+                open_ = cur.fetchone() is not None
+    except Exception:
+        logging.exception("Lecture de la session impossible")
+        return hit[1] if hit else True
+    _session_cache[session_id] = (now, open_)
+    return open_
 
 
 def _user_status(user_id: str) -> Optional[dict]:
@@ -365,6 +437,9 @@ def get_current_user(creds: Optional[HTTPAuthorizationCredentials] = Depends(bea
     st = _user_status(payload["sub"])
     if not st or not st.get("is_active"):
         raise HTTPException(status_code=401, detail="Compte désactivé ou supprimé.")
+    sid = payload.get("sid")
+    if sid and not _session_open(sid):
+        raise HTTPException(status_code=401, detail="Session fermée — reconnectez-vous.")
     user = dict(payload)
     user["role"] = st.get("role") or "user"
     user["email_verified"] = _effective_verified(st)
@@ -415,10 +490,7 @@ def register(body: RegisterRequest, request: Request, background: BackgroundTask
     uid = row["id"]
     if code:
         background.add_task(_send_verification_email, body.email, code)
-    return TokenResponse(
-        access_token=_make_access_token(uid, body.email),
-        refresh_token=_issue_refresh(uid),
-    )
+    return _new_tokens(uid, body.email, request)
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -444,10 +516,7 @@ def login(body: LoginRequest, request: Request):
         raise HTTPException(status_code=403, detail="Compte désactivé.")
 
     uid = row["id"]
-    return TokenResponse(
-        access_token=_make_access_token(uid, body.email),
-        refresh_token=_issue_refresh(uid),
-    )
+    return _new_tokens(uid, body.email, request)
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -460,7 +529,9 @@ def refresh_token(body: RefreshRequest, request: Request):
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                """SELECT rt.id::text, rt.user_id::text, u.email, rt.revoked, rt.revoked_at
+                """SELECT rt.id::text, rt.user_id::text, u.email, rt.revoked, rt.revoked_at,
+                          rt.revoked_reason, rt.family_id, rt.device_label,
+                          rt.family_started_at
                    FROM refresh_tokens rt
                    JOIN users u ON u.id = rt.user_id
                    WHERE rt.token_hash = %s
@@ -477,7 +548,11 @@ def refresh_token(body: RefreshRequest, request: Request):
                 # peut se perdre et l'app rejoue l'ancien token. Au-delà, un
                 # token déjà tourné qui réapparaît signale un vol probable :
                 # on coupe toutes les sessions de l'utilisateur.
+                # Une session fermée volontairement (déconnexion, fermeture
+                # depuis un autre appareil) n'a pas de délai de grâce.
                 revoked_at = row["revoked_at"]
+                if row["revoked_reason"] == "revoked":
+                    raise invalid
                 if revoked_at is None or now - revoked_at > REFRESH_REUSE_GRACE:
                     _revoke_all(cur, row["user_id"])
                     conn.commit()
@@ -485,16 +560,17 @@ def refresh_token(body: RefreshRequest, request: Request):
             else:
                 # Rotation : on révoque l'ancien et on en émet un nouveau
                 cur.execute(
-                    "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW() WHERE id = %s",
+                    "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW(), "
+                    "revoked_reason = 'rotated' WHERE id = %s",
                     (row["id"],),
                 )
         conn.commit()
 
-    uid = row["user_id"]
-    return TokenResponse(
-        access_token=_make_access_token(uid, row["email"]),
-        refresh_token=_issue_refresh(uid),
-    )
+    # Même session ; l'app peut mettre à jour le nom de l'appareil.
+    device = (_device_label(request) if request.headers.get("x-amiin-device")
+              else row["device_label"])
+    return _new_tokens(row["user_id"], row["email"], session_id=row["family_id"],
+                       device=device, started_at=row["family_started_at"])
 
 
 @router.post("/logout", status_code=204)
@@ -504,10 +580,13 @@ def logout(body: RefreshRequest):
     with _get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW() "
-                "WHERE token_hash = %s AND revoked = FALSE",
+                "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW(), "
+                "revoked_reason = 'revoked' WHERE token_hash = %s AND revoked = FALSE "
+                "RETURNING family_id",
                 (h,),
             )
+            for r in cur.fetchall():
+                _session_cache.pop(r["family_id"], None)
         conn.commit()
 
 
@@ -639,10 +718,9 @@ def change_password(body: ChangePasswordRequest, request: Request,
             cur.execute("UPDATE users SET password_hash = %s WHERE id = %s",
                         (hash_password(body.new_password), uid))
             _revoke_all(cur, uid)
-    return TokenResponse(
-        access_token=_make_access_token(uid, row["email"]),
-        refresh_token=_issue_refresh(uid),
-    )
+    # Toutes les autres sessions sont fermées ; celle de cet appareil repart
+    # sous un nouvel identifiant.
+    return _new_tokens(uid, row["email"], request)
 
 
 # ── Mot de passe oublié (code à 6 chiffres par e-mail) ─────────────────────────
@@ -881,3 +959,57 @@ def verify_email(body: VerifyEmailRequest, current_user: dict = Depends(get_curr
     if not row:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
     return _user_response(row)
+
+
+# ── Appareils connectés ────────────────────────────────────────────────────────
+
+class SessionInfo(BaseModel):
+    id: str
+    device: str
+    started_at: str
+    last_active_at: str
+    current: bool
+
+
+@router.get("/sessions", response_model=list)
+def list_sessions(current_user: dict = Depends(get_current_user)):
+    """Sessions ouvertes du compte (une par appareil), la plus récente d'abord."""
+    with _get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT family_id, MAX(device_label) FILTER (WHERE rn = 1) AS device,
+                          MIN(COALESCE(family_started_at, created_at)) AS started_at,
+                          MAX(created_at) AS last_active_at
+                   FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY family_id
+                                                      ORDER BY created_at DESC) AS rn
+                         FROM refresh_tokens
+                         WHERE user_id = %s AND revoked = FALSE AND expires_at > NOW()) t
+                   GROUP BY family_id
+                   ORDER BY MAX(created_at) DESC""",
+                (current_user["sub"],),
+            )
+            rows = cur.fetchall()
+    sid = current_user.get("sid")
+    return [
+        SessionInfo(id=r["family_id"], device=r["device"] or "Appareil inconnu",
+                    started_at=r["started_at"].isoformat(),
+                    last_active_at=r["last_active_at"].isoformat(),
+                    current=r["family_id"] == sid).model_dump()
+        for r in rows
+    ]
+
+
+@router.delete("/sessions/{session_id}", status_code=204)
+def revoke_session(session_id: str, current_user: dict = Depends(get_current_user)):
+    """Ferme la session d'un appareil : il est déconnecté au plus tard en 1 min."""
+    with _get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE refresh_tokens SET revoked = TRUE, revoked_at = NOW(), "
+                "revoked_reason = 'revoked' "
+                "WHERE user_id = %s AND family_id = %s AND revoked = FALSE",
+                (current_user["sub"], session_id),
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Session introuvable.")
+    _session_cache.pop(session_id, None)

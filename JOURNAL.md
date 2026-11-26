@@ -12,8 +12,8 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
      le même téléphone, on voit les discussions, notes, agenda, démarches et profil du compte
      précédent (stockage Hive commun à tous les comptes). Signalé le 2026-11-26. ✅
 3. **Quotas** — coût réel par appel, enveloppe quotidienne, blocage du chat, jauge ✅
-4. Paramètres — brancher ou retirer les réglages sans effet, i18n anglais, sessions par appareil,
-   bouton « Rappels à l'heure exacte » (cf. étape 1, §6)
+4. **Paramètres** — réglages sans effet branchés ou retirés, sessions par appareil ✅
+   (« Rappels à l'heure exacte » : reporté à ta demande ; traduction anglaise : projet à part)
 5. Play Integrity + revue de sécurité, puis paiements
 
 ---
@@ -35,6 +35,12 @@ Feuille de route en cours (priorités avant l'intégration des paiements) :
       conversations, notes, agenda et démarches lui seront rattachés. Ensuite, compte A → déconnexion →
       compte B : B ne voit rien de A ; retour sur A : tout est là. Vérifier aussi les rappels
       d'agenda et le widget après le changement de compte (étape 2b)
+- [ ] Réglages : couper « Rappels agenda » → un rappel programmé ne sonne plus, le rallumer → il
+      revient ; « Mémoire long terme » coupée → Amiin ne cite plus vos actions passées ;
+      « Animations réduites » → plus de glissement entre les écrans (étape 4)
+- [ ] Appareils connectés : se connecter sur deux appareils (ou téléphone + démo web), vérifier la
+      liste dans Réglages › Sécurité, déconnecter l'autre appareil → il revient à l'écran de
+      connexion en une minute au plus (étape 4)
 - [ ] Quota : envoyer quelques messages (écrits et vocaux) et suivre la jauge dans
       Réglages › Compte ; vérifier qu'une fois la limite atteinte la barre de saisie est
       remplacée par le message « Limite d'utilisation du jour atteinte » et que le micro est
@@ -351,3 +357,57 @@ profil et préférences d'Amiin. En changeant de compte, on voyait donc celles d
 - Évaluer Haiku 5.5 (10 fois moins cher que Haiku 4.5), surtout en somali.
 - Côté serveur, plafonner les passes d'outils (aujourd'hui seule l'app limite à 3) : le coût est
   de toute façon compté.
+
+---
+
+## 2026-11-26 — Étape 4 : paramètres et appareils connectés
+
+### Réglages branchés
+- **Notifications › Activer les notifications** et **Rappels agenda** : avant, seuls les rappels
+  de démarches les respectaient. Désormais, couper l'un ou l'autre annule les rappels d'agenda
+  déjà programmés, et le rallumer les reprogramme. Un nouvel événement ne programme rien si
+  c'est coupé (`AgendaService.cancelAllReminders` / `rescheduleAllReminders`).
+- **Comportement d'Amiin › Mémoire long terme** : coupée, Amiin n'enregistre plus vos actions
+  (notes, agenda, démarches) et ne reçoit plus celles déjà mémorisées.
+- **Suggestions automatiques** : coupées, Amiin ne propose plus d'enregistrer une réponse en note.
+- **Texte & accessibilité › Animations** : deux choix (Complètes / Réduites). « Réduites » active
+  `disableAnimations` pour toute l'app : écrans sans glissement, et les animations qui
+  respectent ce réglage s'arrêtent. Le réglage d'accessibilité du téléphone est aussi respecté.
+  L'ancien choix « Désactivées » vaut « Réduites ».
+
+### Réglages retirés (aucune fonctionnalité derrière)
+- Notifications : Conseil du jour, Relance d'actions, Résumé hebdomadaire, Ne pas déranger.
+- Comportement d'Amiin : Résumé quotidien.
+- Langue & région : formats de date et d'heure (l'app est en 24 h, JJ/MM).
+- **Langue de l'interface** : l'anglais est affiché « Bientôt » et l'app reste en français.
+  Traduire toute l'interface est un chantier à part entière (fichiers de traduction, environ
+  20 000 lignes d'écrans à reprendre). La **langue des réponses d'Amiin**, elle, fonctionne
+  déjà (français, anglais, arabe, somali).
+
+### Appareils connectés (sessions par appareil)
+- **Serveur** (`auth.py`) :
+  - chaque connexion ouvre une **session** (`family_id`) qui garde son identité à chaque
+    renouvellement du jeton ;
+  - nouvelles colonnes sur `refresh_tokens` : `family_id`, `device_label`, `created_at`,
+    `family_started_at`, `revoked_reason`. Les jetons existants deviennent chacun une session ;
+  - le JWT porte l'identifiant de session (`sid`) ;
+  - `GET /v1/auth/sessions` liste les sessions ouvertes (appareil, connexion, dernière activité,
+    « cet appareil ») ;
+  - `DELETE /v1/auth/sessions/{id}` ferme la session d'un autre appareil. Il perd l'accès en
+    **une minute au plus**, car `get_current_user` vérifie que la session est encore ouverte
+    (cache de 60 s).
+- **Faille corrigée au passage** : un jeton rejoué dans la minute qui suit une **déconnexion**
+  bénéficiait du délai de grâce prévu pour les renouvellements, ce qui rouvrait la session. Le
+  délai de grâce est maintenant réservé aux jetons simplement renouvelés (`revoked_reason`).
+- **Changement de mot de passe** : les autres appareils sont déconnectés et celui-ci reste connecté.
+- **App** :
+  - l'app envoie le type d'appareil (« Android », « iPhone ou iPad », « Navigateur web »…) dans
+    l'en-tête `X-Amiin-Device` ;
+  - Réglages › Sécurité affiche la liste des appareils ; toucher un autre appareil le déconnecte
+    après confirmation.
+
+### Tests
+- 4 nouveaux tests PostgreSQL : sessions par appareil (liste, appareil courant, renouvellement
+  dans la même session, déconnexion à distance), impossibilité de fermer la session d'un autre
+  compte, pas de délai de grâce après déconnexion, changement de mot de passe.
+- **72 tests serveur passent**. `flutter analyze` ne trouve aucune erreur ; `flutter test` : 22/22.

@@ -179,3 +179,76 @@ def test_suppression_du_compte(env):
     r = client.request("DELETE", "/v1/auth/me", json={"password": "motdepasse123"}, headers=h)
     assert r.status_code == 204
     assert client.get("/v1/auth/me", headers=h).status_code == 401
+
+
+# ── Appareils connectés (sessions) ────────────────────────────────────────────
+
+def _login(client, email, device, password="motdepasse123"):
+    r = client.post("/v1/auth/login", json={"email": email, "password": password},
+                    headers={"X-Amiin-Device": device})
+    assert r.status_code == 200, r.text
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}, r.json()["refresh_token"]
+
+
+def test_sessions_par_appareil(env):
+    auth, client, _ = env
+    email, _, _ = _register(client)
+    h_tel, rt_tel = _login(client, email, "Android 14")
+    h_tab, rt_tab = _login(client, email, "Tablette")
+
+    sessions = client.get("/v1/auth/sessions", headers=h_tel).json()
+    devices = {s["device"]: s for s in sessions}
+    assert {"Android 14", "Tablette"} <= set(devices)
+    assert devices["Android 14"]["current"] and not devices["Tablette"]["current"]
+
+    # Le renouvellement garde la même session (et le même appareil)
+    r = client.post("/v1/auth/refresh", json={"refresh_token": rt_tel})
+    assert r.status_code == 200
+    h_tel = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    again = client.get("/v1/auth/sessions", headers=h_tel).json()
+    assert len(again) == len(sessions)
+    assert next(s for s in again if s["current"])["device"] == "Android 14"
+
+    # Fermer la tablette depuis le téléphone
+    tab_id = devices["Tablette"]["id"]
+    assert client.delete(f"/v1/auth/sessions/{tab_id}", headers=h_tel).status_code == 204
+    auth._session_cache.clear()                  # en production : au plus 60 s
+    assert client.get("/v1/auth/me", headers=h_tab).status_code == 401
+    # …et pas de délai de grâce pour un token révoqué volontairement
+    assert client.post("/v1/auth/refresh", json={"refresh_token": rt_tab}).status_code == 401
+    assert client.get("/v1/auth/me", headers=h_tel).status_code == 200
+    assert client.delete(f"/v1/auth/sessions/{tab_id}", headers=h_tel).status_code == 404
+
+
+def test_session_d_un_autre_compte_intouchable(env):
+    _, client, _ = env
+    a, _, _ = _register(client)
+    b, _, _ = _register(client)
+    h_a, _ = _login(client, a, "A")
+    h_b, _ = _login(client, b, "B")
+    sid_b = client.get("/v1/auth/sessions", headers=h_b).json()[0]["id"]
+    assert client.delete(f"/v1/auth/sessions/{sid_b}", headers=h_a).status_code == 404
+
+
+def test_deconnexion_sans_delai_de_grace(env):
+    _, client, _ = env
+    email, _, _ = _register(client)
+    _, rt = _login(client, email, "Android")
+    assert client.post("/v1/auth/logout", json={"refresh_token": rt}).status_code == 204
+    # Avant : un token rejoué dans la minute ressuscitait la session
+    assert client.post("/v1/auth/refresh", json={"refresh_token": rt}).status_code == 401
+
+
+def test_changement_de_mot_de_passe_ferme_les_autres_appareils(env):
+    auth, client, _ = env
+    email, _, _ = _register(client)
+    h_tel, _ = _login(client, email, "Telephone")
+    h_pc, _ = _login(client, email, "Web")
+    r = client.post("/v1/auth/change-password", headers=h_tel,
+                    json={"current_password": "motdepasse123", "new_password": "nouveau-mdp-456"})
+    assert r.status_code == 200
+    auth._session_cache.clear()
+    h_new = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    assert client.get("/v1/auth/me", headers=h_pc).status_code == 401
+    sessions = client.get("/v1/auth/sessions", headers=h_new).json()
+    assert len(sessions) == 1 and sessions[0]["current"]

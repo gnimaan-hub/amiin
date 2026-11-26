@@ -44,6 +44,23 @@ class AuthUser {
   bool get isAdmin => role == 'admin';
 }
 
+/// Session ouverte sur un appareil (Réglages › Sécurité).
+class DeviceSession {
+  final String id;
+  final String device;
+  final DateTime startedAt;
+  final DateTime lastActiveAt;
+  /// Session de cet appareil-ci.
+  final bool current;
+  const DeviceSession({
+    required this.id,
+    required this.device,
+    required this.startedAt,
+    required this.lastActiveAt,
+    required this.current,
+  });
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 class AuthService extends ChangeNotifier {
@@ -60,8 +77,22 @@ class AuthService extends ChangeNotifier {
     baseUrl: _kBaseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 30),
-    headers: {'Content-Type': 'application/json'},
+    // X-Amiin-Device : nom affiché dans Réglages › Sécurité › Appareils
+    // connectés (ASCII uniquement : contrainte des en-têtes HTTP).
+    headers: {'Content-Type': 'application/json', 'X-Amiin-Device': _deviceLabel()},
   ));
+
+  static String _deviceLabel() {
+    if (kIsWeb) return 'Navigateur web';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android: return 'Android';
+      case TargetPlatform.iOS:     return 'iPhone ou iPad';
+      case TargetPlatform.macOS:   return 'Mac';
+      case TargetPlatform.windows: return 'Windows';
+      case TargetPlatform.linux:   return 'Linux';
+      default:                     return 'Appareil';
+    }
+  }
 
   AuthUser? _user;
   bool _initialized = false;
@@ -265,6 +296,26 @@ class AuthService extends ChangeNotifier {
   /// Redemande un code de vérification (le serveur limite à 1/min, 5/h).
   Future<void> resendVerificationCode() async {
     await _authDio.post('/auth/verify-email/send', options: await _authed());
+  }
+
+  /// Appareils connectés au compte (une session par appareil).
+  Future<List<DeviceSession>> listSessions() async {
+    final resp = await _authDio.get('/auth/sessions', options: await _authed());
+    return [
+      for (final s in (resp.data as List).cast<Map<String, dynamic>>())
+        DeviceSession(
+          id: s['id'] as String,
+          device: s['device'] as String,
+          startedAt: DateTime.parse(s['started_at'] as String).toLocal(),
+          lastActiveAt: DateTime.parse(s['last_active_at'] as String).toLocal(),
+          current: s['current'] == true,
+        ),
+    ];
+  }
+
+  /// Déconnecte un autre appareil (effectif en une minute au plus).
+  Future<void> revokeSession(String id) async {
+    await _authDio.delete('/auth/sessions/$id', options: await _authed());
   }
 
   /// Demande l'envoi d'un code à 6 chiffres par e-mail (réponse identique que
